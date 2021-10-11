@@ -48,6 +48,7 @@ void setup_screen(void) {
     noecho();
     raw();
     keypad(stdscr, TRUE);
+    mousemask(ALL_MOUSE_EVENTS, NULL);
     refresh();
     setup_gui();
 }

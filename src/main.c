@@ -11,6 +11,7 @@
 int is_player(struct monster *);
 int move_mon(struct monster *, int, int);
 void handle_exit(void);
+void handle_mouse(void);
 void handle_keys(int);
 
 int is_player(struct monster* mon) {
@@ -30,6 +31,24 @@ void handle_exit(void) {
     printf("Save complete.\n");
     printf("Connection severed.\n");
     return;
+}
+
+/* handle mouse inputs */
+void handle_mouse() {
+    int x, y;
+    MEVENT event;
+
+    if (getmouse(&event) != OK)
+        return;
+    
+    x = event.x;
+    y = event.y;
+    
+    if (event.bstate & BUTTON1_CLICKED) {
+        if (y >= MSG_Y && x <= MSG_W) {
+            full_msg_window();
+        }
+    }
 }
 
 /* Handle key inputs. */
@@ -69,6 +88,9 @@ void handle_keys(int keycode) {
         case 'p':
             full_msg_window();
             break;
+        case KEY_MOUSE:
+            handle_mouse();
+            break;
         default:
             break;
     }
@@ -96,22 +118,6 @@ int main(void) {
 
     // Exit handling
     atexit(handle_exit);
-
-    /* TODO: While we eventually need to perform a temporary locale switch in order to
-       support ascii characters beyond 128, doing so will take some setup. We will
-       need to save the current locale so that when the program exits, the old locale
-       can be reset.
-       This code is sourced from gnu.org */
-    /*
-    old_locale = setlocale (LC_ALL, NULL);
-    saved_locale = strdup (old_locale);
-    if (saved_locale == NULL)
-        exit(1);
-    setlocale(LC_ALL, "");
-
-    setlocale (LC_ALL, saved_locale);
-    free (saved_locale);
-    */
 
     // Set up the screen
     setup_screen();
