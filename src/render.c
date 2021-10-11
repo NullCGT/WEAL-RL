@@ -3,8 +3,6 @@
 #include "register.h"
 #include "windows.h"
 
-extern struct global g;
-
 /* Render the map, tile by tile.
    Loops over the entirety of the map, and works in O(n) time. */
 void render_map(void) {
@@ -13,6 +11,7 @@ void render_map(void) {
             map_putch(j, i, g.levmap[i][j].chr);    
         }
     }
+    f.update_map = 0;
     return;
 }
 

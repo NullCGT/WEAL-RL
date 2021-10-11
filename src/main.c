@@ -1,14 +1,12 @@
-#include <stdbool.h>
 #include <curses.h>
-#include <menu.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #include "windows.h"
 #include "register.h"
 #include "render.h"
 #include "mapgen.h"
-
-extern struct global g;
+#include "message.h"
 
 int is_player(struct monster *);
 int move_mon(struct monster *, int, int);
@@ -23,6 +21,11 @@ int is_player(struct monster* mon) {
    saves the program state. */
 void handle_exit(void) {
     cleanup_screen();
+    free_message_list(g.msg_list);
+    if (g.saved_locale != NULL) {
+        setlocale (LC_ALL, g.saved_locale);
+        free(g.saved_locale);
+    }
     printf("Saving state...\n");
     printf("Save complete.\n");
     printf("Connection severed.\n");
@@ -63,6 +66,9 @@ void handle_keys(int keycode) {
         case 'b':
             move_mon(&g.player, -1, 1);
             break;
+        case 'p':
+            full_msg_window();
+            break;
         default:
             break;
     }
@@ -76,16 +82,16 @@ int move_mon(struct monster* mon, int x, int y) {
         || nx < 0 || ny < 0|| nx >= MAP_WIDTH || ny >= MAP_WIDTH) {
 	    return 1;
     }
+    g.turns++;
     mon->x = nx;
     mon->y = ny;
+    logma(COLOR_PAIR(YELLOW), "Moved to (%d, %d)", nx, ny);
     return 0;
 }
-
 
 /* Main function. */
 int main(void) {
     int c;
-    WINDOW *main_win;
     WINDOW *sidebar;
 
     // Exit handling
@@ -94,7 +100,8 @@ int main(void) {
     /* TODO: While we eventually need to perform a temporary locale switch in order to
        support ascii characters beyond 128, doing so will take some setup. We will
        need to save the current locale so that when the program exits, the old locale
-       can be reset. */
+       can be reset.
+       This code is sourced from gnu.org */
     /*
     old_locale = setlocale (LC_ALL, NULL);
     saved_locale = strdup (old_locale);
@@ -107,16 +114,16 @@ int main(void) {
     */
 
     // Set up the screen
-    main_win = setup_screen();
-    g.map_win = create_win(MAP_HEIGHT, MAP_WIDTH, 1, 1);
+    setup_screen();
     sidebar = create_win(SB_H, SB_W, 0, MAP_WIDTH + 2);
     box(g.map_win, 0, 0);
     box(sidebar, 0, 0);
     mvwprintw(sidebar, 1, 1, "PLNAME");
+    logma(COLOR_PAIR(GREEN), "Hello, %d. Welcome to the game.", 626);
     wrefresh(sidebar);
+    wrefresh(g.msg_win);
 
     make_level();
-    render_map();
 
     // Create the player
     g.player.x = 20;
@@ -127,15 +134,25 @@ int main(void) {
     // Do things
     c = 'M';
     do {
-        // Clear all monsters from the screen
         clear_monsters();
         handle_keys(c);
         render_all_monsters();
+        /* Conditionally update screen elements */
+        if (f.update_msg) {
+            draw_msg_window(g.msg_win);
+        }
+        if (f.update_map) {
+            render_map();
+        }
+        if (f.update_sidebar) {
+            mvwprintw(sidebar, 2, 1, "T%d", g.turns);
+            wrefresh(sidebar);
+        }
+        /* move cursor to player */
         wmove(g.map_win, g.player.y, g.player.x);
         wrefresh(g.map_win);
     } while ((c = getch()));
 
-    cleanup_win(main_win);
     cleanup_win(g.map_win);
     cleanup_win(sidebar);
     return 0;

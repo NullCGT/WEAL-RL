@@ -47,8 +47,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 #####################Recipes#####################
 
 # binary (default)
-binary: obj/main.o obj/mapgen.o obj/register.o obj/render.o obj/windows.o
-	$(CC) -o $(BINARY) obj/main.o obj/mapgen.o obj/register.o obj/render.o obj/windows.o $(XTRALIBS) $(CFLAGS)
+binary: obj/main.o obj/mapgen.o obj/message.o obj/register.o obj/render.o obj/windows.o
+	$(CC) -o $(BINARY) obj/main.o obj/mapgen.o obj/message.o obj/register.o obj/render.o obj/windows.o $(XTRALIBS) $(CFLAGS)
 
 
 # clean
