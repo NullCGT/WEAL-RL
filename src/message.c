@@ -33,6 +33,8 @@ int draw_msg_window(WINDOW *win) {
 
     werase(win);
     box(win, 0, 0);
+    /* TODO: Include our own version of the curses header. There are issues with getmaxyx in
+       pdcurses when using the default curses.h header in linux. */
     getmaxyx(win, h, w);
     cur_msg = g.msg_list;
     while (cur_msg != NULL) {
@@ -51,7 +53,7 @@ int draw_msg_window(WINDOW *win) {
         }
         wattron(win, cur_msg->attr);
         ret = mvwprintw(win, 1 + i, 1, cur_msg->msg);
-        wattroff(win, cur_msg->msg);
+        wattroff(win, cur_msg->attr);
         prev_msg = cur_msg;
         cur_msg = cur_msg->next;
         i++;
