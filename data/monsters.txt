@@ -1,0 +1,20 @@
+# This file defines the monsters in the game.
+
+# Limitations:
+# 1) Lines must be less than 256 characters in length.
+# 2) Lines must not contain the ':' character.
+
+{
+NAME:ketchucorgi
+STRENGTH:10
+SPEED:10
+SMART:1
+TOUGH:5
+DEFEN:1
+TYPE:plant,animal
+EVOLVE_AT:10
+EVOLVE_TO:tomaterrier
+DESCRIPTION:This adorable dog has bright red fur, a rotund body, and stubby legs. Upon seeing you, it barks happily.
+JOIN_MSG:The ketchucorgi barks happily. It's totally impressed by you!,
+MOVES:bork, wag
+}

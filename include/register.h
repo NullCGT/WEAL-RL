@@ -10,13 +10,41 @@
 #define MSG_H 6
 #define MSG_Y MAP_HEIGHT + 2
 
-struct monster {
+struct action {
+    char *name;
+    char *desc;
+    void *func;
+    struct action *next;
+};
+
+struct npc {
     char name[20];
     int chr;
     int x;
     int y;
-    struct monster *next;
-} monster;
+    struct action *actions;
+    struct npc *next;
+} npc;
+
+struct monstat {
+    int id;
+    const char *name;
+    const char *description;
+    const char *join;
+    int strength;
+    int speed;
+    int smart;
+    int tough;
+    int defense;
+    int evolve_to;
+} monstat;
+
+struct monster {
+    int level;
+    int cur_hp;
+    int max_hp;
+    struct monstat *monstat;
+};
 
 struct tile {
     int chr;
@@ -32,7 +60,7 @@ struct msg {
 
 typedef struct global {
     struct tile levmap[MAP_WIDTH][MAP_HEIGHT];
-    struct monster player;
+    struct npc player;
     struct msg *msg_list;
     int turns;
     char *saved_locale;
@@ -43,9 +71,9 @@ typedef struct global {
 typedef struct bitflags {
     unsigned int update_msg : 1;
     unsigned int update_map : 1;
-    unsigned int update_sidebar : 1;
-    /* 5 free bits */
+    /* 6 free bits */
 } bitflags;
 
 extern struct global g;
 extern struct bitflags f;
+extern struct monstat monstats[];

@@ -15,8 +15,8 @@ void render_map(void) {
     return;
 }
 
-void render_all_monsters(void) {
-    struct monster *cur = &g.player;
+void render_all_npcs(void) {
+    struct npc *cur = &g.player;
     while (cur != NULL) {
         map_putch(cur->y, cur->x, cur->chr);
         cur = cur->next;
@@ -24,8 +24,8 @@ void render_all_monsters(void) {
     return;
 }
 
-void clear_monsters(void) {
-    struct monster *cur = &g.player;
+void clear_npcs(void) {
+    struct npc *cur = &g.player;
     while (cur != NULL) {
         map_putch(cur->y, cur->x, g.levmap[cur->x][cur->y].chr);
         cur = cur->next;

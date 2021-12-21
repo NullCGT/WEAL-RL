@@ -35,7 +35,7 @@ ifeq ($(PORT),pdcurses)
     LDFLAGS:= -lpdcurses
     XTRALIBS:=lib/pdcurses.a
 else
-    CFLAGS:= -Wall -lncursesw -D_XOPEN_SOURCE_EXTENDED
+    CFLAGS:= -Wall -lmenu -lncurses -D_XOPEN_SOURCE_EXTENDED
     XTRALIBS:=
 endif
 
@@ -47,8 +47,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 #####################Recipes#####################
 
 # binary (default)
-binary: obj/main.o obj/mapgen.o obj/message.o obj/register.o obj/render.o obj/windows.o
-	$(CC) -o $(BINARY) obj/main.o obj/mapgen.o obj/message.o obj/register.o obj/render.o obj/windows.o $(XTRALIBS) $(CFLAGS)
+binary: obj/main.o obj/mapgen.o obj/message.o obj/register.o obj/monster.o obj/render.o obj/windows.o
+	$(CC) -o $(BINARY) obj/main.o obj/mapgen.o obj/message.o obj/monster.o obj/register.o obj/render.o obj/windows.o $(XTRALIBS) $(CFLAGS)
 
 
 # clean

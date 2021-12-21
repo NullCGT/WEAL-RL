@@ -4,8 +4,13 @@ void cleanup_screen(void);
 /* Window-related functions */
 WINDOW* create_win(int, int, int, int);
 void cleanup_win(WINDOW *);
+void create_popup_win(const char *, const char *);
 /* Output-related functions */
 int map_putch(int, int, int);
+
+#if 0
+int create_menu(struct action *, char *);
+#endif
 
 /* COLOR DEFINITIONS */
 #define BLACK 0

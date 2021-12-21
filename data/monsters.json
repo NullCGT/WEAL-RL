@@ -1,0 +1,25 @@
+{
+    "ketchucorgi": {
+        "name": "ketchucorgi",
+        "evolve_at": 10,
+        "evolve_into": "tomaterrier",
+        "description": "This adorable dog has bright red fur, a rotund body, and stubby legs. Upon seeing you, it barks happily.",
+        "join_msg": "The ketchucorgi barks happily. It's totally impressed by you!'",
+        "moves": {
+            "bork": 1,
+            "wag": 1
+        }
+    },
+    "tomaterrier": {
+        "name": "tomaterrier"
+    },
+    "salsaluki": {
+
+    },
+    "clockatrice": {
+
+    },
+    "glockatrice": {
+        
+    }
+}

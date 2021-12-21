@@ -2,19 +2,20 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#include "windows.h"
 #include "register.h"
+#include "windows.h"
 #include "render.h"
 #include "mapgen.h"
 #include "message.h"
+#include "monster.h"
 
-int is_player(struct monster *);
-int move_mon(struct monster *, int, int);
+int is_player(struct npc *);
+int move_mon(struct npc *, int, int);
 void handle_exit(void);
 void handle_mouse(void);
 void handle_keys(int);
 
-int is_player(struct monster* mon) {
+int is_player(struct npc* mon) {
     return (mon == &g.player);
 }
 
@@ -91,13 +92,16 @@ void handle_keys(int keycode) {
         case KEY_MOUSE:
             handle_mouse();
             break;
+        case 'w':
+            do_wild_encounter();
+            break;
         default:
             break;
     }
     return;
 }
 
-int move_mon(struct monster* mon, int x, int y) {
+int move_mon(struct npc* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
     if (g.levmap[nx][ny].blocked
@@ -107,42 +111,44 @@ int move_mon(struct monster* mon, int x, int y) {
     g.turns++;
     mon->x = nx;
     mon->y = ny;
-    logma(COLOR_PAIR(YELLOW), "Moved to (%d, %d)", nx, ny);
+    /* logma(COLOR_PAIR(YELLOW), "Moved to (%d, %d)", nx, ny); */
     return 0;
 }
 
 /* Main function. */
 int main(void) {
     int c;
-    WINDOW *sidebar;
 
     // Exit handling
     atexit(handle_exit);
 
     // Set up the screen
     setup_screen();
-    sidebar = create_win(SB_H, SB_W, 0, MAP_WIDTH + 2);
     box(g.map_win, 0, 0);
-    box(sidebar, 0, 0);
-    mvwprintw(sidebar, 1, 1, "PLNAME");
     logma(COLOR_PAIR(GREEN), "Hello, %d. Welcome to the game.", 626);
-    wrefresh(sidebar);
     wrefresh(g.msg_win);
 
     make_level();
+
+    struct action *test_action = malloc(sizeof(struct action));
+    test_action->desc = "description";
+    test_action->name = "test action";
+    test_action->func = NULL;
+    test_action->next = NULL;
 
     // Create the player
     g.player.x = 20;
     g.player.y = 20;
     g.player.chr = '@';
+    g.player.actions = test_action;
     g.player.next = NULL;
     
     // Do things
     c = 'M';
     do {
-        clear_monsters();
+        clear_npcs();
         handle_keys(c);
-        render_all_monsters();
+        render_all_npcs();
         /* Conditionally update screen elements */
         if (f.update_msg) {
             draw_msg_window(g.msg_win);
@@ -150,16 +156,11 @@ int main(void) {
         if (f.update_map) {
             render_map();
         }
-        if (f.update_sidebar) {
-            mvwprintw(sidebar, 2, 1, "T%d", g.turns);
-            wrefresh(sidebar);
-        }
         /* move cursor to player */
         wmove(g.map_win, g.player.y, g.player.x);
         wrefresh(g.map_win);
     } while ((c = getch()));
 
     cleanup_win(g.map_win);
-    cleanup_win(sidebar);
     return 0;
 }
