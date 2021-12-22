@@ -60,30 +60,38 @@ void handle_keys(int keycode) {
             break;
         case 'h':
         case KEY_LEFT:
+        case '4':
             move_mon(&g.player, -1, 0);
             break;
         case 'j':
         case KEY_DOWN:
+        case '2':
             move_mon(&g.player, 0, 1);
             break;
         case 'k':
         case KEY_UP:
+        case '8':
             move_mon(&g.player, 0, -1);
             break;
         case 'l':
         case KEY_RIGHT:
+        case '6':
             move_mon(&g.player, 1, 0);
             break;
         case 'y':
+        case '7':
             move_mon(&g.player, -1, -1);
             break;
         case 'u':
+        case '9':
             move_mon(&g.player, 1, -1);
             break;
         case 'n':
+        case '3':
             move_mon(&g.player, 1, 1);
             break;
         case 'b':
+        case '1':
             move_mon(&g.player, -1, 1);
             break;
         case 'p':
@@ -111,7 +119,7 @@ int move_mon(struct npc* mon, int x, int y) {
     g.turns++;
     mon->x = nx;
     mon->y = ny;
-    /* logma(COLOR_PAIR(YELLOW), "Moved to (%d, %d)", nx, ny); */
+    /* logma(COLOR_PAIR(MAGENTA), "Moved to (%d, %d)", nx, ny); */
     return 0;
 }
 
@@ -148,7 +156,6 @@ int main(void) {
     do {
         clear_npcs();
         handle_keys(c);
-        render_all_npcs();
         /* Conditionally update screen elements */
         if (f.update_msg) {
             draw_msg_window(g.msg_win);
@@ -156,6 +163,7 @@ int main(void) {
         if (f.update_map) {
             render_map();
         }
+        render_all_npcs();
         /* move cursor to player */
         wmove(g.map_win, g.player.y, g.player.x);
         wrefresh(g.map_win);

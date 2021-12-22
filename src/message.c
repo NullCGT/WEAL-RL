@@ -87,6 +87,7 @@ int log_string(const char *format, int attr, va_list arg) {
     return 0;
 }
 
+/* Output a message to the message log. */
 int logm(const char *format, ...) {
     int ret;
     va_list arg;
@@ -97,6 +98,8 @@ int logm(const char *format, ...) {
     return ret;
 }
 
+/* Output a message to the message log with special
+   attributes, such as color or underlining. */
 int logma(int attr, const char *format, ...) {
     int ret;
     va_list arg;
