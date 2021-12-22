@@ -1,11 +1,11 @@
 #include <curses.h>
-/* #include <menu.h> */
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
 
 #include "register.h"
 #include "windows.h"
+#include "render.h"
 #include "message.h"
 
 void setup_gui(void);
@@ -103,13 +103,6 @@ void create_popup_win(const char *title, const char *msg) {
     cleanup_win(new_win);
     f.update_map = 1;
     return;
-}
-
-/* OUTPUT FUNCTIONS */
-
-/* Outputs a character to the map window. Wrapper for mvwaddch(). */
-int map_putch(int y, int x, int chr) {
-    return mvwaddch(g.map_win, y, x, chr); 
 }
 
 #if 0

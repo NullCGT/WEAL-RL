@@ -10,16 +10,18 @@ PORT:=${WEAL_PORT}
 
 # Source files
 SRCDIR:=src
+SRCS:=$(wildcard $(SRCDIR)/*.c)
 
 # Headers
 INCDIR:=include
+DEPS:=$(wildcard $(INCIDR)/*.h)
 
 # Objects
 OBJDIR:=obj
+OBJS:=$(patsubst %.c,%.o,$(patsubst $(SRCDIR)%,$(OBJDIR)%,$(SRCS)))
 
 # Libs and Dependencies
 LIBDIR:=lib
-DEPS:=$(INCDIR)
 
 # Compiler
 CC:=gcc
@@ -31,25 +33,24 @@ BINARY:=weal
 
 # Compile Flags
 ifeq ($(PORT),pdcurses)
-    CFLAGS:= -Wall -lSDL2
+    CFLAGS:= -Wall -lSDL2 -lm -I$(INCDIR)
     LDFLAGS:= -lpdcurses
     XTRALIBS:=lib/pdcurses.a
 else
-    CFLAGS:= -Wall -lmenu -lncurses -D_XOPEN_SOURCE_EXTENDED
+    CFLAGS:= -Wall -lm -lncurses -D_XOPEN_SOURCE_EXTENDED -I$(INCDIR)
     XTRALIBS:=
 endif
 
 #####################Files#######################
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) -c -o $@ $< $(CFLAGS) -I $(INCDIR)
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPS) | objects
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 #####################Recipes#####################
 
 # binary (default)
-binary: obj/main.o obj/mapgen.o obj/message.o obj/register.o obj/monster.o obj/render.o obj/windows.o
-	$(CC) -o $(BINARY) obj/main.o obj/mapgen.o obj/message.o obj/monster.o obj/register.o obj/render.o obj/windows.o $(XTRALIBS) $(CFLAGS)
-
+binary: $(OBJS)
+	$(CC) -o $(BINARY) $(OBJS) $(XTRALIBS) $(CFLAGS)
 
 # clean
 clean:
@@ -58,6 +59,10 @@ clean:
 
 # all
 all: clean binary
+
+# obj
+objects:
+	mkdir -p $(OBJDIR)
 
 # phony
 .PHONY: clean all

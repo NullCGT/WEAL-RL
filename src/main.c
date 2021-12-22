@@ -4,9 +4,9 @@
 
 #include "register.h"
 #include "windows.h"
+#include "message.h"
 #include "render.h"
 #include "mapgen.h"
-#include "message.h"
 #include "monster.h"
 
 int is_player(struct npc *);

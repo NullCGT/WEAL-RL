@@ -1,8 +1,9 @@
 #include <curses.h>
 #include <stdlib.h>
 
-#include "windows.h"
 #include "register.h"
+#include "windows.h"
+#include "message.h"
 
 void free_msg(struct msg *);
 int log_string(const char *, int, va_list);
@@ -70,7 +71,7 @@ int log_string(const char *format, int attr, va_list arg) {
     vsprintf(msgbuf, format, arg);
     msgbuf[127] = '\0';
 
-    struct msg *new_msg = malloc(sizeof(msg));
+    struct msg *new_msg = malloc(sizeof(struct msg));
     new_msg->msg = msgbuf;
     new_msg->turn = 0;
     new_msg->attr = attr;

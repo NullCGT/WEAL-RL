@@ -1,4 +1,8 @@
+#ifndef REGISTER_H
+#define REGISTER_H
+
 #include <curses.h>
+#include "color.h"
 
 #define MAP_WIDTH 80
 #define MAP_HEIGHT 30
@@ -24,7 +28,7 @@ struct npc {
     int y;
     struct action *actions;
     struct npc *next;
-} npc;
+};
 
 struct monstat {
     int id;
@@ -37,7 +41,7 @@ struct monstat {
     int tough;
     int defense;
     int evolve_to;
-} monstat;
+};
 
 struct monster {
     int level;
@@ -49,14 +53,7 @@ struct monster {
 struct tile {
     int chr;
     int blocked;
-} tile;
-
-struct msg {
-    char *msg;
-    int turn;
-    int attr;
-    struct msg *next;
-} msg;
+};
 
 typedef struct global {
     struct tile levmap[MAP_WIDTH][MAP_HEIGHT];
@@ -77,3 +74,5 @@ typedef struct bitflags {
 extern struct global g;
 extern struct bitflags f;
 extern struct monstat monstats[];
+
+#endif
