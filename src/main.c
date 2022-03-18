@@ -113,12 +113,17 @@ int move_mon(struct npc* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
     if (g.levmap[nx][ny].blocked
-        || nx < 0 || ny < 0|| nx >= MAP_WIDTH || ny >= MAP_WIDTH) {
+        || nx < 0 || ny < 0|| nx >= MAP_W || ny >= MAP_W) {
 	    return 1;
     }
     g.turns++;
     mon->x = nx;
     mon->y = ny;
+    /* For testing energy */ 
+    mon->energy -= 1;
+    if (mon->energy < 0) {
+        mon->energy = mon->emax;
+    }
     /* logma(COLOR_PAIR(MAGENTA), "Moved to (%d, %d)", nx, ny); */
     return 0;
 }
@@ -132,8 +137,7 @@ int main(void) {
 
     // Set up the screen
     setup_screen();
-    box(g.map_win, 0, 0);
-    logma(COLOR_PAIR(GREEN), "Hello, %d. Welcome to the game.", 626);
+    logma(COLOR_PAIR(GREEN), "Hello, player. Welcome to the game.");
     wrefresh(g.msg_win);
 
     make_level();
@@ -148,8 +152,11 @@ int main(void) {
     g.player.x = 20;
     g.player.y = 20;
     g.player.chr = '@';
+    g.player.energy = 10;
+    g.player.emax = 100;
     g.player.actions = test_action;
     g.player.next = NULL;
+    g.player.playable = 0;
     
     // Do things
     c = 'M';
@@ -164,6 +171,7 @@ int main(void) {
             render_map();
         }
         render_all_npcs();
+        display_energy_win();
         /* move cursor to player */
         wmove(g.map_win, g.player.y, g.player.x);
         wrefresh(g.map_win);

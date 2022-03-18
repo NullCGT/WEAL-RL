@@ -4,15 +4,19 @@
 #include <curses.h>
 #include "color.h"
 
-#define MAP_WIDTH 80
-#define MAP_HEIGHT 30
+#define MAP_W 80
+#define MSG_W MAP_W
+#define SB_W 30
 
-#define SB_W 20
-#define SB_H 32
-
-#define MSG_W MAP_WIDTH + 2
+#define MAP_H 30
 #define MSG_H 6
-#define MSG_Y MAP_HEIGHT + 2
+#define SB_H MAP_H + MSG_H
+
+#define MAP_Y MSG_H
+#define MSG_Y 0
+#define SB_Y 0
+
+#define SB_X MAP_W
 
 struct action {
     char *name;
@@ -26,8 +30,13 @@ struct npc {
     int chr;
     int x;
     int y;
+    int energy;
+    int emax;
     struct action *actions;
     struct npc *next;
+    /* bitfields */
+    unsigned int playable : 1;
+    /* 7 free bits */
 };
 
 struct monstat {
@@ -56,8 +65,8 @@ struct tile {
 };
 
 typedef struct global {
-    struct tile levmap[MAP_WIDTH][MAP_HEIGHT];
-    struct npc player;
+    struct tile levmap[MAP_W][MAP_H];
+    struct npc player; /* Assume player is first NPC */
     struct msg *msg_list;
     int turns;
     char *saved_locale;

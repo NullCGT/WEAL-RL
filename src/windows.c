@@ -16,7 +16,7 @@ void setup_colors(void);
 
 /* Perform the first-time setup for the game's GUI. */
 void setup_gui(void) {
-    g.map_win = create_win(MAP_HEIGHT, MAP_WIDTH, 1, 1);
+    g.map_win = create_win(MAP_H, MAP_W, MAP_Y, 0);
     g.msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
     draw_msg_window(g.msg_win);
     wrefresh(g.map_win);
@@ -88,8 +88,8 @@ void cleanup_win(WINDOW *win) {
 
 void create_popup_win(const char *title, const char *msg) {
     WINDOW* new_win;
-    int w = MAP_WIDTH / 2;
-    int h = MAP_HEIGHT / 2;
+    int w = MAP_W / 2;
+    int h = MAP_H / 2;
     
     new_win = newwin(h, w, h /2, w / 2);
     box(new_win, 0, 0);
@@ -102,99 +102,23 @@ void create_popup_win(const char *title, const char *msg) {
     while (getch() != 'x');
     cleanup_win(new_win);
     f.update_map = 1;
+    f.update_msg = 1;
     return;
 }
 
-#if 0
-int create_menu(struct action *actions, char *title)
-{	ITEM **my_items;
-	int c;				
-	MENU *my_menu;
-    WINDOW *my_menu_win;
-    int n_choices, i;
-    struct action *cur_action = actions;
+void display_energy_win(void) {
+    WINDOW* new_win;
+    char buf[128];
+    struct npc *cur_npc = &g.player;
 
-
-    /* ITEM CREATION */
-    while (cur_action != NULL) {
-        n_choices++;
-        cur_action = cur_action->next;
+    new_win = newwin(SB_H, SB_W, SB_Y, SB_X);
+    box(new_win, 0, 0);
+    
+    while(cur_npc != NULL) {
+        sprintf(buf, "%c %d/%d", cur_npc->chr, cur_npc->energy, cur_npc->emax);
+        mvwprintw(new_win, 1, 1, buf);
+        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 2, SB_W - 2, '#', '_');
+        cur_npc = cur_npc->next;
     }
-    i = 0;
-    my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
-    cur_action = actions;
-	while (cur_action != NULL) {
-        my_items[i] = new_item(cur_action->name, cur_action->desc);
-        cur_action = cur_action->next;
-        i++;
-    }
-
-	/* Create menu */
-	my_menu = new_menu((ITEM **)my_items);
-
-	/* Set menu option not to show the description */
-	menu_opts_off(my_menu, O_SHOWDESC);
-
-	/* Create the window to be associated with the menu */
-    my_menu_win = newwin(10, 70, 4, 4);
-    keypad(my_menu_win, TRUE);
-     
-	/* Set main window and sub window */
-    set_menu_win(my_menu, my_menu_win);
-    set_menu_sub(my_menu, derwin(my_menu_win, 6, 68, 3, 1));
-	set_menu_format(my_menu, 5, 3);
-	set_menu_mark(my_menu, " > ");
-
-	/* Print a border around the main window and print a title */
-    box(my_menu_win, 0, 0);
-
-    /* Set the title */
-    mvwprintw(my_menu_win, 0, 1, title);
-
-	/* Post the menu */
-	post_menu(my_menu);
-	wrefresh(my_menu_win);
-	
-	while((c = wgetch(my_menu_win)) != 'x')
-	{       
-        switch(c)
-        {
-        case KEY_DOWN:
-            menu_driver(my_menu, REQ_DOWN_ITEM);
-            break;
-        case KEY_UP:
-            menu_driver(my_menu, REQ_UP_ITEM);
-            break;
-        case KEY_LEFT:
-            menu_driver(my_menu, REQ_LEFT_ITEM);
-            break;
-        case KEY_RIGHT:
-            menu_driver(my_menu, REQ_RIGHT_ITEM);
-            break;
-        case KEY_NPAGE:
-            menu_driver(my_menu, REQ_SCR_DPAGE);
-            break;
-        case KEY_PPAGE:
-            menu_driver(my_menu, REQ_SCR_UPAGE);
-            break;
-        case KEY_HOME:
-            menu_driver(my_menu, REQ_FIRST_ITEM);
-            break;
-        case KEY_END:
-            menu_driver(my_menu, REQ_LAST_ITEM);
-            break;
-        }
-        wrefresh(my_menu_win);
-	}
-
-	/* Unpost and free all the memory taken up */
-    unpost_menu(my_menu);
-    free_menu(my_menu);
-    for(i = 0; i < n_choices; ++i) {
-        free_item(my_items[i]);
-    }
-	cleanup_win(my_menu_win);
-    f.update_map = 1;
-    return 0;
+    wrefresh(new_win);
 }
-#endif

@@ -2,8 +2,8 @@
 
 /* Create the level */
 void make_level(void) {
-    for (int i = 0; i < MAP_WIDTH; i++) {
-        for (int j = 0; j < MAP_HEIGHT; j++) {
+    for (int i = 0; i < MAP_W; i++) {
+        for (int j = 0; j < MAP_H; j++) {
             if (i < 10 || i > 40 || j < 10 || j > 40) {
                 g.levmap[i][j].chr = '#';
                 g.levmap[i][j].blocked = 1;
