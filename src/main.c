@@ -46,7 +46,7 @@ void handle_mouse() {
     y = event.y;
     
     if (event.bstate & BUTTON1_CLICKED) {
-        if (y >= MSG_Y && x <= MSG_W) {
+        if (y <= MSG_H - 1 && x <= MSG_W) {
             full_msg_window();
         }
     }
@@ -124,6 +124,11 @@ int move_mon(struct npc* mon, int x, int y) {
     if (mon->energy < 0) {
         mon->energy = mon->emax;
     }
+    /* This is just temporary. In the future, we can cut down on this
+       to prevent excessive map updates. */
+    if (is_player(mon)) {
+        f.update_map = 1;
+    }
     /* logma(COLOR_PAIR(MAGENTA), "Moved to (%d, %d)", nx, ny); */
     return 0;
 }
@@ -173,7 +178,7 @@ int main(void) {
         render_all_npcs();
         display_energy_win();
         /* move cursor to player */
-        wmove(g.map_win, g.player.y, g.player.x);
+        wmove(g.map_win, g.player.y - g.cy, g.player.x - g.cx);
         wrefresh(g.map_win);
     } while ((c = getch()));
 

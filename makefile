@@ -37,7 +37,7 @@ ifeq ($(PORT),pdcurses)
     LDFLAGS:= -lpdcurses
     XTRALIBS:=lib/pdcurses.a
 else
-    CFLAGS:= -Wall -lm -lncurses -D_XOPEN_SOURCE_EXTENDED -I$(INCDIR)
+    CFLAGS:= -Wall -lm -lncursesw -D_XOPEN_SOURCE_EXTENDED -I$(INCDIR)
     XTRALIBS:=
 endif
 

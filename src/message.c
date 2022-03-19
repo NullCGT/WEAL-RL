@@ -112,7 +112,7 @@ int logma(int attr, const char *format, ...) {
 
 void full_msg_window(void) {
     WINDOW *win;
-    win = create_win(MAP_H + MSG_H, MSG_W, 0, 0);
+    win = create_win(MAPWIN_H + MSG_H, MSG_W, 0, 0);
     draw_msg_window(win);
     mvwprintw(win, 0, 0, "[Viewing full message backscroll. Press any key to exit.]");
     wrefresh(win);

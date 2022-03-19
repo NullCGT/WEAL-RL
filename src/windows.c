@@ -16,7 +16,7 @@ void setup_colors(void);
 
 /* Perform the first-time setup for the game's GUI. */
 void setup_gui(void) {
-    g.map_win = create_win(MAP_H, MAP_W, MAP_Y, 0);
+    g.map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
     g.msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
     draw_msg_window(g.msg_win);
     wrefresh(g.map_win);
@@ -31,7 +31,7 @@ void setup_locale(void) {
     g.saved_locale = strdup(old_locale);
     if (g.saved_locale == NULL)
         return;
-    setlocale(LC_ALL, "en-us");
+    setlocale(LC_ALL, "en_US.UTF-8");
     return;
 }
 
@@ -49,6 +49,7 @@ void setup_screen(void) {
     raw();
     keypad(stdscr, TRUE);
     mousemask(ALL_MOUSE_EVENTS, NULL);
+    putenv("ESCDELAY=25");
     refresh();
     setup_gui();
 }
@@ -88,8 +89,8 @@ void cleanup_win(WINDOW *win) {
 
 void create_popup_win(const char *title, const char *msg) {
     WINDOW* new_win;
-    int w = MAP_W / 2;
-    int h = MAP_H / 2;
+    int w = MAPWIN_W / 2;
+    int h = MAPWIN_H / 2;
     
     new_win = newwin(h, w, h /2, w / 2);
     box(new_win, 0, 0);
@@ -117,7 +118,7 @@ void display_energy_win(void) {
     while(cur_npc != NULL) {
         sprintf(buf, "%c %d/%d", cur_npc->chr, cur_npc->energy, cur_npc->emax);
         mvwprintw(new_win, 1, 1, buf);
-        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 2, SB_W - 2, '#', '_');
+        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 2, SB_W - 2, ACS_CKBOARD, '_');
         cur_npc = cur_npc->next;
     }
     wrefresh(new_win);

@@ -4,19 +4,26 @@
 #include <curses.h>
 #include "color.h"
 
-#define MAP_W 80
-#define MSG_W MAP_W
+/* Map and window constants */
+#define MAP_W 100
+#define MAPWIN_W 60
+#define MSG_W MAPWIN_W
 #define SB_W 30
 
-#define MAP_H 30
+#define MAP_H 60
+#define MAPWIN_H 30
 #define MSG_H 6
-#define SB_H MAP_H + MSG_H
+#define SB_H MAPWIN_H + MSG_H
 
-#define MAP_Y MSG_H
+#define MAPWIN_Y MSG_H
 #define MSG_Y 0
 #define SB_Y 0
 
-#define SB_X MAP_W
+#define SB_X MAPWIN_W
+
+/* Common functions */
+#define max(x, y) (((x) > (y)) ? (x) : (y))
+#define min(x, y) (((x) < (y)) ? (x) : (y))
 
 struct action {
     char *name;
@@ -61,7 +68,9 @@ struct monster {
 
 struct tile {
     int chr;
-    int blocked;
+    /* bitfields */
+    unsigned int blocked : 1;
+    /* 7 free bits */
 };
 
 typedef struct global {
@@ -69,6 +78,8 @@ typedef struct global {
     struct npc player; /* Assume player is first NPC */
     struct msg *msg_list;
     int turns;
+    int cx;
+    int cy;
     char *saved_locale;
     WINDOW *map_win;
     WINDOW *msg_win;

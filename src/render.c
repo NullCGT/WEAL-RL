@@ -6,9 +6,12 @@
 /* Render the map, tile by tile.
    Loops over the entirety of the map, and works in O(n) time. */
 void render_map(void) {
-    for (int i = 0; i < MAP_W; i++) {
-        for (int j = 0; j < MAP_H; j++) {
-            map_putch(j, i, g.levmap[i][j].chr);    
+    g.cx = min(max(0, g.player.x - (MAPWIN_W  / 2)), MAP_W - (MAPWIN_W / 2));
+    g.cy = min(max(0, g.player.y - (MAPWIN_H / 2)), MAP_H - (MAPWIN_H / 2));
+    for (int i = 0; i < MAPWIN_W; i++) {
+        for (int j = 0; j < MAPWIN_H; j++) {
+            if (i + g.cx < MAP_W && j + g.cy < MAP_H)
+                map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr);    
         }
     }
     f.update_map = 0;
@@ -18,7 +21,7 @@ void render_map(void) {
 void render_all_npcs(void) {
     struct npc *cur = &g.player;
     while (cur != NULL) {
-        map_putch(cur->y, cur->x, cur->chr);
+        map_putch(cur->y - g.cy, cur->x - g.cx, cur->chr);
         cur = cur->next;
     }
     return;
@@ -39,7 +42,7 @@ int map_putch(int y, int x, int chr) {
 }
 
 void render_bar(WINDOW* win, int cur, int max, int x, int y,
-                int width, char full, char empty) {
+                int width, int full, int empty) {
     int pips = (int) ((width - 2) * cur / max);
     for (int i = 0; i < width; i++) {
         if (!i) {
