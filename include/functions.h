@@ -15,6 +15,12 @@ int logma(int, const char *, ...);
 struct monster *create_monster(int, int);
 void do_wild_encounter(void);
 
+/* RANDOM.H */
+void rndseed(int);
+int rndx(int);
+int rndrng(int, int);
+int rndbool(int);
+
 /* RENDER.H */
 void render_map(void);
 void render_all_npcs(void);

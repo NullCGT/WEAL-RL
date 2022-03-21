@@ -5,7 +5,7 @@
 #####################Options#######################
 
 SHELL:=/bin/sh
-PORT:=ncurses
+#PORT:=ncurses
 #PORT:=pdcurses
 
 #################Definitions######################

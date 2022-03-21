@@ -1,25 +1,17 @@
-#!/bin/bash
-while [ 1 ]
+#!/bin/sh
+clear
+PS3="Select your graphical port: "
+ports=("ncurses" "pdcurses")
+select GRAPHICAL_PORT in "${ports[@]}"
 do
-    printf "Choose a frontend:\n"
-    printf "  1) ncurses (default)\n"
-    printf "  2) pdcurses (recommended for Windows users)\n"
-    read response
-    if [ $response == 2 ]
-        then
-        export GRAPHICAL_PORT=pdcurses
-        break
-    elif [ $response == 1 ]
-        then
-        export GRAPHICAL_PORT=ncurses
-        break
-    fi
+    printf "You have selected the $GRAPHICAL_PORT port.\n"
+    break
 done
-printf "===============================\n"
-printf "Building WEAL for $GRAPHICAL_PORT.\n"
-printf "===============================\n\n"
+printf "Creating makefile...\n"
+cp -f compiling/makefile makefile
+sed -i "/$GRAPHICAL_PORT/s/^#//" makefile
+printf "Building WEAL for $GRAPHICAL_PORT...\n"
 make all
-printf "\n===============================\n"
-printf "Finished building WEAL for $GRAPHICAL_PORT.\n"
-printf "===============================\n"
+printf "Finished building WEAL for $GRAPHICAL_PORT!\n"
+printf "The executable should be located in the main directory.\n"
 exit 0

@@ -1,3 +1,4 @@
 weal
 obj/
 *.o
+/makefile

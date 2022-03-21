@@ -4,7 +4,7 @@
 #include "message.h"
 #include "windows.h"
 
-struct monster *create_monster(int id, int level) {
+struct monster *create_monster(int id) {
     struct monster *new_mon = malloc(sizeof(struct monster));
     new_mon->level = 1;
     new_mon->monstat = &monstats[id];
@@ -16,7 +16,7 @@ struct monster *create_monster(int id, int level) {
 
 void do_wild_encounter(void) {
     struct monster *wild_mon;
-    wild_mon = create_monster(0, 1);
+    wild_mon = create_monster(0);
     logm("A wandering %s wants to battle!", wild_mon->monstat->name);
     draw_msg_window(g.msg_win);
     create_popup_win("Wandering monster!", wild_mon->monstat->description);

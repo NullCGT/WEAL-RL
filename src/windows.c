@@ -116,9 +116,18 @@ void display_energy_win(void) {
     box(new_win, 0, 0);
     
     while(cur_npc != NULL) {
-        sprintf(buf, "%c %d/%d", cur_npc->chr, cur_npc->energy, cur_npc->emax);
+        sprintf(buf, "Player Location: (%d, %d)", cur_npc->x, cur_npc->y);
         mvwprintw(new_win, 1, 1, buf);
-        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 2, SB_W - 2, ACS_CKBOARD, '_');
+        memset(buf, 0, 128);
+        sprintf(buf, "Camera Origin: (%d, %d)", g.cx, g.cy);
+        mvwprintw(new_win, 2, 1, buf);
+        memset(buf, 0, 128);
+        sprintf(buf, "Turn: %d", g.turns);
+        mvwprintw(new_win, 3, 1, buf);
+
+        mvwprintw(new_win, 5, 1, "Energy");
+        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 6, SB_W - 2, ACS_CKBOARD, '_');
+        
         cur_npc = cur_npc->next;
     }
     wrefresh(new_win);

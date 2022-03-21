@@ -8,7 +8,7 @@
 void free_msg(struct msg *);
 int log_string(const char *, int, va_list);
 
-#define MAX_BACKSCROLL 20
+#define MAX_BACKSCROLL 50
 
 void free_msg(struct msg *message) {
     free(message->msg);
@@ -28,7 +28,7 @@ void free_message_list(struct msg *cur_msg) {
 int draw_msg_window(WINDOW *win) {
     int ret = 0;
     int i = 0;
-    int h, w;
+    /* int h, w; */
     struct msg *cur_msg;
     struct msg *prev_msg;
 
@@ -36,7 +36,7 @@ int draw_msg_window(WINDOW *win) {
     box(win, 0, 0);
     /* TODO: Include our own version of the curses header. There are issues with getmaxyx in
        pdcurses when using the default curses.h header in linux. */
-    getmaxyx(win, h, w);
+    /* getmaxyx(win, h, w); */
     cur_msg = g.msg_list;
     while (cur_msg != NULL) {
         if (i >= MAX_BACKSCROLL) {
@@ -46,7 +46,7 @@ int draw_msg_window(WINDOW *win) {
             free_msg(prev_msg);
             i++;
             continue;
-        } else if (i > h - 3) {
+        } else if (i > MAPWIN_H + MSG_H - 3) { /* h - 3 for when maxxy works */
             prev_msg = cur_msg;
             cur_msg = cur_msg->next;
             i++;

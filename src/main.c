@@ -8,6 +8,7 @@
 #include "render.h"
 #include "mapgen.h"
 #include "monster.h"
+#include "random.h"
 
 int is_player(struct npc *);
 int move_mon(struct npc *, int, int);
@@ -23,14 +24,14 @@ int is_player(struct npc* mon) {
    saves the program state. */
 void handle_exit(void) {
     cleanup_screen();
+    printf("Freeing message list...\n");
     free_message_list(g.msg_list);
+    printf("Restoring locale...\n");
     if (g.saved_locale != NULL) {
         setlocale (LC_ALL, g.saved_locale);
         free(g.saved_locale);
     }
-    printf("Saving state...\n");
-    printf("Save complete.\n");
-    printf("Connection severed.\n");
+    printf("Goodbye!\n");
     return;
 }
 
@@ -112,8 +113,11 @@ void handle_keys(int keycode) {
 int move_mon(struct npc* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
-    if (g.levmap[nx][ny].blocked
-        || nx < 0 || ny < 0|| nx >= MAP_W || ny >= MAP_W) {
+    if (nx < 0 || ny < 0|| nx >= MAP_W || ny >= MAP_H
+        || g.levmap[nx][ny].blocked) {
+        if (is_player(mon)) {
+            logm("You cannot pass that way.");
+        }
 	    return 1;
     }
     g.turns++;
@@ -129,7 +133,6 @@ int move_mon(struct npc* mon, int x, int y) {
     if (is_player(mon)) {
         f.update_map = 1;
     }
-    /* logma(COLOR_PAIR(MAGENTA), "Moved to (%d, %d)", nx, ny); */
     return 0;
 }
 
@@ -139,6 +142,9 @@ int main(void) {
 
     // Exit handling
     atexit(handle_exit);
+
+    // Seed the rng
+    rndseed_t();
 
     // Set up the screen
     setup_screen();

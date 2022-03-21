@@ -6,12 +6,14 @@
 /* Render the map, tile by tile.
    Loops over the entirety of the map, and works in O(n) time. */
 void render_map(void) {
-    g.cx = min(max(0, g.player.x - (MAPWIN_W  / 2)), MAP_W - (MAPWIN_W / 2));
-    g.cy = min(max(0, g.player.y - (MAPWIN_H / 2)), MAP_H - (MAPWIN_H / 2));
+    g.cx = min(max(0, g.player.x - (MAPWIN_W  / 2)), MAP_W - MAPWIN_W);
+    g.cy = min(max(0, g.player.y - (MAPWIN_H / 2)), MAP_H - MAPWIN_H);
     for (int i = 0; i < MAPWIN_W; i++) {
         for (int j = 0; j < MAPWIN_H; j++) {
             if (i + g.cx < MAP_W && j + g.cy < MAP_H)
-                map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr);    
+                map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr);
+            else
+                map_putch(j, i, 'X');  
         }
     }
     f.update_map = 0;
@@ -30,7 +32,7 @@ void render_all_npcs(void) {
 void clear_npcs(void) {
     struct npc *cur = &g.player;
     while (cur != NULL) {
-        map_putch(cur->y, cur->x, g.levmap[cur->x][cur->y].chr);
+        map_putch(cur->y - g.cy, cur->x - g.cx, g.levmap[cur->x][cur->y].chr);
         cur = cur->next;
     }
     return;
