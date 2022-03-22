@@ -38,7 +38,12 @@ void handle_exit(void) {
 }
 
 /* Called when the terminal is resized. */
+/* TODO: Respond gracefully. */
 void handle_sigwinch(int sig) {
+    (void) sig;
+    cleanup_screen();
+    printf("Do not resize the program while running.\n");
+    exit(0);
     return;
 }
 

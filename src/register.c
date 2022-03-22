@@ -19,6 +19,11 @@ struct bitflags f = {
     .update_map = 1
 };
 
+struct terminal term = {
+    .h = 36,
+    .w = 90
+};
+
 struct monstat monstats[] = {
     {
         .id = 1,

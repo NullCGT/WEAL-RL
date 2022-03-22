@@ -40,8 +40,17 @@ void setup_locale(void) {
    this initializes the screen, turns off echoing, and does the basic setup
    needed for curses to do its job. */
 void setup_screen(void) {
+    int h, w;
     putenv("ESCDELAY=25");
     initscr();
+    getmaxyx(stdscr, h, w);
+    if (h > 1 && w > 1) {
+        term.h = h;
+        term.w = w;
+    } else if ((h > 1 && h < MIN_TERM_H) || (w > 1 && w < MIN_TERM_W)) {
+        printf("Terminal must be at least %dx%d.", MIN_TERM_W, MIN_TERM_H);
+        exit(0);
+    }
     if (has_colors()) {
         start_color();
         setup_colors();

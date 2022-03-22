@@ -6,20 +6,9 @@
 
 /* Map and window constants */
 #define MAP_W 80
-#define MAPWIN_W 60
-#define MSG_W MAPWIN_W
-#define SB_W 30
-
 #define MAP_H 40
-#define MAPWIN_H 30
-#define MSG_H 6
-#define SB_H MAPWIN_H + MSG_H
-
-#define MAPWIN_Y MSG_H
-#define MSG_Y 0
-#define SB_Y 0
-
-#define SB_X MAPWIN_W
+#define MIN_TERM_H 80
+#define MIN_TERM_W 40
 
 /* Common functions */
 #define max(x, y) (((x) > (y)) ? (x) : (y))
@@ -91,8 +80,29 @@ typedef struct bitflags {
     /* 6 free bits */
 } bitflags;
 
+typedef struct terminal {
+    int h;
+    int w;
+} terminal;
+
 extern struct global g;
 extern struct bitflags f;
+extern struct terminal term;
 extern struct monstat monstats[];
+
+/* Map and window macros */
+#define MAPWIN_W (term.w * 2 / 3)
+#define MSG_W MAPWIN_W
+#define SB_W (term.w - MAPWIN_W)
+
+#define MAPWIN_H min(MAP_H, (term.h * 5 / 6))
+#define MSG_H (term.h - MAPWIN_H)
+#define SB_H MAPWIN_H + MSG_H
+
+#define MAPWIN_Y MSG_H
+#define MSG_Y 0
+#define SB_Y 0
+
+#define SB_X MAPWIN_W
 
 #endif
