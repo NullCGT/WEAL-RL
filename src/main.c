@@ -1,6 +1,7 @@
 #include <curses.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <signal.h>
 
 #include "register.h"
 #include "windows.h"
@@ -13,6 +14,7 @@
 int is_player(struct npc *);
 int move_mon(struct npc *, int, int);
 void handle_exit(void);
+void handle_sigwinch(int);
 void handle_mouse(void);
 void handle_keys(int);
 
@@ -32,6 +34,11 @@ void handle_exit(void) {
         free(g.saved_locale);
     }
     printf("Goodbye!\n");
+    return;
+}
+
+/* Called when the terminal is resized. */
+void handle_sigwinch(int sig) {
     return;
 }
 
@@ -104,6 +111,11 @@ void handle_keys(int keycode) {
         case 'w':
             do_wild_encounter();
             break;
+        case 'm':
+            logm("Regenerated the level.");
+            make_level();
+            f.update_map = 1;
+            break;
         default:
             break;
     }
@@ -140,8 +152,9 @@ int move_mon(struct npc* mon, int x, int y) {
 int main(void) {
     int c;
 
-    // Exit handling
+    /* handle exits and resizes */
     atexit(handle_exit);
+    signal(SIGWINCH, handle_sigwinch);
 
     // Seed the rng
     rndseed_t();
@@ -149,8 +162,8 @@ int main(void) {
     // Set up the screen
     setup_screen();
     logma(COLOR_PAIR(GREEN), "Hello, player. Welcome to the game.");
-    wrefresh(g.msg_win);
 
+    // Create the map
     make_level();
 
     struct action *test_action = malloc(sizeof(struct action));
@@ -169,7 +182,7 @@ int main(void) {
     g.player.next = NULL;
     g.player.playable = 0;
     
-    // Do things
+    /* Main Loop */
     c = 'M';
     do {
         clear_npcs();
@@ -188,6 +201,5 @@ int main(void) {
         wrefresh(g.map_win);
     } while ((c = getch()));
 
-    cleanup_win(g.map_win);
-    return 0;
+    exit(0);
 }

@@ -5,12 +5,12 @@
 #include "color.h"
 
 /* Map and window constants */
-#define MAP_W 100
+#define MAP_W 80
 #define MAPWIN_W 60
 #define MSG_W MAPWIN_W
 #define SB_W 30
 
-#define MAP_H 60
+#define MAP_H 40
 #define MAPWIN_H 30
 #define MSG_H 6
 #define SB_H MAPWIN_H + MSG_H

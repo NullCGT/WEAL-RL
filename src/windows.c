@@ -18,6 +18,7 @@ void setup_colors(void);
 void setup_gui(void) {
     g.map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
     g.msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
+    f.update_map = 1;
     draw_msg_window(g.msg_win);
     wrefresh(g.map_win);
 }
@@ -39,6 +40,7 @@ void setup_locale(void) {
    this initializes the screen, turns off echoing, and does the basic setup
    needed for curses to do its job. */
 void setup_screen(void) {
+    putenv("ESCDELAY=25");
     initscr();
     if (has_colors()) {
         start_color();
@@ -49,7 +51,6 @@ void setup_screen(void) {
     raw();
     keypad(stdscr, TRUE);
     mousemask(ALL_MOUSE_EVENTS, NULL);
-    putenv("ESCDELAY=25");
     refresh();
     setup_gui();
 }

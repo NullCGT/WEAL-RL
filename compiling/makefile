@@ -1,6 +1,6 @@
 # WEAL Makefile
 # Kestrel Gregorich-Trevor
-# 2021
+# 2022
 #
 #####################Options#######################
 
@@ -34,24 +34,26 @@ BINARY:=weal
 
 # Compile Flags
 ifeq ($(PORT),pdcurses)
-    CFLAGS:= -Wall -Wextra -pedantic -g -lSDL2 -lm -I$(INCDIR)
+    CFLAGS:= -Wall -Wextra -pedantic -g -lSDL2 `xml2-config --cflags` -lm
+	LIBS:= -isystem$(INCDIR) `xml2-config --libs`
     LDFLAGS:= -lpdcurses
     XTRALIBS:=lib/pdcurses.a
 else
-    CFLAGS:= -Wall -Wextra -pedantic -g -lm -lncursesw -D_XOPEN_SOURCE_EXTENDED -I$(INCDIR)
+    CFLAGS:= -Wall -Wextra -pedantic -g -lm -lncursesw `xml2-config --cflags` -D_XOPEN_SOURCE_EXTENDED 
+	LIBS:= -isystem$(INCDIR) `xml2-config --libs`
     XTRALIBS:=
 endif
 
 #####################Files#######################
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(INCDIR)/*.h | objects
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS)
 
 #####################Recipes#####################
 
 # binary (default)
 binary: $(OBJS)
-	$(CC) -o $(BINARY) $(OBJS) $(XTRALIBS) $(CFLAGS)
+	$(CC) -o $(BINARY) $(OBJS) $(XTRALIBS) $(CFLAGS) $(LIBS)
 
 # clean
 clean:

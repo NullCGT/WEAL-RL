@@ -1,6 +1,8 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#include "curses.h"
+
 void free_message_list(struct msg *);
 void full_msg_window(void);
 int draw_msg_window(WINDOW *);
