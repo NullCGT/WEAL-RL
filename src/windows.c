@@ -19,7 +19,7 @@ void setup_gui(void) {
     g.map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
     g.msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
     f.update_map = 1;
-    draw_msg_window(g.msg_win);
+    draw_msg_window(g.msg_win, MSG_H);
     wrefresh(g.map_win);
 }
 

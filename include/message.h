@@ -5,7 +5,7 @@
 
 void free_message_list(struct msg *);
 void full_msg_window(void);
-int draw_msg_window(WINDOW *);
+void draw_msg_window(WINDOW *, int);
 int logm(const char *, ...);
 int logma(int, const char *, ...);
 

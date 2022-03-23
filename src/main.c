@@ -194,7 +194,7 @@ int main(void) {
         handle_keys(c);
         /* Conditionally update screen elements */
         if (f.update_msg) {
-            draw_msg_window(g.msg_win);
+            draw_msg_window(g.msg_win, MSG_H);
         }
         if (f.update_map) {
             render_map();

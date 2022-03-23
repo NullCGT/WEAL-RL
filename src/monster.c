@@ -18,7 +18,7 @@ void do_wild_encounter(void) {
     struct monster *wild_mon;
     wild_mon = create_monster(0);
     logm("A wandering %s wants to battle!", wild_mon->monstat->name);
-    draw_msg_window(g.msg_win);
+    draw_msg_window(g.msg_win, MSG_H);
     create_popup_win("Wandering monster!", wild_mon->monstat->description);
     return;
 }
