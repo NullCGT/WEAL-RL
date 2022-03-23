@@ -2,6 +2,7 @@
 
 #include "register.h"
 #include "render.h"
+#include "windows.h"
 
 /* Render the map, tile by tile.
    Loops over the entirety of the map, and works in O(n) time. */
@@ -37,26 +38,4 @@ void clear_npcs(void) {
         cur = cur->next;
     }
     return;
-}
-
-/* Outputs a character to the map window. Wrapper for mvwaddch(). */
-int map_putch(int y, int x, int chr) {
-    return mvwaddch(g.map_win, y, x, chr); 
-}
-
-void render_bar(WINDOW* win, int cur, int max, int x, int y,
-                int width, int full, int empty) {
-    int pips = (int) ((width - 2) * cur / max);
-    for (int i = 0; i < width; i++) {
-        if (!i) {
-            mvwaddch(win, y, x + i, '[');
-        } else if (i <= pips) {
-            mvwaddch(win, y, x + i, full);
-        } else if (i == width - 1) {
-            mvwaddch(win, y, x + i, ']');
-        } else {
-            mvwaddch(win, y, x + i, empty);
-        }
-    }
-    
 }

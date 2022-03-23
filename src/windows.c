@@ -11,6 +11,8 @@
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
+void render_bar(WINDOW*, int, int, int, int, int, int, int);
+void draw_msg_window(WINDOW *, int);
 
 /* SCREEN FUNCTIONS */
 
@@ -141,4 +143,84 @@ void display_energy_win(void) {
         cur_npc = cur_npc->next;
     }
     wrefresh(new_win);
+}
+
+void render_bar(WINDOW* win, int cur, int max, int x, int y,
+                int width, int full, int empty) {
+    int pips = (int) ((width - 2) * cur / max);
+    for (int i = 0; i < width; i++) {
+        if (!i) {
+            mvwaddch(win, y, x + i, '[');
+        } else if (i <= pips) {
+            mvwaddch(win, y, x + i, full);
+        } else if (i == width - 1) {
+            mvwaddch(win, y, x + i, ']');
+        } else {
+            mvwaddch(win, y, x + i, empty);
+        }
+    }
+    
+}
+
+/* TODO: Use waddstr in and scrollok in order to take a lot of the complexity out of this and
+   also support screen wrapping. Note: May require rewriting the linked list of messages to
+   allow backwards traversal. */
+/* TODO: Pdcurses has issues with getmaxyx, so we will need to include our own version of the
+   header. That will allow us to cut down on the arguments. */
+void draw_msg_window(WINDOW *win, int h) {
+    int i = 0;
+    int x, y;
+    struct msg *cur_msg;
+    struct msg *prev_msg;
+
+    werase(win);
+    cur_msg = g.msg_list;
+    while (cur_msg != NULL) {
+        getyx(win, y, x);
+        (void) x;
+        if (i >= MAX_BACKSCROLL) {
+            prev_msg->next = NULL;
+            prev_msg = cur_msg;
+            cur_msg = cur_msg->next;
+            free_msg(prev_msg);
+            i++;
+            continue;
+        } else if (y > h - 2) {
+            prev_msg = cur_msg;
+            cur_msg = cur_msg->next;
+            i++;
+            continue;
+        }
+        wattron(win, cur_msg->attr);
+        waddstr(win, cur_msg->msg);
+        wattroff(win, cur_msg->attr);
+        waddch(win, '\n');
+        prev_msg = cur_msg;
+        cur_msg = cur_msg->next;
+        i++;
+    }
+    wrefresh(win);
+    f.update_msg = 0;
+}
+
+void full_msg_window(void) {
+    WINDOW *win;
+    win = create_win(MAPWIN_H + MSG_H, MSG_W, 0, 0);
+    draw_msg_window(win, term.h);
+    wrefresh(win);
+    getch();
+    cleanup_win(win);
+    f.update_map = 1;
+    f.update_msg = 1;
+    return;
+}
+
+/* Outputs a character to the map window. Wrapper for mvwaddch(). */
+int map_putch(int y, int x, int chr) {
+    return mvwaddch(g.map_win, y, x, chr); 
+}
+
+void refresh_map(void) {
+    wmove(g.map_win, g.player.y - g.cy, g.player.x - g.cx);
+    wrefresh(g.map_win);
 }

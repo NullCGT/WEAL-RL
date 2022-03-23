@@ -1,4 +1,3 @@
-#include <curses.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <signal.h>
@@ -201,9 +200,7 @@ int main(void) {
         }
         render_all_npcs();
         display_energy_win();
-        /* move cursor to player */
-        wmove(g.map_win, g.player.y - g.cy, g.player.x - g.cx);
-        wrefresh(g.map_win);
+        refresh_map();
     } while ((c = getch()));
 
     exit(0);
