@@ -42,9 +42,11 @@ void handle_exit(void) {
 /* TODO: Respond gracefully. */
 void handle_sigwinch(int sig) {
     (void) sig;
+    #if 0
     cleanup_screen();
     printf("Do not resize the program while running.\n");
     exit(0);
+    #endif
     return;
 }
 
@@ -107,6 +109,10 @@ void handle_keys(int keycode) {
         case 'b':
         case '1':
             move_mon(&g.player, -1, 1);
+            break;
+        case '.':
+        case '5':
+            move_mon(&g.player, 0, 0);
             break;
         case 'p':
             full_msg_window();
