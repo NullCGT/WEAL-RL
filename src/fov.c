@@ -48,14 +48,14 @@ void cast_light(int cx, int cy,
                 if (dx * dx + dy * dy < rsq)
                     make_visible(x, y);
                 if (blocked) {
-                    if (g.levmap[x][y].blocked) {
+                    if (g.levmap[x][y].opaque) {
                         new_start = right_slope;
                         continue;
                     } else {
                         blocked = 0;
                         start = new_start;
                     }
-                } else if (g.levmap[x][y].blocked && r < radius) {
+                } else if (g.levmap[x][y].opaque && r < radius) {
                     blocked = 1;
                     cast_light(cx, cy, start, left_slope,
                                r + 1, radius, xx, xy, yx, yy);
