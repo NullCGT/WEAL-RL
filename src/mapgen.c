@@ -6,6 +6,7 @@
 #include "message.h"
 #include "parser.h"
 
+void init_map(void);
 int wfc_magpen(void);
 
 #define WFC_SUCCESS 0
@@ -56,11 +57,16 @@ int wfc_mapgen(void) {
             unsigned char cell = output_image->data[y * MAP_W + x];
             if (cell == '.') {
                 g.levmap[x][y].blocked = 0;
+                g.levmap[x][y].opaque = 0;
                 g.levmap[x][y].chr ='.';
             } else {
                 g.levmap[x][y].blocked = 1;
+                g.levmap[x][y].opaque = 1;
                 g.levmap[x][y].chr = ACS_CKBOARD;
             }
+            /* Initialize lit and visible state. Probably move elsewhere later. */
+            g.levmap[x][y].lit = 0;
+            g.levmap[x][y].visible = 0;
         }
     }
     /* Clean leftover data from xml parser. */
@@ -71,9 +77,24 @@ int wfc_mapgen(void) {
     return WFC_SUCCESS;
 }
 
+/* Initialize the map by making sure everything is not visible and
+   not explored. */
+void init_map(void) {
+    for (int y = 0; y < MAP_H; y++) {
+        for (int x = 0; x < MAP_W; x++) {
+            g.levmap[x][y].visible = 0;
+            g.levmap[x][y].explored = 0;
+            g.levmap[x][y].blocked = 0;
+            g.levmap[x][y].chr = '.';
+        }
+    }
+}
+
 /* Create the level */
 void make_level(void) {
     int success = 0;
+
+    init_map();
     for (int tries = 0; tries < WFC_TRIES; tries++) {
         if (!wfc_mapgen()) {
             success = !success;
@@ -82,12 +103,7 @@ void make_level(void) {
     }
     /* Handle map creation failure. */
     if (!success) {
-        for (int y = 0; y < MAP_H; y++) {
-            for (int x = 0; x < MAP_W; x++) {
-                g.levmap[x][y].blocked = 0;
-                g.levmap[x][y].chr = '.';
-            }
-        }
+        logm("Map creation failed: WFC attempts >= %d.", WFC_TRIES);
     }
     return;
 }

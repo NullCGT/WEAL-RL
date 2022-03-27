@@ -216,8 +216,12 @@ void full_msg_window(void) {
 }
 
 /* Outputs a character to the map window. Wrapper for mvwaddch(). */
-int map_putch(int y, int x, int chr) {
-    return mvwaddch(g.map_win, y, x, chr); 
+int map_putch(int y, int x, int chr, int attr) {
+    int ret;
+    wattron(g.map_win, attr);
+    ret = mvwaddch(g.map_win, y, x, chr); 
+    wattroff(g.map_win, attr);
+    return ret;
 }
 
 void refresh_map(void) {

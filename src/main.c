@@ -9,6 +9,7 @@
 #include "mapgen.h"
 #include "monster.h"
 #include "random.h"
+#include "fov.h"
 
 int is_player(struct npc *);
 int move_mon(struct npc *, int, int);
@@ -112,12 +113,18 @@ void handle_keys(int keycode) {
         case KEY_MOUSE:
             handle_mouse();
             break;
+        // Debug
         case 'w':
             do_wild_encounter();
             break;
         case 'm':
             logm("Regenerated the level.");
             make_level();
+            f.update_map = 1;
+            break;
+        case 'z':
+            logm("Magic mapped the level.");
+            magic_mapping();
             f.update_map = 1;
             break;
         default:
@@ -148,6 +155,7 @@ int move_mon(struct npc* mon, int x, int y) {
        to prevent excessive map updates. */
     if (is_player(mon)) {
         f.update_map = 1;
+        f.update_fov = 1;
     }
     return 0;
 }
@@ -194,6 +202,10 @@ int main(void) {
         /* Conditionally update screen elements */
         if (f.update_msg) {
             draw_msg_window(g.msg_win, MSG_H);
+        }
+        if (f.update_fov) {
+            clear_fov();
+            calculate_fov(g.player.x, g.player.y, 7);
         }
         if (f.update_map) {
             render_map();

@@ -13,6 +13,7 @@
 /* Common functions */
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
+#define signum(x) ((x > 0) - (x < 0))
 
 struct action {
     char *name;
@@ -59,7 +60,11 @@ struct tile {
     int chr;
     /* bitfields */
     unsigned int blocked : 1;
-    /* 7 free bits */
+    unsigned int visible : 1;
+    unsigned int lit : 1;
+    unsigned int explored : 1;
+    unsigned int opaque : 1;
+    /* 4 free bits */
 };
 
 typedef struct global {
@@ -77,7 +82,8 @@ typedef struct global {
 typedef struct bitflags {
     unsigned int update_msg : 1;
     unsigned int update_map : 1;
-    /* 6 free bits */
+    unsigned int update_fov : 1;
+    /* 5 free bits */
 } bitflags;
 
 typedef struct terminal {
