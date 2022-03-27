@@ -2,6 +2,7 @@
 #include <locale.h>
 #include <signal.h>
 
+#include "map.h"
 #include "register.h"
 #include "windows.h"
 #include "message.h"
@@ -117,10 +118,11 @@ void handle_keys(int keycode) {
         case 'w':
             do_wild_encounter();
             break;
-        case 'm':
-            logm("Regenerated the level.");
-            make_level();
-            f.update_map = 1;
+        case '>':
+            change_depth(1);
+            break;
+        case '<':
+            change_depth(-1);
             break;
         case 'z':
             logm("Magic mapped the level.");
@@ -137,7 +139,7 @@ int move_mon(struct npc* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
     if (nx < 0 || ny < 0|| nx >= MAP_W || ny >= MAP_H
-        || g.levmap[nx][ny].blocked) {
+        || is_blocked(nx, ny)) {
         if (is_player(mon)) {
             logm("You cannot pass that way.");
         }

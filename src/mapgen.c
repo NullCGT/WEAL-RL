@@ -1,8 +1,8 @@
 #define WFC_IMPLEMENTATION
 
-#include "register.h"
 #include <random.h>
 #include <stdio.h>
+#include "register.h"
 #include "message.h"
 #include "parser.h"
 
@@ -105,5 +105,7 @@ void make_level(void) {
     if (!success) {
         logm("Map creation failed: WFC attempts >= %d.", WFC_TRIES);
     }
+    f.update_map = 1;
+    f.update_fov = 1;
     return;
 }

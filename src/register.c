@@ -7,6 +7,7 @@ struct global g = {
     .player = { {0} },
     .msg_list = NULL,
     .turns = 0,
+    .depth = 1,
     .cx = 0,
     .cy = 0,
     .saved_locale = NULL,
@@ -16,7 +17,8 @@ struct global g = {
 
 struct bitflags f = {
     .update_msg = 1,
-    .update_map = 1
+    .update_map = 1,
+    .update_fov = 1
 };
 
 struct terminal term = {

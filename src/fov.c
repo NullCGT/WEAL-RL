@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "map.h"
 #include "register.h"
 #include "message.h"
 
@@ -7,7 +8,6 @@ void cast_light(int, int,
                 int, int,
                 int, int,
                 int, int);
-int make_visible(int, int);
 void calculate_fov(int, int, int);
 
 /* Cast light down an octant. Used for recursive shadowcasting. */
@@ -48,14 +48,14 @@ void cast_light(int cx, int cy,
                 if (dx * dx + dy * dy < rsq)
                     make_visible(x, y);
                 if (blocked) {
-                    if (g.levmap[x][y].opaque) {
+                    if (is_opaque(x, y)) {
                         new_start = right_slope;
                         continue;
                     } else {
                         blocked = 0;
                         start = new_start;
                     }
-                } else if (g.levmap[x][y].opaque && r < radius) {
+                } else if (is_opaque(x, y) && r < radius) {
                     blocked = 1;
                     cast_light(cx, cy, start, left_slope,
                                r + 1, radius, xx, xy, yx, yy);
@@ -66,15 +66,6 @@ void cast_light(int cx, int cy,
         if (blocked)
             break;
     }
-}
-
-/* Make a point on the map visible. */
-int make_visible(int x, int y) {
-    g.levmap[x][y].visible = 1;
-    g.levmap[x][y].explored = 1;
-    if (g.levmap[x][y].opaque)
-        return 1;
-    return 0;
 }
 
 /* calculate the fov from a single point using recursive shadowcasting.
@@ -106,15 +97,6 @@ void clear_fov(void) {
     for (int y = 0; y < MAP_H; y++) {
         for (int x = 0; x < MAP_W; x++) {
             g.levmap[x][y].visible = 0;
-        }
-    }
-}
-
-/* Explores the entire map. */
-void magic_mapping(void) {
-    for (int y = 0; y < MAP_H; y++) {
-        for (int x = 0; x < MAP_W; x++) {
-            g.levmap[x][y].explored = 1;
         }
     }
 }

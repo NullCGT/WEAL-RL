@@ -136,8 +136,11 @@ void display_energy_win(void) {
         memset(buf, 0, 128);
         sprintf(buf, "Turn: %d", g.turns);
         mvwprintw(new_win, 3, 1, buf);
+        memset(buf, 0, 128);
+        sprintf(buf, "Depth: %d meters", g.depth * 4);
+        mvwprintw(new_win, 4, 1, buf);
 
-        mvwprintw(new_win, 5, 1, "Energy");
+        mvwprintw(new_win, 6, 1, "Energy");
         render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 6, SB_W - 2, ACS_CKBOARD, '_');
         
         cur_npc = cur_npc->next;
@@ -162,9 +165,6 @@ void render_bar(WINDOW* win, int cur, int max, int x, int y,
     
 }
 
-/* TODO: Use waddstr in and scrollok in order to take a lot of the complexity out of this and
-   also support screen wrapping. Note: May require rewriting the linked list of messages to
-   allow backwards traversal. */
 /* TODO: Pdcurses has issues with getmaxyx, so we will need to include our own version of the
    header. That will allow us to cut down on the arguments. */
 void draw_msg_window(WINDOW *win, int h) {

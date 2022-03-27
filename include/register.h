@@ -72,6 +72,7 @@ typedef struct global {
     struct npc player; /* Assume player is first NPC */
     struct msg *msg_list;
     int turns;
+    int depth;
     int cx;
     int cy;
     char *saved_locale;

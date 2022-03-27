@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "map.h"
 #include "register.h"
 #include "render.h"
 #include "windows.h"
@@ -14,9 +15,9 @@ void render_map(void) {
         for (int j = 0; j < MAPWIN_H; j++) {
             if (i + g.cx < MAP_W && j + g.cy < MAP_H
                 && i + g.cx >= 0 && j + g.cy >= 0) {
-                if (g.levmap[i + g.cx][j + g.cy].visible) {
+                if (is_visible(i + g.cx, j + g.cy)) {
                     map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr, COLOR_PAIR(WHITE));
-                } else if (g.levmap[i + g.cx][j + g.cy].explored) {
+                } else if (is_explored(i + g.cx, j + g.cy)) {
                     map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr, COLOR_PAIR(BLUE));
                 }
             } else
