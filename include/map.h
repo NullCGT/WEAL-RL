@@ -6,7 +6,7 @@ void magic_mapping(void);
 void change_depth(int);
 
 #define in_bounds(x, y) \
-    (x > 0 && x < MAP_W && y > 0 && y < MAP_H)
+    (x > 0 && x < MAPW && y > 0 && y < MAPH)
 #define is_opaque(x, y) \
     (g.levmap[x][y].opaque)
 #define is_blocked(x, y) \

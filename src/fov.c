@@ -34,7 +34,7 @@ void cast_light(int cx, int cy,
                bounds, continue. */
             x = cx + dx * xx + dy * xy;
             y = cy + dx * yx + dy * yy;
-            if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H)
+            if (x < 0 || x >= MAPW || y < 0 || y >= MAPH)
                 continue;
             /* Set up slopes */
             left_slope = (dx - 0.5) / (dy + 0.5);
@@ -94,8 +94,8 @@ void calculate_fov(int x, int y, int range) {
 
 /* Sets all tiles to not visible. */
 void clear_fov(void) {
-    for (int y = 0; y < MAP_H; y++) {
-        for (int x = 0; x < MAP_W; x++) {
+    for (int y = 0; y < MAPH; y++) {
+        for (int x = 0; x < MAPW; x++) {
             g.levmap[x][y].visible = 0;
         }
     }

@@ -144,7 +144,7 @@ void handle_keys(int keycode) {
 int move_mon(struct npc* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
-    if (nx < 0 || ny < 0|| nx >= MAP_W || ny >= MAP_H
+    if (nx < 0 || ny < 0|| nx >= MAPW || ny >= MAPH
         || is_blocked(nx, ny)) {
         if (is_player(mon)) {
             logm("You cannot pass that way.");

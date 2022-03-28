@@ -5,8 +5,8 @@
 #include "color.h"
 
 /* Map and window constants */
-#define MAP_W 80
-#define MAP_H 40
+#define MAPW 80
+#define MAPH 40
 #define MIN_TERM_H 80
 #define MIN_TERM_W 40
 
@@ -68,7 +68,7 @@ struct tile {
 };
 
 typedef struct global {
-    struct tile levmap[MAP_W][MAP_H];
+    struct tile levmap[MAPW][MAPH];
     struct npc player; /* Assume player is first NPC */
     struct msg *msg_list;
     int turns;
@@ -102,7 +102,7 @@ extern struct monstat monstats[];
 #define MSG_W MAPWIN_W
 #define SB_W (term.w - MAPWIN_W)
 
-#define MAPWIN_H min(MAP_H, (term.h * 5 / 6))
+#define MAPWIN_H min(MAPH, (term.h * 5 / 6))
 #define MSG_H (term.h - MAPWIN_H)
 #define SB_H MAPWIN_H + MSG_H
 

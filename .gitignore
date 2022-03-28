@@ -2,3 +2,4 @@ weal
 obj/
 *.o
 /makefile
+build/

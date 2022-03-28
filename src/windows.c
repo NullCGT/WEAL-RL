@@ -11,6 +11,7 @@
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
+void cleanup_win(WINDOW *);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 void draw_msg_window(WINDOW *, int);
 

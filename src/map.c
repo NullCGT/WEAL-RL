@@ -15,8 +15,8 @@ int make_visible(int x, int y) {
 
 /* Explores the entire map. */
 void magic_mapping(void) {
-    for (int y = 0; y < MAP_H; y++) {
-        for (int x = 0; x < MAP_W; x++) {
+    for (int y = 0; y < MAPH; y++) {
+        for (int x = 0; x < MAPW; x++) {
             g.levmap[x][y].explored = 1;
         }
     }

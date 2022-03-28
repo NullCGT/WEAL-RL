@@ -22,8 +22,8 @@ int wfc_mapgen(void) {
     /* Additionally, note that this function massively leaks memory. I've opened
        an issue on github with the author, so hopefully this will be resolved in
        the future. */
-    struct wfc *wfc = wfc_overlapping(MAP_W,
-                                    MAP_H,
+    struct wfc *wfc = wfc_overlapping(MAPW,
+                                    MAPH,
                                     &image,
                                     3,
                                     3,
@@ -52,9 +52,9 @@ int wfc_mapgen(void) {
         wfc_destroy(wfc);
         return WFC_ERROR;
     }
-    for (int y = 0; y < MAP_H; y++) {
-        for (int x = 0; x < MAP_W; x++) {
-            unsigned char cell = output_image->data[y * MAP_W + x];
+    for (int y = 0; y < MAPH; y++) {
+        for (int x = 0; x < MAPW; x++) {
+            unsigned char cell = output_image->data[y * MAPW + x];
             if (cell == '.') {
                 g.levmap[x][y].blocked = 0;
                 g.levmap[x][y].opaque = 0;
@@ -80,8 +80,8 @@ int wfc_mapgen(void) {
 /* Initialize the map by making sure everything is not visible and
    not explored. */
 void init_map(void) {
-    for (int y = 0; y < MAP_H; y++) {
-        for (int x = 0; x < MAP_W; x++) {
+    for (int y = 0; y < MAPH; y++) {
+        for (int x = 0; x < MAPW; x++) {
             g.levmap[x][y].visible = 0;
             g.levmap[x][y].explored = 0;
             g.levmap[x][y].blocked = 0;

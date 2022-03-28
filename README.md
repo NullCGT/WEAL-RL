@@ -4,27 +4,9 @@
 
 This is a README :)
 
-# Building
-To build the game for the first time, execute the following commands:
-
-    chmod 777 build.sh
-    ./build.sh
-
-FOr subsequent builds, you may simply run make.
-
-    make
-
-When launching build.sh, will be presented with a choice of frontends.
-The ncurses version of the game will run directly in your terminal,
-while the pdcurses version will launch in an external SDL2 window.
-
-# Requirements
-## Ncurses-specific requirements
+# Compilation Requirements
+- cmake
 - ncurses
-
-## Pdcurses-specific requirements
-- SDL2
-## Platform-agnostic requirements
 - libxml2
 
 # Credits
