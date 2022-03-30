@@ -70,7 +70,20 @@ int main(void) {
     g.player.energy = 10;
     g.player.emax = 100;
     g.player.next = NULL;
-    g.player.playable = 0;
+    g.player.playable = 1;
+
+    struct npc test_npc = {
+        .name = "Troll",
+        .chr = 'T',
+        .x = g.player.x + 1,
+        .y = g.player.y + 1,
+        .energy = 10,
+        .emax = 100,
+        .actions = NULL,
+        .next = NULL,
+        .playable = 0
+    };
+    g.player.next = &test_npc;
     
     /* Main Loop */
     c = A_NONE;

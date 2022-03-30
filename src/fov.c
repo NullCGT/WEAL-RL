@@ -90,6 +90,7 @@ void calculate_fov(int x, int y, int range) {
         cast_light(x, y, 1.0, 0.0, 1, range,
                     m_0[oct], m_1[oct], m_2[oct], m_3[oct]);
     }
+    make_visible(x, y);
 }
 
 /* Sets all tiles to not visible. */

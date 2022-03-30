@@ -15,10 +15,13 @@ int is_player(struct npc* mon) {
 int move_mon(struct npc* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
-    if (nx < 0 || ny < 0|| nx >= MAPW || ny >= MAPH
-        || is_blocked(nx, ny)) {
+    if ((nx < 0 || ny < 0|| nx >= MAPW || ny >= MAPH)
+        && is_player(mon)) {
+            logm("I'm not leaving until I find Kate.");
+            return 1;
+    } else if (is_blocked(nx, ny) && is_player(mon)) {
         if (is_player(mon)) {
-            logm("I cannot go that way.");
+            logm("I press my hand to the wall. The concrete is cold.");
         }
 	    return 1;
     }

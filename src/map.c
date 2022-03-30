@@ -26,7 +26,7 @@ void magic_mapping(void) {
 /* Change the depth via ascending or descending. */
 void change_depth(int change) {
     if (g.depth + change < 0) {
-        logm("You stare up at the sky, and wonder if you will ever see it again.");
+        logm("I look up. It's too cloudy to make out any stars.");
         return;
     }
     g.depth += change;

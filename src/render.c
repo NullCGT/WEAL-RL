@@ -30,8 +30,8 @@ void render_map(void) {
 
 void render_all_npcs(void) {
     struct npc *cur = &g.player;
-    while (cur != NULL) {
-        map_putch(cur->x - g.cx, cur->y - g.cy, cur->chr, WHITE);
+    while (cur != NULL && is_visible(cur->x, cur->y)) {
+        map_putch(cur->x - g.cx, cur->y - g.cy, cur->chr, GREEN);
         cur = cur->next;
     }
     return;
@@ -39,7 +39,7 @@ void render_all_npcs(void) {
 
 void clear_npcs(void) {
     struct npc *cur = &g.player;
-    while (cur != NULL) {
+    while (cur != NULL && is_visible(cur->x, cur->y)) {
         map_putch(cur->x - g.cx, cur->y - g.cy, g.levmap[cur->x][cur->y].chr, WHITE);
         cur = cur->next;
     }
