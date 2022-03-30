@@ -1,8 +1,15 @@
-#define BLACK 0
-#define RED 1
-#define GREEN 2
-#define YELLOW 3
-#define BLUE 4
-#define MAGENTA 5
-#define CYAN 6
-#define WHITE 7
+#ifndef COLOR_H
+#define COLOR_H
+
+enum colornum {
+    BLACK,
+    RED,
+    GREEN,
+    YELLOW,
+    BLUE,
+    MAGENTA,
+    CYAN,
+    WHITE
+};
+
+#endif

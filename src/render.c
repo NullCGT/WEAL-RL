@@ -8,7 +8,7 @@
 /* Render the map, tile by tile.
    Loops over the entirety of the map, and works in O(n) time. */
 void render_map(void) {
-    werase(g.map_win);
+    clear_map();
     g.cx = min(max(0, g.player.x - (MAPWIN_W  / 2)), abs(MAPW - MAPWIN_W));
     g.cy = min(max(0, g.player.y - (MAPWIN_H / 2)), abs(MAPH - MAPWIN_H));
     for (int i = 0; i < MAPWIN_W; i++) {
@@ -16,12 +16,12 @@ void render_map(void) {
             if (i + g.cx < MAPW && j + g.cy < MAPH
                 && i + g.cx >= 0 && j + g.cy >= 0) {
                 if (is_visible(i + g.cx, j + g.cy)) {
-                    map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr, COLOR_PAIR(WHITE));
+                    map_putch(i, j, g.levmap[i + g.cx][j + g.cy].chr, WHITE);
                 } else if (is_explored(i + g.cx, j + g.cy)) {
-                    map_putch(j, i, g.levmap[i + g.cx][j + g.cy].chr, COLOR_PAIR(BLUE));
+                    map_putch(i, j, g.levmap[i + g.cx][j + g.cy].chr, BLUE);
                 }
             } else
-                map_putch(j, i, ' ', COLOR_PAIR(WHITE));  
+                map_putch(i, j, ' ', WHITE);  
         }
     }
     f.update_map = 0;
@@ -31,7 +31,7 @@ void render_map(void) {
 void render_all_npcs(void) {
     struct npc *cur = &g.player;
     while (cur != NULL) {
-        map_putch(cur->y - g.cy, cur->x - g.cx, cur->chr, COLOR_PAIR(WHITE));
+        map_putch(cur->x - g.cx, cur->y - g.cy, cur->chr, WHITE);
         cur = cur->next;
     }
     return;
@@ -40,7 +40,7 @@ void render_all_npcs(void) {
 void clear_npcs(void) {
     struct npc *cur = &g.player;
     while (cur != NULL) {
-        map_putch(cur->y - g.cy, cur->x - g.cx, g.levmap[cur->x][cur->y].chr, COLOR_PAIR(WHITE));
+        map_putch(cur->x - g.cx, cur->y - g.cy, g.levmap[cur->x][cur->y].chr, WHITE);
         cur = cur->next;
     }
     return;

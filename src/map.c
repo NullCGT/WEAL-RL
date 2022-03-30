@@ -20,6 +20,7 @@ void magic_mapping(void) {
             g.levmap[x][y].explored = 1;
         }
     }
+    f.update_map = 1;
 }
 
 /* Change the depth via ascending or descending. */

@@ -15,13 +15,6 @@
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #define signum(x) ((x > 0) - (x < 0))
 
-struct action {
-    char *name;
-    char *desc;
-    void *func;
-    struct action *next;
-};
-
 struct npc {
     char name[20];
     int chr;
@@ -99,7 +92,7 @@ extern struct monstat monstats[];
 
 /* Map and window macros */
 #define MAPWIN_W (term.w * 2 / 3)
-#define MSG_W MAPWIN_W
+#define MSG_W MAPWIN_W - 2
 #define SB_W (term.w - MAPWIN_W)
 
 #define MAPWIN_H min(MAPH, (term.h * 5 / 6))

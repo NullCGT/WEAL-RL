@@ -62,7 +62,7 @@ int wfc_mapgen(void) {
             } else {
                 g.levmap[x][y].blocked = 1;
                 g.levmap[x][y].opaque = 1;
-                g.levmap[x][y].chr = ACS_CKBOARD;
+                g.levmap[x][y].chr = '#';
             }
             /* Initialize lit and visible state. Probably move elsewhere later. */
             g.levmap[x][y].lit = 0;

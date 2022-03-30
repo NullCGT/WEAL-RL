@@ -53,7 +53,7 @@ int logm(const char *format, ...) {
     va_list arg;
 
     va_start(arg, format);
-    ret = log_string(format, A_NORMAL, arg);
+    ret = log_string(format, WHITE, arg);
     va_end(arg);
     return ret;
 }

@@ -13,7 +13,7 @@ void free_message_list(struct msg *);
 int logm(const char *, ...);
 int logma(int, const char *, ...);
 
-#define MAX_MSG_LEN 128
+#define MAX_MSG_LEN 256
 #define MAX_BACKSCROLL 50
 
 #endif

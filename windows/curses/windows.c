@@ -7,13 +7,15 @@
 #include "windows.h"
 #include "render.h"
 #include "message.h"
+#include "action.h"
 
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
+WINDOW* create_win(int, int, int, int);
 void cleanup_win(WINDOW *);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
-void draw_msg_window(WINDOW *, int);
+int handle_mouse(void);
 
 /* SCREEN FUNCTIONS */
 
@@ -22,7 +24,7 @@ void setup_gui(void) {
     g.map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
     g.msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
     f.update_map = 1;
-    draw_msg_window(g.msg_win, MSG_H);
+    draw_msg_window(MSG_H, 0);
     wrefresh(g.map_win);
 }
 
@@ -166,13 +168,19 @@ void render_bar(WINDOW* win, int cur, int max, int x, int y,
     
 }
 
-/* TODO: Pdcurses has issues with getmaxyx, so we will need to include our own version of the
-   header. That will allow us to cut down on the arguments. */
-void draw_msg_window(WINDOW *win, int h) {
+/* TODO: Fix this terrible, terrible function up. PLEASE. */
+void draw_msg_window(int h, int full) {
     int i = 0;
     int x, y;
     struct msg *cur_msg;
     struct msg *prev_msg;
+    WINDOW *win;
+
+    if (full) {
+        win = create_win(MAPWIN_H + MSG_H, MSG_W, 0, 0);
+    } else {
+        win = g.msg_win;
+    }
 
     werase(win);
     cur_msg = g.msg_list;
@@ -183,6 +191,7 @@ void draw_msg_window(WINDOW *win, int h) {
             prev_msg->next = NULL;
             prev_msg = cur_msg;
             cur_msg = cur_msg->next;
+            // TODO: Do not handle memory in screen-related files.
             free_msg(prev_msg);
             i++;
             continue;
@@ -192,9 +201,9 @@ void draw_msg_window(WINDOW *win, int h) {
             i++;
             continue;
         }
-        wattron(win, cur_msg->attr);
+        wattron(win, COLOR_PAIR(cur_msg->attr));
         waddstr(win, cur_msg->msg);
-        wattroff(win, cur_msg->attr);
+        wattroff(win, COLOR_PAIR(cur_msg->attr));
         waddch(win, '\n');
         prev_msg = cur_msg;
         cur_msg = cur_msg->next;
@@ -202,30 +211,101 @@ void draw_msg_window(WINDOW *win, int h) {
     }
     wrefresh(win);
     f.update_msg = 0;
-}
 
-void full_msg_window(void) {
-    WINDOW *win;
-    win = create_win(MAPWIN_H + MSG_H, MSG_W, 0, 0);
-    draw_msg_window(win, term.h);
-    wrefresh(win);
-    getch();
-    cleanup_win(win);
-    f.update_map = 1;
-    f.update_msg = 1;
-    return;
+    if (full) {
+        getch();
+        cleanup_win(win);
+        f.update_map = 1;
+        f.update_msg = 1;
+    }
 }
 
 /* Outputs a character to the map window. Wrapper for mvwaddch(). */
-int map_putch(int y, int x, int chr, int attr) {
+int map_putch(int x, int y, int chr, int attr) {
     int ret;
-    wattron(g.map_win, attr);
+    wattron(g.map_win, COLOR_PAIR(attr));
     ret = mvwaddch(g.map_win, y, x, chr); 
-    wattroff(g.map_win, attr);
+    wattroff(g.map_win, COLOR_PAIR(attr));
     return ret;
+}
+
+void clear_map(void) {
+    werase(g.map_win);
 }
 
 void refresh_map(void) {
     wmove(g.map_win, g.player.y - g.cy, g.player.x - g.cx);
     wrefresh(g.map_win);
+}
+
+/* handle mouse inputs */
+int handle_mouse(void) {
+    int x, y;
+    MEVENT event;
+
+    if (getmouse(&event) != OK)
+        return A_NONE;
+    
+    x = event.x;
+    y = event.y;
+    
+    if (event.bstate & BUTTON1_CLICKED) {
+        if (y <= MSG_H - 1 && x <= MSG_W) {
+            return A_FULLSCREEN;
+        }
+    }
+    return A_NONE;
+}
+
+/* Handle key inputs. Blocking. */
+int handle_keys(void) {
+    int keycode = getch();
+    switch(keycode) {
+        case 'h':
+        case KEY_LEFT:
+        case '4':
+            return A_WEST;
+        case 'j':
+        case KEY_DOWN:
+        case '2':
+            return A_SOUTH;
+        case 'k':
+        case KEY_UP:
+        case '8':
+            return A_NORTH;
+        case 'l':
+        case KEY_RIGHT:
+        case '6':
+            return A_EAST;
+        case 'y':
+        case '7':
+            return A_NORTHWEST;
+        case 'u':
+        case '9':
+            return A_NORTHEAST;
+        case 'n':
+        case '3':
+            return A_SOUTHEAST;
+        case 'b':
+        case '1':
+            return A_SOUTHWEST;
+        case '.':
+        case '5':
+            return A_REST;
+        case KEY_MOUSE:
+            return handle_mouse();
+        case 'p':
+            return A_FULLSCREEN;
+        case '>':
+            return A_DESCEND;
+        case '<':
+            return A_ASCEND;
+        case 'Q':
+            return A_QUIT;
+        case 'z':
+            return A_DEBUG_MAGICMAP;
+        default:
+            break;
+    }
+    return A_NONE;
 }
