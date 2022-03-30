@@ -15,7 +15,16 @@ file(GLOB SRCS "src/*.c")
 add_executable(weal ${SRCS} windows/curses/windows.c)
 add_executable(weal_sdl ${SRCS} windows/sdl/windows.c)
 
-target_link_libraries(weal_sdl PUBLIC LibXml2::LibXml2 ${CURSES_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/blt/Linux64/libBearLibTerminal.so)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    target_link_libraries(weal_sdl PUBLIC LibXml2::LibXml2 ${CURSES_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/blt/Linux64/libBearLibTerminal.so)
+endif()
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    target_link_libraries(weal_sdl PUBLIC LibXml2::LibXml2 ${CURSES_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/blt/Windows64/BearLibTerminal.dll ${CMAKE_SOURCE_DIR}/lib/blt/Linux64/BearLibTerminal.lib)
+endif()
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    target_link_libraries(weal_sdl PUBLIC LibXml2::LibXml2 ${CURSES_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/blt/OSX/BearLibTerminal.dylib)
+endif()
+
 target_link_libraries(weal PUBLIC LibXml2::LibXml2 ${CURSES_LIBRARIES})
 
 set_target_properties(weal PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
