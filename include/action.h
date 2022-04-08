@@ -3,7 +3,7 @@
 
 #define DEBUG_CUTOFF 100
 
-int move_mon(struct npc*, int, int);
+int move_mon(struct actor*, int, int);
 void execute_action(int);
 
 enum actionnum {

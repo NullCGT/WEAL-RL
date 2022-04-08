@@ -14,7 +14,7 @@
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #define signum(x) ((x > 0) - (x < 0))
 
-struct npc {
+struct actor {
     char name[20];
     int chr;
     int x;
@@ -22,7 +22,7 @@ struct npc {
     int energy;
     int emax;
     struct action *actions;
-    struct npc *next;
+    struct actor *next;
     /* bitfields */
     unsigned int playable : 1;
     /* 7 free bits */
@@ -61,7 +61,7 @@ struct tile {
 
 typedef struct global {
     struct tile levmap[MAPW][MAPH];
-    struct npc player; /* Assume player is first NPC */
+    struct actor player; /* Assume player is first NPC */
     struct msg *msg_list;
     struct msg *msg_last;
     int turns;

@@ -15,7 +15,7 @@
 #include "fov.h"
 #include "action.h"
 
-int move_mon(struct npc *, int, int);
+int move_mon(struct actor *, int, int);
 void handle_exit(void);
 void handle_sigwinch(int);
 
@@ -74,7 +74,7 @@ int main(void) {
     g.player.next = NULL;
     g.player.playable = 1;
 
-    struct npc test_npc = {
+    struct actor test_npc = {
         .name = "Troll",
         .chr = 'T',
         .x = g.player.x + 1,

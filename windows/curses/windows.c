@@ -128,7 +128,7 @@ void create_popup_win(const char *title, const char *msg) {
 void display_energy_win(void) {
     WINDOW* new_win;
     char buf[128];
-    struct npc *cur_npc = &g.player;
+    struct actor *cur_npc = &g.player;
 
     new_win = newwin(SB_H, SB_W, SB_Y, SB_X);
     box(new_win, 0, 0);

@@ -6,13 +6,13 @@
 #include "map.h"
 #include "windows.h"
 
-int is_player(struct npc *);
+int is_player(struct actor *);
 
-int is_player(struct npc* mon) {
+int is_player(struct actor* mon) {
     return (mon == &g.player);
 }
 
-int move_mon(struct npc* mon, int x, int y) {
+int move_mon(struct actor* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
     if ((nx < 0 || ny < 0|| nx >= MAPW || ny >= MAPH)
