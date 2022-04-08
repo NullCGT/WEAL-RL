@@ -168,12 +168,10 @@ void render_bar(WINDOW* win, int cur, int max, int x, int y,
     
 }
 
-/* TODO: Fix this terrible, terrible function up. PLEASE. */
 void draw_msg_window(int h, int full) {
     int i = 0;
     int x, y;
     struct msg *cur_msg;
-    struct msg *prev_msg;
     WINDOW *win;
 
     if (full) {
@@ -187,16 +185,7 @@ void draw_msg_window(int h, int full) {
     while (cur_msg != NULL) {
         getyx(win, y, x);
         (void) x;
-        if (i >= MAX_BACKSCROLL) {
-            prev_msg->next = NULL;
-            prev_msg = cur_msg;
-            cur_msg = cur_msg->next;
-            // TODO: Do not handle memory in screen-related files.
-            free_msg(prev_msg);
-            i++;
-            continue;
-        } else if (y > h - 2) {
-            prev_msg = cur_msg;
+        if (y > h - 2) {
             cur_msg = cur_msg->next;
             i++;
             continue;
@@ -205,7 +194,6 @@ void draw_msg_window(int h, int full) {
         waddstr(win, cur_msg->msg);
         wattroff(win, COLOR_PAIR(cur_msg->attr));
         waddch(win, '\n');
-        prev_msg = cur_msg;
         cur_msg = cur_msg->next;
         i++;
     }

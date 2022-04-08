@@ -6,6 +6,7 @@ struct msg {
     int turn;
     int attr;
     struct msg *next;
+    struct msg *prev;
 };
 
 void free_msg(struct msg *);
@@ -14,6 +15,6 @@ int logm(const char *, ...);
 int logma(int, const char *, ...);
 
 #define MAX_MSG_LEN 256
-#define MAX_BACKSCROLL 50
+#define MAX_BACKSCROLL 25
 
 #endif

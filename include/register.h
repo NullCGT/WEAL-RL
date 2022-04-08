@@ -1,7 +1,6 @@
 #ifndef REGISTER_H
 #define REGISTER_H
 
-#include <curses.h>
 #include "color.h"
 
 /* Map and window constants */
@@ -64,13 +63,12 @@ typedef struct global {
     struct tile levmap[MAPW][MAPH];
     struct npc player; /* Assume player is first NPC */
     struct msg *msg_list;
+    struct msg *msg_last;
     int turns;
     int depth;
     int cx;
     int cy;
     char *saved_locale;
-    WINDOW *map_win;
-    WINDOW *msg_win;
 } global;
 
 typedef struct bitflags {

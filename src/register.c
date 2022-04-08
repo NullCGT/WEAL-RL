@@ -6,13 +6,12 @@ struct global g = {
     .levmap = {{ {0} }},
     .player = { {0} },
     .msg_list = NULL,
+    .msg_last = NULL,
     .turns = 0,
     .depth = 1,
     .cx = 0,
     .cy = 0,
-    .saved_locale = NULL,
-    .map_win = NULL,
-    .msg_win = NULL,
+    .saved_locale = NULL
 };
 
 struct bitflags f = {

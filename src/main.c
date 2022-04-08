@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <signal.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #include "map.h"
 #include "register.h"
@@ -87,7 +89,7 @@ int main(void) {
     
     /* Main Loop */
     c = A_NONE;
-    while (TRUE) {
+    while (1) {
         clear_npcs();
         execute_action(c);
         /* Conditionally update screen elements */

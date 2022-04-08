@@ -51,7 +51,6 @@ void draw_msg_window(int h, int full) {
     int y = 0;
     dimensions_t dim;
     struct msg *cur_msg;
-    struct msg *prev_msg;
 
     if (full) {
         terminal_clear_area(0, MSG_Y, MSG_W, h);
@@ -60,16 +59,7 @@ void draw_msg_window(int h, int full) {
     terminal_clear_area(0, MSG_Y, MSG_W, h);
     cur_msg = g.msg_list;
     while (cur_msg !=  NULL) {
-        if (i >= MAX_BACKSCROLL) {
-            prev_msg->next = NULL;
-            prev_msg = cur_msg;
-            cur_msg = cur_msg->next;
-            // TODO: Do not handle memory in screen-related files.
-            free_msg(prev_msg);
-            i++;
-            continue;
-        } else if (y > h - 2) {
-            prev_msg = cur_msg;
+        if (y > h - 2) {
             cur_msg = cur_msg->next;
             i++;
             continue;
@@ -78,7 +68,6 @@ void draw_msg_window(int h, int full) {
         dim = terminal_print_ext(0, y, MSG_W, MSG_H, TK_ALIGN_LEFT, cur_msg->msg);
         terminal_color(colors[WHITE]);
         y += dim.height;
-        prev_msg = cur_msg;
         cur_msg = cur_msg->next;
         i++;
     }
@@ -131,14 +120,14 @@ int handle_keys(void) {
         return A_SOUTHEAST;
     } else if (keycode == TK_B) {
         return A_SOUTHWEST;
-    } else if (keycode == TK_PERIOD) {
-        return A_REST;
-    } else if (keycode == TK_P) {
-        return A_FULLSCREEN;
     } else if (keycode == TK_PERIOD && shift) {
         return A_DESCEND;
     } else if (keycode == TK_COMMA && shift) {
         return A_ASCEND;
+    } else if (keycode == TK_PERIOD) {
+        return A_REST;
+    } else if (keycode == TK_P) {
+        return A_FULLSCREEN;
     } else if (keycode == TK_Q && shift) {
         return A_QUIT;
     } else if (keycode == TK_Z) {
