@@ -17,15 +17,18 @@ void cleanup_win(WINDOW *);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 int handle_mouse(void);
 
+WINDOW *map_win;
+WINDOW *msg_win;
+
 /* SCREEN FUNCTIONS */
 
 /* Perform the first-time setup for the game's GUI. */
 void setup_gui(void) {
-    g.map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
-    g.msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
+    map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
+    msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
     f.update_map = 1;
     draw_msg_window(MSG_H, 0);
-    wrefresh(g.map_win);
+    wrefresh(map_win);
 }
 
 /* Set the locale of the terminal for the purposes of consistency, bug
@@ -177,7 +180,7 @@ void draw_msg_window(int h, int full) {
     if (full) {
         win = create_win(MAPWIN_H + MSG_H, MSG_W, 0, 0);
     } else {
-        win = g.msg_win;
+        win = msg_win;
     }
 
     werase(win);
@@ -211,19 +214,19 @@ void draw_msg_window(int h, int full) {
 /* Outputs a character to the map window. Wrapper for mvwaddch(). */
 int map_putch(int x, int y, int chr, int attr) {
     int ret;
-    wattron(g.map_win, COLOR_PAIR(attr));
-    ret = mvwaddch(g.map_win, y, x, chr); 
-    wattroff(g.map_win, COLOR_PAIR(attr));
+    wattron(map_win, COLOR_PAIR(attr));
+    ret = mvwaddch(map_win, y, x, chr); 
+    wattroff(map_win, COLOR_PAIR(attr));
     return ret;
 }
 
 void clear_map(void) {
-    werase(g.map_win);
+    werase(map_win);
 }
 
 void refresh_map(void) {
-    wmove(g.map_win, g.player.y - g.cy, g.player.x - g.cx);
-    wrefresh(g.map_win);
+    wmove(map_win, g.player.y - g.cy, g.player.x - g.cx);
+    wrefresh(map_win);
 }
 
 /* handle mouse inputs */
