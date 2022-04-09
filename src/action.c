@@ -5,8 +5,10 @@
 #include "message.h"
 #include "map.h"
 #include "windows.h"
+#include "render.h"
 
 int is_player(struct actor *);
+int autoexplore(void);
 
 int is_player(struct actor* mon) {
     return (mon == &g.player);
@@ -40,6 +42,48 @@ int move_mon(struct actor* mon, int x, int y) {
         f.update_fov = 1;
     }
     return 0;
+}
+
+int autoexplore(void) {
+    int lx, ly;
+    int lowest = MAX_HEAT;
+    // Do things
+    for (int x = -1; x <= 1; x++) {
+        if (x + g.player.x < 0 || x + g.player.x >= MAPW) continue;
+        for (int y = -1; y <= 1; y++) {
+            if (!x && !y) continue;
+            if (y + g.player.y < 0 || y + g.player.y >= MAPH) continue;
+            if (g.levmap[x + g.player.x][y + g.player.y].explore_heat <= lowest) {
+                lowest = g.levmap[x + g.player.x][y + g.player.y].explore_heat;
+                lx = x;
+                ly = y;
+            }
+        }
+    }
+    if (lowest < MAX_HEAT) {
+        if (!f.mode_explore) {
+            logma(YELLOW, "I begin cautiously exploring the area.");
+            f.mode_explore = 1;
+        }
+        move_mon(&g.player, lx, ly);
+        return 0;
+    } else {
+        logm("I don't think there's anywhere else I can explore from here.");
+        f.mode_explore = 0;
+        return 1;
+    }
+}
+
+int get_action(void) {
+    /* If we are in runmode or are exploring, don't block input. */
+    /* TODO: Fix the kludge happening here and make autoexplore return an
+       action. */
+    if (f.mode_explore) {
+        autoexplore();
+        return A_NONE;
+    }
+    /* Otherwise, block input all day :) */
+    return handle_keys();
 }
 
 void execute_action(int actnum) {
@@ -80,11 +124,17 @@ void execute_action(int actnum) {
         case A_FULLSCREEN:
             draw_msg_window(MAPWIN_H + MSG_H, 1);
             break;
+        case A_EXPLORE:
+            autoexplore();
+            break;
         case A_QUIT:
             exit(0);
             break;
         case A_DEBUG_MAGICMAP:
             magic_mapping();
+            break;
+        case A_DEBUG_HEAT:
+            switch_viewmode();
             break;
         case A_NONE:
             break;

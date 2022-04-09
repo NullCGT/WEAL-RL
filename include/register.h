@@ -50,6 +50,9 @@ struct monster {
 
 struct tile {
     int chr;
+    /* Heatmaps */
+    int player_heat;
+    int explore_heat;
     /* bitfields */
     unsigned int blocked : 1;
     unsigned int visible : 1;
@@ -68,14 +71,18 @@ typedef struct global {
     int depth;
     int cx;
     int cy;
+    int display_heat;
     char *saved_locale;
 } global;
 
 typedef struct bitflags {
+    /* Rendering update flags */
     unsigned int update_msg : 1;
     unsigned int update_map : 1;
     unsigned int update_fov : 1;
-    /* 5 free bits */
+    /* Mode flags */
+    unsigned int mode_explore : 1;
+    /* 4 free bits */
 } bitflags;
 
 typedef struct terminal {

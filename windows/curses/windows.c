@@ -220,6 +220,13 @@ int map_putch(int x, int y, int chr, int attr) {
     return ret;
 }
 
+/* Outputs a character to the map window. Since curses only supports
+   a small set of colors, we cast to an integer and modulo. */
+int map_putch_truecolor(int x, int y, int chr, unsigned color) {
+    int final_color = color % COLOR_MAX;
+    return map_putch(x, y, chr, final_color);
+}
+
 void clear_map(void) {
     werase(map_win);
 }
@@ -291,10 +298,14 @@ int handle_keys(void) {
             return A_DESCEND;
         case '<':
             return A_ASCEND;
+        case 'x':
+            return A_EXPLORE;
         case 'Q':
             return A_QUIT;
         case 'z':
             return A_DEBUG_MAGICMAP;
+        case 'e':
+            return A_DEBUG_HEAT;
         default:
             break;
     }

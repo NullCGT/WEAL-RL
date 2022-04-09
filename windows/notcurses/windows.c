@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "register.h"
 #include "windows.h"
@@ -129,6 +128,14 @@ int map_putch(int x, int y, int chr, int attr) {
     return ret;
 }
 
+int map_putch_truecolor(int x, int y, int chr, unsigned color) {
+    int ret;
+    ncplane_set_fg_rgb(nstd, color);
+    ret = ncplane_putchar_yx(nstd, y + MAPWIN_Y, x, (wchar_t) chr);
+    ncplane_set_fg_rgb(nstd, colors[WHITE]);
+    return ret;
+}
+
 void clear_map(void) {
     ncplane_erase(nstd);
 }
@@ -189,11 +196,15 @@ int handle_keys(void) {
             break;
         case 'p':
             return A_FULLSCREEN;
+        case 'x':
+            return A_EXPLORE;
         case 'Q':
         case NCKEY_EXIT:
             return A_QUIT;
         case 'z':
             return A_DEBUG_MAGICMAP;
+        case 'e':
+            return A_DEBUG_HEAT;
         default:
             break;
     }

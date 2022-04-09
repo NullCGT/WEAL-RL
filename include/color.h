@@ -12,4 +12,6 @@ enum colornum {
     WHITE
 };
 
+#define COLOR_MAX WHITE
+
 #endif

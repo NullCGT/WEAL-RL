@@ -11,13 +11,15 @@ struct global g = {
     .depth = 1,
     .cx = 0,
     .cy = 0,
+    .display_heat = 0,
     .saved_locale = NULL
 };
 
 struct bitflags f = {
     .update_msg = 1,
     .update_map = 1,
-    .update_fov = 1
+    .update_fov = 1,
+    .mode_explore = 0
 };
 
 struct terminal term = {

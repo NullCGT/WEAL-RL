@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <signal.h>
-#include <unistd.h>
 #include <stdio.h>
 
 #include "map.h"
@@ -99,6 +98,7 @@ int main(void) {
         if (f.update_fov) {
             clear_fov();
             calculate_fov(g.player.x, g.player.y, 7);
+            create_heatmap(); /* VERY EXPENSIVE. */
         }
         if (f.update_map) {
             render_map();
@@ -106,7 +106,7 @@ int main(void) {
         render_all_npcs();
         display_energy_win();
         refresh_map();
-        c = handle_keys();
+        c = get_action(); /* Blocking input occurs here */
     }
     exit(0);
 }

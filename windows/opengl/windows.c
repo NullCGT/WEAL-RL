@@ -89,6 +89,13 @@ int map_putch(int x, int y, int chr, int color) {
     return 0;
 }
 
+int map_putch_truecolor(int x, int y, int chr, unsigned color) {
+    terminal_color(color + 0xff000000);
+    terminal_put(x, y + MAPWIN_Y, chr);
+    terminal_color(colors[WHITE]);
+    return 0;
+}
+
 void clear_map(void) {
     terminal_clear_area(0, MAPWIN_Y, MAPWIN_W, MAPWIN_H);
 }
@@ -128,10 +135,14 @@ int handle_keys(void) {
         return A_REST;
     } else if (keycode == TK_P) {
         return A_FULLSCREEN;
+    } else if (keycode == TK_X) {
+        return A_EXPLORE;
     } else if (keycode == TK_Q && shift) {
         return A_QUIT;
     } else if (keycode == TK_Z) {
         return A_DEBUG_MAGICMAP;
+    } else if (keycode == TK_E) {
+        return A_DEBUG_HEAT;
     }
     return A_NONE;
 }
