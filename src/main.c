@@ -2,6 +2,8 @@
 #include <locale.h>
 #include <signal.h>
 #include <stdio.h>
+#include <execinfo.h>
+#include <unistd.h>
 
 #include "map.h"
 #include "register.h"
@@ -14,7 +16,6 @@
 #include "fov.h"
 #include "action.h"
 
-int move_mon(struct actor *, int, int);
 void handle_exit(void);
 void handle_sigwinch(int);
 
@@ -45,6 +46,19 @@ void handle_sigwinch(int sig) {
     return;
 }
 
+
+/* This is pulled directly from a stack overflow post by user Todd Gamblin.
+   https://stackoverflow.com/questions/77005/how-to-automatically-generate-a-stacktrace-when-my-program-crashes */
+void handle_sigsegv(int sig) {
+    (void) sig;
+    void *array[10];
+    size_t size;
+    size = backtrace(array, 10);
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    exit(1);
+}
+
 /* Main function. */
 int main(void) {
     int c;
@@ -52,6 +66,7 @@ int main(void) {
     /* handle exits and resizes */
     atexit(handle_exit);
     signal(SIGWINCH, handle_sigwinch);
+    signal(SIGSEGV, handle_sigsegv);
 
     // Seed the rng
     rndseed_t();

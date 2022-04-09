@@ -6,7 +6,7 @@ project(weal_ncurses VERSION 1.0)       # Runs in the console with ncurses.
 project(weal_opengl VERSION 1.0)        # Runs in an opengl window with bearlibterminal
 
 # Seting flags in this manner is bad practice.
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -lm")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -lm -rdynamic")
 
 # Find required packages
 find_package(LibXml2 REQUIRED)
