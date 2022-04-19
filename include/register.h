@@ -72,6 +72,7 @@ typedef struct global {
     int cx;
     int cy;
     int display_heat;
+    int prev_action; /* for the moment, only used for runmode */
     char *saved_locale;
 } global;
 
@@ -82,7 +83,8 @@ typedef struct bitflags {
     unsigned int update_fov : 1;
     /* Mode flags */
     unsigned int mode_explore : 1;
-    /* 4 free bits */
+    unsigned int mode_run : 1;
+    /* 3 free bits */
 } bitflags;
 
 typedef struct terminal {

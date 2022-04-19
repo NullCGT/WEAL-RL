@@ -304,32 +304,59 @@ int handle_mouse(void) {
 /* Handle key inputs. Blocking. */
 int handle_keys(void) {
     int keycode = getch();
+    /* This is a bit more complicated than other input systems,
+       since curses picks up character codes, rather than
+       keyboard strikes. */
     switch(keycode) {
+        case 'H':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'h':
         case KEY_LEFT:
         case '4':
             return A_WEST;
+        case 'J':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'j':
         case KEY_DOWN:
         case '2':
             return A_SOUTH;
+        case 'K':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'k':
         case KEY_UP:
         case '8':
             return A_NORTH;
+        case 'L':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'l':
         case KEY_RIGHT:
         case '6':
             return A_EAST;
+        case 'Y':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'y':
         case '7':
             return A_NORTHWEST;
+        case 'U':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'u':
         case '9':
             return A_NORTHEAST;
+        case 'N':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'n':
         case '3':
             return A_SOUTHEAST;
+        case 'B':
+            f.mode_run = 1;
+            /* FALLTHRU */
         case 'b':
         case '1':
             return A_SOUTHWEST;

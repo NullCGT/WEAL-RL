@@ -21,10 +21,12 @@ int move_mon(struct actor* mon, int x, int y) {
     if ((nx < 0 || ny < 0|| nx >= MAPW || ny >= MAPH)
         && is_player(mon)) {
             logm("I'm not leaving until I find Kate.");
+            f.mode_run = 0;
             return 1;
     } else if (is_blocked(nx, ny) && is_player(mon)) {
         if (is_player(mon)) {
             logm("I press my hand to the wall. The concrete is cold.");
+            f.mode_run = 0;
         }
 	    return 1;
     }
@@ -83,11 +85,16 @@ int get_action(void) {
         autoexplore();
         return A_NONE;
     }
+    /* If running, move in the previously input direction. */
+    if (f.mode_run) {
+        return g.prev_action;
+    }
     /* Otherwise, block input all day :) */
     return handle_keys();
 }
 
 void execute_action(int actnum) {
+    if (actnum) g.prev_action = actnum;
     switch(actnum) {
         case A_WEST:
             move_mon(&g.player, -1, 0);

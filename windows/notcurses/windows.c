@@ -205,75 +205,106 @@ void refresh_map(void) {
 /* Handle key inputs. Blocking. */
 int handle_keys(void) {
     struct ncinput input;
+    int shift;
+    int ret = A_NONE;
+
     notcurses_get(nc, NULL, &input);
     if (input.evtype == NCTYPE_RELEASE)
-        return A_NONE;
+        return ret;
+    shift = (input.modifiers & NCKEY_MOD_SHIFT);
     switch(input.id) {
         case 'h':
+        case 'H':
         case NCKEY_LEFT:
         case '4':
-            return A_WEST;
+            ret = A_WEST;
+            break;
         case 'j':
+        case 'J':
         case NCKEY_DOWN:
         case '2':
-            return A_SOUTH;
+            ret = A_SOUTH;
+            break;
         case 'k':
+        case 'K':
         case NCKEY_UP:
         case '8':
-            return A_NORTH;
+            ret = A_NORTH;
+            break;
         case 'l':
+        case 'L':
         case NCKEY_RIGHT:
         case '6':
-            return A_EAST;
+            ret = A_EAST;
+            break;
         case 'y':
+        case 'Y':
         case NCKEY_ULEFT:
         case '7':
-            return A_NORTHWEST;
+            ret = A_NORTHWEST;
+            break;
         case 'u':
+        case 'U':
         case NCKEY_URIGHT:
         case '9':
-            return A_NORTHEAST;
+            ret = A_NORTHEAST;
+            break;
         case 'n':
+        case 'N':
         case NCKEY_DRIGHT:
         case '3':
-            return A_SOUTHEAST;
+            ret = A_SOUTHEAST;
+            break;
         case 'b':
+        case 'B':
         case NCKEY_DLEFT:
         case '1':
-            return A_SOUTHWEST;
+            ret = A_SOUTHWEST;
+            break;
         case '.':
-            if (input.modifiers & NCKEY_MOD_SHIFT)
-                return A_DESCEND;
+            if (shift) {
+                ret = A_DESCEND;
+                break;
+            }
             /* FALLTHRU */
         case NCKEY_CENTER:
         case '5':
-            return A_REST;
+            ret = A_REST;
+            break;
         case ',':
-            if (input.modifiers & NCKEY_MOD_SHIFT)
-                return A_ASCEND;
+            if (shift) {
+                ret = A_ASCEND;
+                break;
+            }
             break;
         case 'p':
-            return A_FULLSCREEN;
+            ret = A_FULLSCREEN;
+            break;
         case 'x':
-            return A_EXPLORE;
+            ret = A_EXPLORE;
+            break;
         case 'Q':
         case NCKEY_EXIT:
         case NCKEY_ESC:
-            return A_QUIT;
+            ret = A_QUIT;
+            break;
         case '/':
-            if (input.modifiers & NCKEY_MOD_SHIFT)
-                return A_HELP;
+            if (shift)
+                ret = A_HELP;
             break;
         case 'R':
             if (input.modifiers & NCKEY_MOD_CTRL)
-                return A_DEBUG_MAGICMAP;
+                ret = A_DEBUG_MAGICMAP;
             break;
         case 'E':
             if (input.modifiers & NCKEY_MOD_CTRL)
-                return A_DEBUG_HEAT;
+                ret = A_DEBUG_HEAT;
             break;
         default:
             break;
     }
-    return A_NONE;
+    /* Toggle runmode */
+    if (shift && is_movement(ret))
+        f.mode_run = 1;
+    return ret;
 }

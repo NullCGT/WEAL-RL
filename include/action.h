@@ -9,6 +9,7 @@ void execute_action(int);
 
 enum actionnum {
     A_NONE,
+    /* Movement actions */
     A_WEST,
     A_EAST,
     A_NORTH,
@@ -17,6 +18,7 @@ enum actionnum {
     A_NORTHEAST,
     A_SOUTHWEST,
     A_SOUTHEAST,
+    /* End movement actions */
     A_REST,
     A_ASCEND,
     A_DESCEND,
@@ -27,6 +29,9 @@ enum actionnum {
     A_DEBUG_MAGICMAP = DEBUG_CUTOFF,
     A_DEBUG_HEAT
 };
+
+#define is_movement(a) \
+    (a > A_NONE && a < A_REST)
 
 
 #endif

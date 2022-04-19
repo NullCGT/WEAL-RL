@@ -158,44 +158,49 @@ void refresh_map(void) {
 /* Handle key inputs. Blocking. */
 int handle_keys(void) {
     int keycode = terminal_read();
+    int ret = A_NONE;
     int shift = 0;
     if (terminal_check(TK_SHIFT)) {
         shift = 1;
     }
     if (keycode == TK_H || keycode == TK_LEFT) {
-        return A_WEST;
+        ret = A_WEST;
     } else if (keycode == TK_J || keycode == TK_DOWN) {
-        return A_SOUTH;
+        ret = A_SOUTH;
     } else if (keycode == TK_K || keycode == TK_UP) {
-        return A_NORTH;
+        ret = A_NORTH;
     } else if (keycode == TK_L || keycode == TK_RIGHT) {
-        return A_EAST;
+        ret = A_EAST;
     } else if (keycode == TK_Y) {
-        return A_NORTHWEST;
+        ret = A_NORTHWEST;
     } else if (keycode == TK_U) {
-        return A_NORTHEAST;
+        ret = A_NORTHEAST;
     } else if (keycode == TK_N) {
-        return A_SOUTHEAST;
+        ret = A_SOUTHEAST;
     } else if (keycode == TK_B) {
-        return A_SOUTHWEST;
+        ret = A_SOUTHWEST;
     } else if (keycode == TK_PERIOD && shift) {
-        return A_DESCEND;
+        ret = A_DESCEND;
     } else if (keycode == TK_COMMA && shift) {
-        return A_ASCEND;
+        ret = A_ASCEND;
     } else if (keycode == TK_PERIOD) {
-        return A_REST;
+        ret = A_REST;
     } else if (keycode == TK_P) {
-        return A_FULLSCREEN;
+        ret = A_FULLSCREEN;
     } else if (keycode == TK_X) {
-        return A_EXPLORE;
+        ret = A_EXPLORE;
     } else if (keycode == TK_SLASH && shift) {
-        return A_HELP;
+        ret = A_HELP;
     } else if (keycode == TK_Q && shift) {
-        return A_QUIT;
+        ret = A_QUIT;
     } else if (keycode == TK_R && terminal_check(TK_CONTROL)) {
-        return A_DEBUG_MAGICMAP;
+        ret = A_DEBUG_MAGICMAP;
     } else if (keycode == TK_E && terminal_check(TK_CONTROL)) {
-        return A_DEBUG_HEAT;
+        ret = A_DEBUG_HEAT;
     }
-    return A_NONE;
+    /* Toggle runmode */
+    if (is_movement(ret) && shift) {
+        f.mode_run = 1;
+    }
+    return ret;
 }
