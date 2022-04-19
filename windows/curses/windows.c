@@ -54,6 +54,7 @@ void setup_screen(void) {
     int h, w;
     putenv("ESCDELAY=25");
     initscr();
+    curs_set(0);
     getmaxyx(stdscr, h, w);
     if (h > 1 && w > 1) {
         term.h = h;
