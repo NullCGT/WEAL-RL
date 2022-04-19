@@ -19,7 +19,7 @@ void magic_mapping(void) {
             g.levmap[x][y].explored = 1;
         }
     }
-    logma(MAGENTA, "I punch in the cheat code that lets me see the entire map.");
+    logma(MAGENTA, "I punch in the debug function that lets me see the entire map.");
     f.update_map = 1;
 }
 

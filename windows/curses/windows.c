@@ -1,5 +1,6 @@
 #include <curses.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <locale.h>
 #include <string.h>
 
@@ -16,6 +17,8 @@ WINDOW* create_win(int, int, int, int);
 void cleanup_win(WINDOW *);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 int handle_mouse(void);
+
+#define MAX_FILE_LEN 200
 
 WINDOW *map_win;
 WINDOW *msg_win;
@@ -123,6 +126,49 @@ void create_popup_win(const char *title, const char *msg) {
     f.update_map = 1;
     f.update_msg = 1;
     return;
+}
+
+void display_file_text(const char *fname) {
+    FILE *fp;
+    WINDOW *new_win;
+    int i =0;
+    int j = 0;
+    int action = A_NONE;
+    char *line = NULL;
+    size_t len = 0;
+
+    new_win = newpad(MAX_FILE_LEN, term.w);
+    /* Write the file to the window */
+    fp = fopen(fname, "r");
+    if (fp == NULL)
+        return;
+    while (getline(&line, &len, fp) != -1) {
+        mvwprintw(new_win, i++, 0, line);
+    }
+    fclose(fp);
+    /* Handle player input */
+    while (1) {
+        prefresh(new_win, j, 0, 0, 0, term.h - 1, term.w - 1);
+
+        action = handle_keys();
+        switch (action) {
+            case A_NORTH:
+            case A_ASCEND:
+                j -= 1;
+                break;
+            case A_SOUTH:
+            case A_DESCEND:
+                j += 1;
+                break;
+            case A_QUIT:
+            case A_HELP:
+                cleanup_win(new_win);
+                f.update_map = 1;
+                f.update_msg = 1;
+                return;
+        }
+        j = max(0, j);
+    }
 }
 
 void display_energy_win(void) {
@@ -300,14 +346,18 @@ int handle_keys(void) {
             return A_ASCEND;
         case 'x':
             return A_EXPLORE;
+        case '?':
+            return A_HELP;
         case 'Q':
             return A_QUIT;
-        case 'z':
-            return A_DEBUG_MAGICMAP;
-        case 'e':
-            return A_DEBUG_HEAT;
         default:
             break;
     }
+    /* Handle combination keys */
+    const char *key_name = keyname(keycode);
+    if (!strncmp(key_name, "^R", 2))
+        return A_DEBUG_MAGICMAP;
+    if (!strncmp(key_name, "^E", 2))
+        return A_DEBUG_HEAT;
     return A_NONE;
 }

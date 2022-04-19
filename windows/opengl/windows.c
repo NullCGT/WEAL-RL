@@ -36,8 +36,59 @@ void cleanup_screen(void) {
     terminal_close();
 }
 
+void display_file_text(const char *fname) {
+    FILE *fp;
+    int i, y;
+    int j = 0;
+    int action = A_NONE;
+    char *line = NULL;
+    size_t len = 0;
+
+    terminal_clear();
+    terminal_layer(POPUP_LAYER);
+    
+    while (1) {
+        i = 0;
+        y = 0;
+        terminal_clear();
+        fp = fopen(fname, "r");
+        if (fp == NULL)
+            return;
+        while (getline(&line, &len, fp) != -1) {
+            if (i < j) {
+                i++;
+                continue;
+            }
+            terminal_print_ext(0, y++, MSG_W + MAPWIN_W, MSG_H + MAPWIN_H, TK_ALIGN_LEFT, line);
+        }
+        terminal_refresh();
+        fclose(fp);
+        action = handle_keys();
+        switch (action) {
+            case A_NORTH:
+            case A_ASCEND:
+                j -= 1;
+                break;
+            case A_SOUTH:
+            case A_DESCEND:
+                j += 1;
+                break;
+            case A_QUIT:
+            case A_HELP:
+                terminal_clear();
+                terminal_layer(MAP_LAYER);
+                f.update_map = 1;
+                f.update_msg = 1;
+                return;
+        }
+        j = max(0, j);
+    }
+}
+
 /* TODO: Implement. */
 void create_popup_win(const char *title, const char *msg) {
+    (void) title;
+    (void) msg;
     return;
 }
 
@@ -137,11 +188,13 @@ int handle_keys(void) {
         return A_FULLSCREEN;
     } else if (keycode == TK_X) {
         return A_EXPLORE;
+    } else if (keycode == TK_SLASH && shift) {
+        return A_HELP;
     } else if (keycode == TK_Q && shift) {
         return A_QUIT;
-    } else if (keycode == TK_Z) {
+    } else if (keycode == TK_R && terminal_check(TK_CONTROL)) {
         return A_DEBUG_MAGICMAP;
-    } else if (keycode == TK_E) {
+    } else if (keycode == TK_E && terminal_check(TK_CONTROL)) {
         return A_DEBUG_HEAT;
     }
     return A_NONE;

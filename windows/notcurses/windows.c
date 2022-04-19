@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "register.h"
 #include "windows.h"
@@ -13,6 +14,8 @@ void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
 int handle_mouse(void);
+
+#define MAX_FILE_LEN 300
 
 /* Variables */
 struct notcurses *nc;
@@ -94,6 +97,61 @@ void setup_screen(void) {
 void cleanup_screen(void) {
     notcurses_stop(nc);
     return;
+}
+
+void display_file_text(const char *fname) {
+    FILE *fp;
+    struct ncplane *text_plane;
+    char *line = NULL;
+    size_t len = 0;
+    int action;
+
+    /* Open the file for reading */
+    fp = fopen(fname, "r");
+    if (fp == NULL)
+        return;
+    /* Clear existing planes */
+    ncplane_erase(nmsg_plane);
+    ncplane_erase(nstd);
+    /* Set up new plane */
+    struct ncplane_options text_plane_opts = {
+        .y = 0,
+        .x = 0,
+        .rows = MAX_FILE_LEN,
+        .cols = MSG_W + MAPWIN_W,
+        .userptr = NULL,
+        .name = "File Text Plane",
+        .resizecb = NULL,
+        .flags = 0
+    };
+    text_plane =  ncplane_create(nstd, &text_plane_opts);
+    ncplane_set_scrolling(text_plane, 1);
+    /* Write file to new plane */
+    while (getline(&line, &len, fp) != -1) {
+        ncplane_printf(text_plane, "%s", line);
+    }
+    fclose(fp);
+    /* Handle player input */
+    while (1) {
+        notcurses_render(nc);
+        action = handle_keys();
+        switch (action) {
+            case A_NORTH:
+            case A_ASCEND:
+                ncplane_move_rel(text_plane, 1, 0);
+                break;
+            case A_SOUTH:
+            case A_DESCEND:
+                ncplane_move_rel(text_plane, -1, 0);
+                break;
+            case A_QUIT:
+            case A_HELP:
+                ncplane_destroy(text_plane);
+                f.update_map = 1;
+                f.update_msg = 1;
+                return;
+        }
+    }
 }
 
 void create_popup_win(const char *title, const char *msg) {
@@ -200,11 +258,20 @@ int handle_keys(void) {
             return A_EXPLORE;
         case 'Q':
         case NCKEY_EXIT:
+        case NCKEY_ESC:
             return A_QUIT;
-        case 'z':
-            return A_DEBUG_MAGICMAP;
-        case 'e':
-            return A_DEBUG_HEAT;
+        case '/':
+            if (input.modifiers & NCKEY_MOD_SHIFT)
+                return A_HELP;
+            break;
+        case 'R':
+            if (input.modifiers & NCKEY_MOD_CTRL)
+                return A_DEBUG_MAGICMAP;
+            break;
+        case 'E':
+            if (input.modifiers & NCKEY_MOD_CTRL)
+                return A_DEBUG_HEAT;
+            break;
         default:
             break;
     }

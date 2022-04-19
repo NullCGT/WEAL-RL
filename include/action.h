@@ -22,6 +22,7 @@ enum actionnum {
     A_DESCEND,
     A_EXPLORE,
     A_FULLSCREEN,
+    A_HELP,
     A_QUIT,
     A_DEBUG_MAGICMAP = DEBUG_CUTOFF,
     A_DEBUG_HEAT

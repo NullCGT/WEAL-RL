@@ -4,6 +4,7 @@
 void setup_screen(void);
 void cleanup_screen(void);
 void create_popup_win(const char *, const char *);
+void display_file_text(const char *);
 void display_energy_win(void);
 void draw_msg_window(int, int);
 int map_putch(int, int, int, int);

@@ -92,6 +92,6 @@ int switch_viewmode(void) {
     g.display_heat = g.display_heat + 1;
     if (g.display_heat > V_MAX) g.display_heat = 0;
     f.update_map = 1;
-    logma(MAGENTA, "I punch in the cheat code that toggles the level heatmap.");
+    logma(MAGENTA, "I punch in the debug function that toggles the level heatmap.");
     return 0;
 }

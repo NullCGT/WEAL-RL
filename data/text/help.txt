@@ -1,7 +1,76 @@
-|= USER MANUAL =|
+###########################################################
+                |= USER MANUAL =|
 
-MOVEMENT
+Listen up, Civilian.
+
+Normally, you would receive a textbook and spend weeks
+committing this crap to memory, but we don't have that
+kind of time. I've done my best to hit the high points
+here.
+
+You're our last hope, and this software cost us half
+our budget, so don't screw this up.
+
+    - Colonel Koval
+
+                 |= MOVEMENT =|
+
+Movement: It's what keeps you alive. You can move using the
+numpad, arrow keys, or vikeys, as diagrammed below:
 
 789   yku
 456   h.l
-123   bjn1
+123   bjn
+
+Holding shift while inputting a direction will cause you to
+move in that direction until you encounter an obstacle or
+something that requires your attention.
+
+Remember: You can move in all eight cardinal directions, not
+just four.
+
+              |= DEFAULT KEYBINDS =|
+
+Printed below are the most commonly used keys for interacting
+with the world around you.
+Memorize these, and you should have all you need to know in
+order to complete your mission.
+
+Key     Function        Explanation
+-----------------------------------------------------------
+ >      Descend         Descend to a lower level.
+ <      Ascend          Ascend to a higher level.
+ ?      Help            View this manual.
+
+             |= ADVANCED KEYBINDS =|
+
+This section is about advanced keybinds. York tells me that
+they're for "power users," but I think that's complete
+horse crap.  If you ask me, the only people who learn these
+are doing it to show off. Just stick to your basics, and
+you'll be fine.
+
+Key     Function        Explanation
+-----------------------------------------------------------
+ x      Autoexplore     Automatically explore the area.
+
+              |= DEBUG KEYBINDS =|
+
+Hey _______. This next section is pretty tricky, so Colonel
+Koval tapped me to write it. Sorry about all of this, by the
+way.
+
+As a provisional member of _______, you are not authorized
+to use any of the following functions. Nonetheless, the Colonel
+felt it best for you to be aware of their existence. They
+could come in handy if your software is on the fritz.
+
+Best of luck out there. I hope you find Kate.
+
+        - York
+
+Key     Function        Explanation
+-----------------------------------------------------------
+ ^E     Show Heatmap    Display internal heatmaps.
+ ^R     Reveal Map      Reveal the entire map.
+ ###########################################################

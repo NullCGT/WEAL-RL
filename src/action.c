@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "register.h"
 #include "action.h"
@@ -127,6 +128,9 @@ void execute_action(int actnum) {
         case A_EXPLORE:
             autoexplore();
             break;
+        case A_HELP:
+            display_file_text("data/text/help.txt");
+            break;
         case A_QUIT:
             exit(0);
             break;
@@ -139,7 +143,7 @@ void execute_action(int actnum) {
         case A_NONE:
             break;
         default:
-            logm("Unrecognized action %d?", actnum);
+            logma(RED, "Action %d? I don't understand.", actnum);
             break;
     }
 }
