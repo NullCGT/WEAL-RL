@@ -76,7 +76,6 @@ typedef struct terminal {
 extern struct global g;
 extern struct bitflags f;
 extern struct terminal term;
-extern struct monstat monstats[];
 
 /* Map and window macros */
 #define MAPWIN_W (term.w * 2 / 3)
