@@ -27,7 +27,7 @@ static color_t colors[] = {
 
 void setup_screen(void) {
     terminal_open();
-    terminal_set("window: title='WEAL', size=80x40, resizable=true; font: FSEX302.ttf, size=18");
+    terminal_set("window: title='WEAL', size=80x40");
     terminal_layer(MAP_LAYER);
     terminal_color(colors[WHITE]);
 }
