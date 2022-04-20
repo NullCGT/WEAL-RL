@@ -11,7 +11,6 @@
 #include "message.h"
 #include "render.h"
 #include "mapgen.h"
-#include "monster.h"
 #include "random.h"
 #include "fov.h"
 #include "action.h"

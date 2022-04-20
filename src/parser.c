@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include "tile.h" /* Included only for tiledefs */
 #include "message.h"
 #include "parser.h"
 
 void remove_whitespace(unsigned char *);
+void parser_tiles(const char *infile);
 
 /* Strips whitespace characters from a string. */
 void remove_whitespace(unsigned char *str) {
@@ -65,7 +67,7 @@ int parser_getint(xmlDocPtr doc, xmlNodePtr cur) {
 /* IMPORTANT: This function does not actually free the memory allocated to
    tempdata. This MUST be freed after use. */
 /* TODO: Return a pointer instead of a struct? */
-struct wfc_image parse_wfc_xml(char *infile) {
+struct wfc_image parse_wfc_xml(const char *infile) {
     int width = 0;
     int height = 0;
     unsigned char *tempdata;

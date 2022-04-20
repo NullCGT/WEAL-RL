@@ -7,6 +7,6 @@
 
 xmlDocPtr parse_xml(const char *, const char *);
 int parser_getint(xmlDocPtr, xmlNodePtr);
-struct wfc_image parse_wfc_xml(char *infile);
+struct wfc_image parse_wfc_xml(const char *infile);
 
 #endif

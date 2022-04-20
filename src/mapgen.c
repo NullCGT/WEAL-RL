@@ -56,17 +56,10 @@ int wfc_mapgen(void) {
         for (int x = 0; x < MAPW; x++) {
             unsigned char cell = output_image->data[y * MAPW + x];
             if (cell == '.') {
-                g.levmap[x][y].blocked = 0;
-                g.levmap[x][y].opaque = 0;
-                g.levmap[x][y].chr ='.';
+                init_tile(&g.levmap[x][y], T_FLOOR);
             } else {
-                g.levmap[x][y].blocked = 1;
-                g.levmap[x][y].opaque = 1;
-                g.levmap[x][y].chr = '#';
+                init_tile(&g.levmap[x][y], T_WALL);
             }
-            /* Initialize lit and visible state. Probably move elsewhere later. */
-            g.levmap[x][y].lit = 0;
-            g.levmap[x][y].visible = 0;
         }
     }
     /* Clean leftover data from xml parser. */
@@ -82,10 +75,9 @@ int wfc_mapgen(void) {
 void init_map(void) {
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
+            g.levmap[x][y].lit = 0;
             g.levmap[x][y].visible = 0;
             g.levmap[x][y].explored = 0;
-            g.levmap[x][y].blocked = 0;
-            g.levmap[x][y].chr = '.';
         }
     }
 }

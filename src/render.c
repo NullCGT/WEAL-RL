@@ -22,8 +22,8 @@ void render_map(void) {
                     if (g.display_heat)
                         put_heatmap(i, j);
                     else
-                        map_putch(i, j, g.levmap[i + g.cx][j + g.cy].chr, 
-                                    is_visible(i + g.cx, j +g.cy) ? WHITE : BLUE);
+                        map_put_tile(i, j, i + g.cx, j + g.cy, 
+                            is_visible(i + g.cx, j +g.cy) ? g.levmap[i][j].pt->color : BLUE);
                 }
             } else
                 map_putch(i, j, ' ', WHITE);  
@@ -45,7 +45,7 @@ void render_all_npcs(void) {
 void clear_npcs(void) {
     struct actor *cur = &g.player;
     while (cur != NULL && is_visible(cur->x, cur->y)) {
-        map_putch(cur->x - g.cx, cur->y - g.cy, g.levmap[cur->x][cur->y].chr, WHITE);
+        map_put_tile(cur->x - g.cx, cur->y - g.cy, cur->x, cur->y, g.levmap[cur->x][cur->y].pt->color);
         cur = cur->next;
     }
     return;
@@ -82,7 +82,7 @@ void put_heatmap(int x, int y) {
     }
     int color = 0xffffff - i * (0xffffff / MAX_HEATMAP_DISPLAY);
     if (i >= MAX_HEATMAP_DISPLAY) {
-        map_putch(x, y, g.levmap[x + g.cx][y + g.cy].chr, WHITE);
+        map_put_tile(x, y, x + g.cx, y + g.cy, g.levmap[x][y].pt->color);
         return;
     }
     map_putch_truecolor(x, y, heatmap[i], color);

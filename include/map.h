@@ -12,10 +12,12 @@ void create_heatmap(void);
 
 #define in_bounds(x, y) \
     (x > 0 && x < MAPW && y > 0 && y < MAPH)
+/* permtile attributes */
 #define is_opaque(x, y) \
-    (g.levmap[x][y].opaque)
+    (g.levmap[x][y].pt->opaque)
 #define is_blocked(x, y) \
-    (g.levmap[x][y].blocked)
+    (g.levmap[x][y].pt->blocked)
+/* tile attributes */
 #define is_visible(x, y) \
     (g.levmap[x][y].visible)
 #define is_explored(x, y) \

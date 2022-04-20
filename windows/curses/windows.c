@@ -138,21 +138,29 @@ void display_file_text(const char *fname) {
     char *line = NULL;
     size_t len = 0;
 
-    new_win = newpad(MAX_FILE_LEN, term.w);
     /* Write the file to the window */
     fp = fopen(fname, "r");
     if (fp == NULL)
         return;
+    new_win = newpad(MAX_FILE_LEN, term.w);
     while (getline(&line, &len, fp) != -1) {
         mvwprintw(new_win, i++, 0, line);
     }
     fclose(fp);
     /* Handle player input */
+    f.mode_map = 0;
     while (1) {
         prefresh(new_win, j, 0, 0, 0, term.h - 1, term.w - 1);
 
         action = handle_keys();
         switch (action) {
+            case A_QUIT:
+            case A_HELP:
+                cleanup_win(new_win);
+                f.update_map = 1;
+                f.update_msg = 1;
+                f.mode_map = 1;
+                return;
             case A_NORTH:
             case A_ASCEND:
                 j -= 1;
@@ -161,12 +169,6 @@ void display_file_text(const char *fname) {
             case A_DESCEND:
                 j += 1;
                 break;
-            case A_QUIT:
-            case A_HELP:
-                cleanup_win(new_win);
-                f.update_map = 1;
-                f.update_msg = 1;
-                return;
         }
         j = max(0, j);
     }
@@ -258,6 +260,10 @@ void draw_msg_window(int h, int full) {
     }
 }
 
+int map_put_tile(int x, int y, int mx, int my, int attr) {
+    return map_putch(x, y, g.levmap[mx][my].pt->chr, attr);
+}
+
 /* Outputs a character to the map window. Wrapper for mvwaddch(). */
 int map_putch(int x, int y, int chr, int attr) {
     int ret;
@@ -310,53 +316,53 @@ int handle_keys(void) {
        keyboard strikes. */
     switch(keycode) {
         case 'H':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'h':
         case KEY_LEFT:
         case '4':
             return A_WEST;
         case 'J':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'j':
         case KEY_DOWN:
         case '2':
             return A_SOUTH;
         case 'K':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'k':
         case KEY_UP:
         case '8':
             return A_NORTH;
         case 'L':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'l':
         case KEY_RIGHT:
         case '6':
             return A_EAST;
         case 'Y':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'y':
         case '7':
             return A_NORTHWEST;
         case 'U':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'u':
         case '9':
             return A_NORTHEAST;
         case 'N':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'n':
         case '3':
             return A_SOUTHEAST;
         case 'B':
-            f.mode_run = 1;
+            f.mode_run = f.mode_map;
             /* FALLTHRU */
         case 'b':
         case '1':

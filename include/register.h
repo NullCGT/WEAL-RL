@@ -2,6 +2,7 @@
 #define REGISTER_H
 
 #include "color.h"
+#include "tile.h"
 
 /* Map and window constants */
 #define MAPW 80
@@ -41,27 +42,6 @@ struct monstat {
     int evolve_to;
 };
 
-struct monster {
-    int level;
-    int cur_hp;
-    int max_hp;
-    struct monstat *monstat;
-};
-
-struct tile {
-    int chr;
-    /* Heatmaps */
-    int player_heat;
-    int explore_heat;
-    /* bitfields */
-    unsigned int blocked : 1;
-    unsigned int visible : 1;
-    unsigned int lit : 1;
-    unsigned int explored : 1;
-    unsigned int opaque : 1;
-    /* 4 free bits */
-};
-
 typedef struct global {
     struct tile levmap[MAPW][MAPH];
     struct actor player; /* Assume player is first NPC */
@@ -84,7 +64,8 @@ typedef struct bitflags {
     /* Mode flags */
     unsigned int mode_explore : 1;
     unsigned int mode_run : 1;
-    /* 3 free bits */
+    unsigned int mode_map : 1;
+    /* 2 free bits */
 } bitflags;
 
 typedef struct terminal {

@@ -133,6 +133,13 @@ void draw_msg_window(int h, int full) {
     f.update_msg = 0;
 }
 
+int map_put_tile(int x, int y, int mx, int my, int color) {
+    terminal_color(colors[color]);
+    terminal_put(x, y + MAPWIN_Y, g.levmap[mx][my].pt->chr);
+    terminal_color(colors[WHITE]);
+    return 0;
+}
+
 int map_putch(int x, int y, int chr, int color) {
     terminal_color(colors[color]);
     terminal_put(x, y + MAPWIN_Y, chr);
@@ -200,7 +207,7 @@ int handle_keys(void) {
     }
     /* Toggle runmode */
     if (is_movement(ret) && shift) {
-        f.mode_run = 1;
+        f.mode_run = f.mode_map;
     }
     return ret;
 }

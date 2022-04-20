@@ -113,6 +113,7 @@ void display_file_text(const char *fname) {
     /* Clear existing planes */
     ncplane_erase(nmsg_plane);
     ncplane_erase(nstd);
+    f.mode_map = 0;
     /* Set up new plane */
     struct ncplane_options text_plane_opts = {
         .y = 0,
@@ -149,6 +150,7 @@ void display_file_text(const char *fname) {
                 ncplane_destroy(text_plane);
                 f.update_map = 1;
                 f.update_msg = 1;
+                f.mode_map = 1;
                 return;
         }
     }
@@ -177,7 +179,14 @@ void draw_msg_window(int h, int full) {
     f.update_msg = 0;
 }
 
-/* Outputs a character to the map window. Wrapper for mvwaddch(). */
+int map_put_tile(int x, int y, int mx, int my, int color) {
+    int ret;
+    ncplane_set_fg_rgb(nstd, colors[color]);
+    ret = ncplane_putwc_yx(nstd, y + MAPWIN_Y, x, g.levmap[mx][my].pt->wchr);
+    ncplane_set_fg_rgb(nstd, colors[WHITE]);
+    return ret;
+}
+
 int map_putch(int x, int y, int chr, int attr) {
     int ret;
     ncplane_set_fg_rgb(nstd, colors[attr]);
@@ -305,6 +314,6 @@ int handle_keys(void) {
     }
     /* Toggle runmode */
     if (shift && is_movement(ret))
-        f.mode_run = 1;
+        f.mode_run = f.mode_map;
     return ret;
 }

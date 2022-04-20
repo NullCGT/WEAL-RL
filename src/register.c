@@ -21,7 +21,8 @@ struct bitflags f = {
     .update_map = 1,
     .update_fov = 1,
     .mode_explore = 0,
-    .mode_run = 0
+    .mode_run = 0,
+    .mode_map = 1,
 };
 
 struct terminal term = {
