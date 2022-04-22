@@ -6,6 +6,7 @@
 
 /* Attributes are fixed */
 struct permtile {
+    int id;
     const char *name;
     char chr;
     wchar_t wchr;
@@ -36,9 +37,9 @@ void init_tile(struct tile *intile, int tindex);
 
 /* Tile definitions */
 #define PERMTILES \
+    FLOOR(FLOOR,      "tile floor",    '.', L'.', WHITE), \
     FLOOR(STAIR_DOWN, "stairs down",   '>', L'>', YELLOW), \
     FLOOR(STAIR_UP,   "stairs up",     '<', L'<', YELLOW), \
-    FLOOR(FLOOR,      "tile floor",    '.', L'.', WHITE), \
     WALL(WALL,        "concrete wall", '#', L'█', WHITE)
 
 /* Welcome to Macro Hell */
@@ -58,11 +59,11 @@ enum permtilenum {
 #undef WALL
 
 #define TILE(id, name, chr, wchr, color, blocked, opaque) \
-    { name, chr, wchr, color, blocked, opaque }
+    { T_##id, name, chr, wchr, color, blocked, opaque }
 #define WALL(id, name, chr, wchr, color) \
-    { name, chr, wchr, color, 1, 1 }
+    { T_##id, name, chr, wchr, color, 1, 1 }
 #define FLOOR(id, name, chr, wchr, color) \
-    { name, chr, wchr, color, 0, 0 }
+    { T_##id, name, chr, wchr, color, 0, 0 }
 
 extern struct permtile permtiles[];
 

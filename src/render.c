@@ -23,7 +23,9 @@ void render_map(void) {
                         put_heatmap(i, j);
                     else
                         map_put_tile(i, j, i + g.cx, j + g.cy, 
-                            is_visible(i + g.cx, j +g.cy) ? g.levmap[i][j].pt->color : BLUE);
+                            is_visible(i + g.cx, j + g.cy) ? g.levmap[i + g.cx][j + g.cy].pt->color : BLUE);
+                } else {
+                    map_putch(i, j, ' ', WHITE);
                 }
             } else
                 map_putch(i, j, ' ', WHITE);  

@@ -40,6 +40,7 @@ Key     Function        Explanation
 -----------------------------------------------------------
  >      Descend         Descend to a lower level.
  <      Ascend          Ascend to a higher level.
+ ,      Get             Pick up an item.
  ?      Help            View this manual.
 
              |= ADVANCED KEYBINDS =|
@@ -52,6 +53,7 @@ you'll be fine.
 
 Key     Function        Explanation
 -----------------------------------------------------------
+ :      Look Down       Describe the current tile.
  x      Autoexplore     Automatically explore the area.
 
               |= DEBUG KEYBINDS =|

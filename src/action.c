@@ -10,6 +10,8 @@
 
 int is_player(struct actor *);
 int autoexplore(void);
+int look_down(void);
+int pick_up(void);
 
 int is_player(struct actor* mon) {
     return (mon == &g.player);
@@ -45,6 +47,17 @@ int move_mon(struct actor* mon, int x, int y) {
         f.update_fov = 1;
     }
     return 0;
+}
+
+int look_down() {
+    logm("I glance down. I am standing on %s.", g.levmap[g.player.x][g.player.y].pt->name);
+    return 0;
+}
+
+int pick_up() {
+    logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
+         g.levmap[g.player.x][g.player.y].pt->name);
+    return 1;
 }
 
 int autoexplore(void) {
@@ -128,6 +141,12 @@ void execute_action(int actnum) {
             break;
         case A_DESCEND:
             change_depth(1);
+            break;
+        case A_LOOK_DOWN:
+            look_down();
+            break;
+        case A_PICK_UP:
+            pick_up();
             break;
         case A_FULLSCREEN:
             draw_msg_window(MAPWIN_H + MSG_H, 1);

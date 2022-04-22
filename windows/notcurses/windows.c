@@ -283,7 +283,8 @@ int handle_keys(void) {
         case ',':
             if (shift) {
                 ret = A_ASCEND;
-                break;
+            } else {
+                ret = A_PICK_UP;
             }
             break;
         case 'p':
@@ -300,6 +301,12 @@ int handle_keys(void) {
         case '/':
             if (shift)
                 ret = A_HELP;
+            break;
+        case ';':
+            if (shift) {
+                ret = A_LOOK_DOWN;
+                break;
+            }
             break;
         case 'R':
             if (input.modifiers & NCKEY_MOD_CTRL)

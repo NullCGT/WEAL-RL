@@ -179,7 +179,7 @@ void display_energy_win(void) {
     char buf[128];
     struct actor *cur_npc = &g.player;
 
-    new_win = newwin(SB_H, SB_W, SB_Y, SB_X);
+    new_win = newwin(SB_H, SB_W, 0, SB_X);
     box(new_win, 0, 0);
     
     while(cur_npc != NULL) {
@@ -378,6 +378,10 @@ int handle_keys(void) {
             return A_DESCEND;
         case '<':
             return A_ASCEND;
+        case ',':
+            return A_PICK_UP;
+        case ':':
+            return A_LOOK_DOWN;
         case 'x':
             return A_EXPLORE;
         case '?':

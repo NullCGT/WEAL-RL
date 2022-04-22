@@ -22,6 +22,8 @@ enum actionnum {
     A_REST,
     A_ASCEND,
     A_DESCEND,
+    A_PICK_UP,
+    A_LOOK_DOWN,
     A_EXPLORE,
     A_FULLSCREEN,
     A_HELP,

@@ -34,22 +34,22 @@ are playing the ncurses version of the game. If you're reall, really hurting for
 computational power, it might take a few seconds to generate level maps.
 
 # Building from Source
-In order to compile WEAL, you will need the following libraries:
+In order to compile WEAL, you will need the following:
+- CMake
 - ncurses
 - notcurses
 - libxml2
 
 The compilation steps are as follows:
 ```
-mkdir build
-cd build
-cmake ..
-make
+cmake -S . -B build
+cmake --build build
 ```
 
 Game binaries will be created in the build/bin folder.
 
 # Credits
+- [Kenney 1-Bit Tiles Pack](https://www.kenney.nl/assets/bit-pack).
 - [Wave Function Collapse algorithm, by mxgmn](https://github.com/mxgmn/WaveFunctionCollapse).
 - [Wave Function Collapse C library, by krychu](https://github.com/krychu/wfc).
 - [BearLibTerminal, by  tommyettinger](https://github.com/tommyettinger/BearLibTerminal)

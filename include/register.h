@@ -29,19 +29,6 @@ struct actor {
     /* 7 free bits */
 };
 
-struct monstat {
-    int id;
-    const char *name;
-    const char *description;
-    const char *join;
-    int strength;
-    int speed;
-    int smart;
-    int tough;
-    int defense;
-    int evolve_to;
-};
-
 typedef struct global {
     struct tile levmap[MAPW][MAPH];
     struct actor player; /* Assume player is first NPC */
@@ -71,6 +58,16 @@ typedef struct bitflags {
 typedef struct terminal {
     int h;
     int w;
+ /*
+    int mapwin_w;
+    int mapwin_h;
+    int mapwin_y;
+    int msg_w;
+    int msg_h;
+    int msg_y;
+    int sb_w;
+    int sb_h;
+    int sb_x; */
 } terminal;
 
 extern struct global g;

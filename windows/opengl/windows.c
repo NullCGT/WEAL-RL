@@ -14,6 +14,13 @@
 #define SB_LAYER 3
 #define POPUP_LAYER 4
 
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
+#define FONT_WIDTH 8
+#define FONT_HEIGHT 16
+#define WIDTH_MUL TILE_WIDTH / FONT_WIDTH
+#define HEIGHT_MUL TILE_HEIGHT / FONT_HEIGHT
+
 static color_t colors[] = {
     0xFF000000, // Black
     0xFFFF0000, // Red
@@ -27,7 +34,8 @@ static color_t colors[] = {
 
 void setup_screen(void) {
     terminal_open();
-    terminal_set("window: title='WEAL', size=80x40");
+    terminal_set("window: title='WEAL', cellsize=8x16, size=160x40, resizeable=true");
+    terminal_set("0x1000: tileset.png, size=16x16, spacing=2x1");
     terminal_layer(MAP_LAYER);
     terminal_color(colors[WHITE]);
 }
@@ -46,14 +54,17 @@ void display_file_text(const char *fname) {
 
     terminal_clear();
     terminal_layer(POPUP_LAYER);
+    f.mode_map = 0;
     
     while (1) {
         i = 0;
         y = 0;
         terminal_clear();
         fp = fopen(fname, "r");
-        if (fp == NULL)
+        if (fp == NULL) {
+            f.mode_map = 1;
             return;
+        }
         while (getline(&line, &len, fp) != -1) {
             if (i < j) {
                 i++;
@@ -79,6 +90,7 @@ void display_file_text(const char *fname) {
                 terminal_layer(MAP_LAYER);
                 f.update_map = 1;
                 f.update_msg = 1;
+                f.mode_map = 1;
                 return;
         }
         j = max(0, j);
@@ -104,7 +116,7 @@ void draw_msg_window(int h, int full) {
     struct msg *cur_msg;
 
     if (full) {
-        terminal_clear_area(0, MSG_Y, MSG_W, h);
+        terminal_clear();
     }
     terminal_layer(MSG_LAYER);
     terminal_clear_area(0, MSG_Y, MSG_W, h);
@@ -125,7 +137,7 @@ void draw_msg_window(int h, int full) {
     terminal_refresh();
     if (full) {
         terminal_read();
-        terminal_clear_area(0, MAPWIN_Y, MAPWIN_W, h);
+        terminal_clear();
         terminal_refresh();
     }
     terminal_layer(MAP_LAYER);
@@ -135,21 +147,21 @@ void draw_msg_window(int h, int full) {
 
 int map_put_tile(int x, int y, int mx, int my, int color) {
     terminal_color(colors[color]);
-    terminal_put(x, y + MAPWIN_Y, g.levmap[mx][my].pt->chr);
+    terminal_put(x * WIDTH_MUL, (y + MAPWIN_Y) * HEIGHT_MUL, 0x1000 + g.levmap[mx][my].pt->id);
     terminal_color(colors[WHITE]);
     return 0;
 }
 
 int map_putch(int x, int y, int chr, int color) {
     terminal_color(colors[color]);
-    terminal_put(x, y + MAPWIN_Y, chr);
+    terminal_put(x * WIDTH_MUL, (y + MAPWIN_Y) * HEIGHT_MUL, chr);
     terminal_color(colors[WHITE]);
     return 0;
 }
 
 int map_putch_truecolor(int x, int y, int chr, unsigned color) {
     terminal_color(color + 0xff000000);
-    terminal_put(x, y + MAPWIN_Y, chr);
+    terminal_put(x * WIDTH_MUL, (y + MAPWIN_Y) * HEIGHT_MUL, chr);
     terminal_color(colors[WHITE]);
     return 0;
 }
@@ -186,23 +198,27 @@ int handle_keys(void) {
         ret = A_SOUTHEAST;
     } else if (keycode == TK_B) {
         ret = A_SOUTHWEST;
-    } else if (keycode == TK_PERIOD && shift) {
+    } else if ((keycode == TK_PERIOD) && shift) {
         ret = A_DESCEND;
-    } else if (keycode == TK_COMMA && shift) {
+    } else if ((keycode == TK_COMMA) && shift) {
         ret = A_ASCEND;
+    } else if (keycode == TK_COMMA) {
+        ret = A_PICK_UP;
     } else if (keycode == TK_PERIOD) {
         ret = A_REST;
     } else if (keycode == TK_P) {
         ret = A_FULLSCREEN;
     } else if (keycode == TK_X) {
         ret = A_EXPLORE;
-    } else if (keycode == TK_SLASH && shift) {
+    } else if ((keycode == TK_SLASH) && shift) {
         ret = A_HELP;
-    } else if (keycode == TK_Q && shift) {
+    } else if ((keycode == TK_SEMICOLON) && shift) {
+        ret = A_LOOK_DOWN;
+    } else if ((keycode == TK_Q) && shift) {
         ret = A_QUIT;
-    } else if (keycode == TK_R && terminal_check(TK_CONTROL)) {
+    } else if ((keycode == TK_R) && terminal_check(TK_CONTROL)) {
         ret = A_DEBUG_MAGICMAP;
-    } else if (keycode == TK_E && terminal_check(TK_CONTROL)) {
+    } else if ((keycode == TK_E) && terminal_check(TK_CONTROL)) {
         ret = A_DEBUG_HEAT;
     }
     /* Toggle runmode */
