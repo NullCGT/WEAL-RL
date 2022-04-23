@@ -12,7 +12,6 @@
 #include "render.h"
 #include "mapgen.h"
 #include "random.h"
-#include "fov.h"
 #include "action.h"
 
 void handle_exit(void);
@@ -34,14 +33,15 @@ void handle_exit(void) {
 }
 
 /* Called when the terminal is resized. */
-/* TODO: Respond gracefully. */
+/* TODO: Improve handling */
 void handle_sigwinch(int sig) {
     (void) sig;
-    #if 0
     cleanup_screen();
-    printf("Do not resize the program while running.\n");
-    exit(0);
-    #endif
+    setup_screen();
+    f.update_map = 1;
+    f.update_fov = 1;
+    f.update_msg = 1;
+    render_all();
     return;
 }
 
@@ -107,21 +107,7 @@ int main(void) {
     while (1) {
         clear_npcs();
         execute_action(c);
-        /* Conditionally update screen elements */
-        if (f.update_msg) {
-            draw_msg_window(term.msg_h, 0);
-        }
-        if (f.update_fov) {
-            clear_fov();
-            calculate_fov(g.player.x, g.player.y, 7);
-            create_heatmap(); /* VERY EXPENSIVE. */
-        }
-        if (f.update_map) {
-            render_map();
-        }
-        render_all_npcs();
-        display_energy_win();
-        refresh_map();
+        render_all();
         c = get_action(); /* Blocking input occurs here */
     }
     exit(0);

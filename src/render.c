@@ -2,11 +2,31 @@
 
 #include "map.h"
 #include "register.h"
+#include "fov.h"
 #include "render.h"
 #include "windows.h"
 #include "message.h"
 
 void put_heatmap(int, int);
+
+
+/* Perform all rendering tasks. Often called from the main loop. */
+void render_all(void) {
+    if (f.update_msg) {
+        draw_msg_window(term.msg_h, 0);
+    }
+    if (f.update_fov) {
+        clear_fov();
+        calculate_fov(g.player.x, g.player.y, 7);
+        create_heatmap(); /* VERY EXPENSIVE. */
+    }
+    if (f.update_map) {
+        render_map();
+    }
+    render_all_npcs();
+    display_energy_win();
+    refresh_map();
+}
 
 /* Render the map, tile by tile.
    Loops over the entirety of the map, and works in O(n) time. */
