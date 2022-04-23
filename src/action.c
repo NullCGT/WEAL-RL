@@ -7,6 +7,7 @@
 #include "map.h"
 #include "windows.h"
 #include "render.h"
+#include "gameover.h"
 
 int is_player(struct actor *);
 int autoexplore(void);
@@ -158,7 +159,8 @@ void execute_action(int actnum) {
             display_file_text("data/text/help.txt");
             break;
         case A_QUIT:
-            exit(0);
+            logm("I give up...");
+            end_game();
             break;
         case A_DEBUG_MAGICMAP:
             magic_mapping();

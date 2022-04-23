@@ -45,6 +45,17 @@ void wrap_string(char *buf, int max_width) {
     }
 }
 
+/* Unwraps the line breaks in a string. */
+char *unwrap_string(char *buf) {
+    int i =0;
+    while (buf[i] != '\0') {
+        if (buf[i] == '\n')
+            buf[i] = ' ';
+        i++;
+    }
+    return buf;
+}
+
 /* Outputs a string to the log. */
 int log_string(const char *format, int attr, va_list arg) {
     char *msgbuf = malloc(MAX_MSG_LEN * sizeof(char));
@@ -58,7 +69,7 @@ int log_string(const char *format, int attr, va_list arg) {
     struct msg *new_msg = malloc(sizeof(struct msg));
     wrap_string(msgbuf, MSG_W);
     new_msg->msg = msgbuf;
-    new_msg->turn = 0;
+    new_msg->turn = g.turns;
     new_msg->attr = attr;
     new_msg->next = NULL;
     new_msg->prev = NULL;

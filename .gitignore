@@ -3,3 +3,4 @@ obj/
 *.o
 /makefile
 build/
+dumplog.txt

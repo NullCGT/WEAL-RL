@@ -11,6 +11,7 @@ struct msg {
 
 void free_msg(struct msg *);
 void free_message_list(struct msg *);
+char *unwrap_string(char *);
 int logm(const char *, ...);
 int logma(int, const char *, ...);
 
