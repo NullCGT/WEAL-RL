@@ -26,6 +26,18 @@ struct bitflags f = {
 };
 
 struct terminal term = {
-    .h = 36,
+    .h = 40,
     .w = 90
 };
+
+void setup_term_dimensions(int h, int w, int height_mul, int width_mul) {
+    term.h = h;
+    term.w = w;
+    term.mapwin_w = term.w * 2 / 3 / width_mul;
+    term.mapwin_h = min(MAPH, term.h * 5 / 6 / height_mul);
+    term.msg_w = term.mapwin_w * width_mul - 2;
+    term.msg_h = term.h - term.mapwin_h * height_mul;
+    term.mapwin_y = term.msg_h / height_mul;
+    term.sb_w = term.w - (term.mapwin_w * width_mul);
+    term.sb_x = term.w - term.sb_w;
+}

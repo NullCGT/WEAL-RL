@@ -8,6 +8,7 @@ void display_file_text(const char *);
 void display_energy_win(void);
 void draw_msg_window(int, int);
 int map_put_tile(int, int, int, int, int);
+int map_put_actor(int, int, struct actor *, int);
 int map_putch(int, int, int, int);
 int map_putch_truecolor(int, int, int, unsigned);
 void clear_map(void);

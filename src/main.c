@@ -82,6 +82,7 @@ int main(void) {
     g.player.x = 20;
     g.player.y = 20;
     g.player.chr = '@';
+    g.player.tile_offset = 0x2000;
     g.player.energy = 10;
     g.player.emax = 100;
     g.player.next = NULL;
@@ -90,6 +91,7 @@ int main(void) {
     struct actor test_npc = {
         .name = "Troll",
         .chr = 'T',
+        .tile_offset = 0x2001,
         .x = g.player.x + 1,
         .y = g.player.y + 1,
         .energy = 10,
@@ -107,7 +109,7 @@ int main(void) {
         execute_action(c);
         /* Conditionally update screen elements */
         if (f.update_msg) {
-            draw_msg_window(MSG_H, 0);
+            draw_msg_window(term.msg_h, 0);
         }
         if (f.update_fov) {
             clear_fov();

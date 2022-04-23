@@ -150,7 +150,7 @@ void execute_action(int actnum) {
             pick_up();
             break;
         case A_FULLSCREEN:
-            draw_msg_window(MAPWIN_H + MSG_H, 1);
+            draw_msg_window(term.h, 1);
             break;
         case A_EXPLORE:
             autoexplore();

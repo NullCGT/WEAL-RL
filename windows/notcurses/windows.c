@@ -40,8 +40,8 @@ void setup_gui(void) {
     struct ncplane_options msgplane_opts = {
         .y = 0,
         .x = 0,
-        .rows = MSG_H,
-        .cols = MSG_W,
+        .rows = term.msg_h,
+        .cols = term.msg_w,
         .userptr = NULL,
         .name = "Log Plane",
         .resizecb = NULL,
@@ -81,8 +81,7 @@ void setup_screen(void) {
 
     nstd = notcurses_stddim_yx(nc, &h, &w);
     if (h > 1 && w > 1) {
-        term.h = h;
-        term.w = w;
+        setup_term_dimensions(h, w, 1, 1);
     } else if ((h > 1 && h < MIN_TERM_H) || (w > 1 && w < MIN_TERM_W)) {
         // printf("Terminal must be at least %dx%d.", MIN_TERM_W, MIN_TERM_H);
         notcurses_stop(nc);
@@ -119,7 +118,7 @@ void display_file_text(const char *fname) {
         .y = 0,
         .x = 0,
         .rows = MAX_FILE_LEN,
-        .cols = MSG_W + MAPWIN_W,
+        .cols = term.w,
         .userptr = NULL,
         .name = "File Text Plane",
         .resizecb = NULL,
@@ -182,15 +181,19 @@ void draw_msg_window(int h, int full) {
 int map_put_tile(int x, int y, int mx, int my, int color) {
     int ret;
     ncplane_set_fg_rgb(nstd, colors[color]);
-    ret = ncplane_putwc_yx(nstd, y + MAPWIN_Y, x, g.levmap[mx][my].pt->wchr);
+    ret = ncplane_putwc_yx(nstd, y + term.mapwin_y, x, g.levmap[mx][my].pt->wchr);
     ncplane_set_fg_rgb(nstd, colors[WHITE]);
     return ret;
+}
+
+int map_put_actor(int x, int y, struct actor *actor, int attr) {
+    return map_putch(x, y, actor->chr, attr);
 }
 
 int map_putch(int x, int y, int chr, int attr) {
     int ret;
     ncplane_set_fg_rgb(nstd, colors[attr]);
-    ret = ncplane_putchar_yx(nstd, y + MAPWIN_Y, x, (wchar_t) chr);
+    ret = ncplane_putchar_yx(nstd, y + term.mapwin_y, x, (wchar_t) chr);
     ncplane_set_fg_rgb(nstd, colors[WHITE]);
     return ret;
 }
@@ -198,7 +201,7 @@ int map_putch(int x, int y, int chr, int attr) {
 int map_putch_truecolor(int x, int y, int chr, unsigned color) {
     int ret;
     ncplane_set_fg_rgb(nstd, color);
-    ret = ncplane_putchar_yx(nstd, y + MAPWIN_Y, x, (wchar_t) chr);
+    ret = ncplane_putchar_yx(nstd, y + term.mapwin_y, x, (wchar_t) chr);
     ncplane_set_fg_rgb(nstd, colors[WHITE]);
     return ret;
 }

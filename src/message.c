@@ -67,7 +67,7 @@ int log_string(const char *format, int attr, va_list arg) {
     msgbuf[MAX_MSG_LEN - 1] = '\0';
 
     struct msg *new_msg = malloc(sizeof(struct msg));
-    wrap_string(msgbuf, MSG_W);
+    wrap_string(msgbuf, term.msg_w);
     new_msg->msg = msgbuf;
     new_msg->turn = g.turns;
     new_msg->attr = attr;

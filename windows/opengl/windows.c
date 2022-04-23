@@ -18,8 +18,8 @@
 #define TILE_HEIGHT 16
 #define FONT_WIDTH 8
 #define FONT_HEIGHT 16
-#define WIDTH_MUL TILE_WIDTH / FONT_WIDTH
-#define HEIGHT_MUL TILE_HEIGHT / FONT_HEIGHT
+#define WIDTH_MUL (TILE_WIDTH / FONT_WIDTH)
+#define HEIGHT_MUL (TILE_HEIGHT / FONT_HEIGHT)
 
 static color_t colors[] = {
     0xFF000000, // Black
@@ -34,10 +34,14 @@ static color_t colors[] = {
 
 void setup_screen(void) {
     terminal_open();
-    terminal_set("window: title='WEAL', cellsize=8x16, size=160x40, resizeable=true");
-    terminal_set("0x1000: tileset.png, size=16x16, spacing=2x1");
+    terminal_set("window: title='WEAL', cellsize=8x16, size=90x40, resizeable=true");
+    terminal_set("0x1000: tiles.png, size=16x16, resize=16x16, resize-filter=nearest, spacing=2x1");
+    terminal_set("0x2000: monsters.png, size=16x16, resize=16x16, resize-filter=nearest, spacing=2x1");
     terminal_layer(MAP_LAYER);
     terminal_color(colors[WHITE]);
+
+
+    setup_term_dimensions(term.h, term.w, HEIGHT_MUL, WIDTH_MUL);
 }
 
 void cleanup_screen(void) {
@@ -70,7 +74,7 @@ void display_file_text(const char *fname) {
                 i++;
                 continue;
             }
-            terminal_print_ext(0, y++, MSG_W + MAPWIN_W, MSG_H + MAPWIN_H, TK_ALIGN_LEFT, line);
+            terminal_print_ext(0, y++, term.w, term.h, TK_ALIGN_LEFT, line);
         }
         terminal_refresh();
         fclose(fp);
@@ -119,7 +123,7 @@ void draw_msg_window(int h, int full) {
         terminal_clear();
     }
     terminal_layer(MSG_LAYER);
-    terminal_clear_area(0, MSG_Y, MSG_W, h);
+    terminal_clear_area(0, 0, term.msg_w, h);
     cur_msg = g.msg_list;
     while (cur_msg !=  NULL) {
         if (y > h - 2) {
@@ -128,7 +132,7 @@ void draw_msg_window(int h, int full) {
             continue;
         }
         terminal_color(colors[cur_msg->attr]);
-        dim = terminal_print_ext(0, y, MSG_W, MSG_H, TK_ALIGN_LEFT, cur_msg->msg);
+        dim = terminal_print_ext(0, y, term.msg_w, term.msg_h, TK_ALIGN_LEFT, cur_msg->msg);
         terminal_color(colors[WHITE]);
         y += dim.height;
         cur_msg = cur_msg->next;
@@ -147,27 +151,31 @@ void draw_msg_window(int h, int full) {
 
 int map_put_tile(int x, int y, int mx, int my, int color) {
     terminal_color(colors[color]);
-    terminal_put(x * WIDTH_MUL, (y + MAPWIN_Y) * HEIGHT_MUL, 0x1000 + g.levmap[mx][my].pt->id);
+    terminal_put(x * WIDTH_MUL, (y + term.mapwin_y) * HEIGHT_MUL, 0x1000 + g.levmap[mx][my].pt->id);
     terminal_color(colors[WHITE]);
     return 0;
 }
 
+int map_put_actor(int x, int y, struct actor *actor, int color) {
+    return map_putch(x, y, actor->tile_offset, color);
+}
+
 int map_putch(int x, int y, int chr, int color) {
     terminal_color(colors[color]);
-    terminal_put(x * WIDTH_MUL, (y + MAPWIN_Y) * HEIGHT_MUL, chr);
+    terminal_put(x * WIDTH_MUL, (y + term.mapwin_y) * HEIGHT_MUL, chr);
     terminal_color(colors[WHITE]);
     return 0;
 }
 
 int map_putch_truecolor(int x, int y, int chr, unsigned color) {
     terminal_color(color + 0xff000000);
-    terminal_put(x * WIDTH_MUL, (y + MAPWIN_Y) * HEIGHT_MUL, chr);
+    terminal_put(x * WIDTH_MUL, (y + term.mapwin_y) * HEIGHT_MUL, chr);
     terminal_color(colors[WHITE]);
     return 0;
 }
 
 void clear_map(void) {
-    terminal_clear_area(0, MAPWIN_Y, MAPWIN_W, MAPWIN_H);
+    terminal_clear_area(0, term.mapwin_y, term.mapwin_w, term.mapwin_h);
 }
 
 void refresh_map(void) {

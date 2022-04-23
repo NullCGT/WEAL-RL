@@ -15,9 +15,13 @@
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #define signum(x) ((x > 0) - (x < 0))
 
+/* Func Proto */
+void setup_term_dimensions(int, int, int, int);
+
 struct actor {
     char name[20];
     int chr;
+    int tile_offset;
     int x;
     int y;
     int energy;
@@ -58,35 +62,17 @@ typedef struct bitflags {
 typedef struct terminal {
     int h;
     int w;
- /*
     int mapwin_w;
     int mapwin_h;
     int mapwin_y;
     int msg_w;
     int msg_h;
-    int msg_y;
     int sb_w;
-    int sb_h;
-    int sb_x; */
+    int sb_x;
 } terminal;
 
 extern struct global g;
 extern struct bitflags f;
 extern struct terminal term;
-
-/* Map and window macros */
-#define MAPWIN_W (term.w * 2 / 3)
-#define MSG_W MAPWIN_W - 2
-#define SB_W (term.w - MAPWIN_W)
-
-#define MAPWIN_H min(MAPH, (term.h * 5 / 6))
-#define MSG_H (term.h - MAPWIN_H)
-#define SB_H MAPWIN_H + MSG_H
-
-#define MAPWIN_Y MSG_H
-#define MSG_Y 0
-#define SB_Y 0
-
-#define SB_X MAPWIN_W
 
 #endif

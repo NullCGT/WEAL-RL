@@ -12,10 +12,10 @@ void put_heatmap(int, int);
    Loops over the entirety of the map, and works in O(n) time. */
 void render_map(void) {
     clear_map();
-    g.cx = min(max(0, g.player.x - (MAPWIN_W  / 2)), abs(MAPW - MAPWIN_W));
-    g.cy = min(max(0, g.player.y - (MAPWIN_H / 2)), abs(MAPH - MAPWIN_H));
-    for (int i = 0; i < MAPWIN_W; i++) {
-        for (int j = 0; j < MAPWIN_H; j++) {
+    g.cx = min(max(0, g.player.x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
+    g.cy = min(max(0, g.player.y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
+    for (int i = 0; i < term.mapwin_w; i++) {
+        for (int j = 0; j < term.mapwin_h; j++) {
             if (i + g.cx < MAPW && j + g.cy < MAPH
                 && i + g.cx >= 0 && j + g.cy >= 0) {
                 if (is_explored(i + g.cx, j + g.cy)) {
@@ -38,7 +38,7 @@ void render_map(void) {
 void render_all_npcs(void) {
     struct actor *cur = &g.player;
     while (cur != NULL && is_visible(cur->x, cur->y)) {
-        map_putch(cur->x - g.cx, cur->y - g.cy, cur->chr, GREEN);
+        map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, GREEN);
         cur = cur->next;
     }
     return;

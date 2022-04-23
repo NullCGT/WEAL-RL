@@ -27,10 +27,10 @@ WINDOW *msg_win;
 
 /* Perform the first-time setup for the game's GUI. */
 void setup_gui(void) {
-    map_win = create_win(MAPWIN_H, MAPWIN_W, MAPWIN_Y, 0);
-    msg_win = create_win(MSG_H, MSG_W, MSG_Y, 0);
+    map_win = create_win(term.mapwin_h, term.mapwin_w, term.mapwin_y, 0);
+    msg_win = create_win(term.msg_h, term.msg_w, 0, 0);
     f.update_map = 1;
-    draw_msg_window(MSG_H, 0);
+    draw_msg_window(term.msg_h, 0);
     wrefresh(map_win);
 }
 
@@ -57,8 +57,7 @@ void setup_screen(void) {
     curs_set(0);
     getmaxyx(stdscr, h, w);
     if (h > 1 && w > 1) {
-        term.h = h;
-        term.w = w;
+        setup_term_dimensions(h, w, 1, 1);
     } else if ((h > 1 && h < MIN_TERM_H) || (w > 1 && w < MIN_TERM_W)) {
         printf("Terminal must be at least %dx%d.", MIN_TERM_W, MIN_TERM_H);
         exit(0);
@@ -111,8 +110,8 @@ void cleanup_win(WINDOW *win) {
 
 void create_popup_win(const char *title, const char *msg) {
     WINDOW* new_win;
-    int w = MAPWIN_W / 2;
-    int h = MAPWIN_H / 2;
+    int w = term.mapwin_w / 2;
+    int h = term.mapwin_h / 2;
     
     new_win = newwin(h, w, h /2, w / 2);
     box(new_win, 0, 0);
@@ -179,7 +178,7 @@ void display_energy_win(void) {
     char buf[128];
     struct actor *cur_npc = &g.player;
 
-    new_win = newwin(SB_H, SB_W, 0, SB_X);
+    new_win = newwin(term.h, term.sb_w, 0, term.sb_x);
     box(new_win, 0, 0);
     
     while(cur_npc != NULL) {
@@ -196,7 +195,7 @@ void display_energy_win(void) {
         mvwprintw(new_win, 4, 1, buf);
 
         mvwprintw(new_win, 6, 1, "Energy");
-        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 6, SB_W - 2, ACS_CKBOARD, '_');
+        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 6, term.sb_w - 2, ACS_CKBOARD, '_');
         
         cur_npc = cur_npc->next;
     }
@@ -227,7 +226,7 @@ void draw_msg_window(int h, int full) {
     WINDOW *win;
 
     if (full) {
-        win = create_win(MAPWIN_H + MSG_H, MSG_W, 0, 0);
+        win = create_win(term.h, term.msg_w, 0, 0);
     } else {
         win = msg_win;
     }
@@ -262,6 +261,10 @@ void draw_msg_window(int h, int full) {
 
 int map_put_tile(int x, int y, int mx, int my, int attr) {
     return map_putch(x, y, g.levmap[mx][my].pt->chr, attr);
+}
+
+int map_put_actor(int x, int y, struct actor *actor, int attr) {
+    return map_putch(x, y, actor->chr, attr);
 }
 
 /* Outputs a character to the map window. Wrapper for mvwaddch(). */
@@ -301,7 +304,7 @@ int handle_mouse(void) {
     y = event.y;
     
     if (event.bstate & BUTTON1_CLICKED) {
-        if (y <= MSG_H - 1 && x <= MSG_W) {
+        if (y <= term.msg_h - 1 && x <= term.msg_w) {
             return A_FULLSCREEN;
         }
     }
