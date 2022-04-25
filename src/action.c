@@ -97,8 +97,6 @@ int autoexplore(void) {
 
 int get_action(void) {
     /* If we are in runmode or are exploring, don't block input. */
-    /* TODO: Fix the kludge happening here and make autoexplore return an
-       action. */
     if (f.mode_explore) {
         return autoexplore();
     }

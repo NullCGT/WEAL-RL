@@ -34,7 +34,6 @@ void handle_exit(void) {
 }
 
 /* Called when the terminal is resized. */
-/* TODO: Improve handling */
 void handle_sigwinch(int sig) {
     (void) sig;
     cleanup_screen();

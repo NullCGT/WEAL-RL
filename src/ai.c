@@ -25,7 +25,6 @@ void take_turn(struct actor *actor) {
             action = get_action();
         } else {
             /* AI Decision-Making */
-            /* action = ai_action(actor); */
             int lx, ly;
             int lowest = MAX_HEAT;
             for (int x = -1; x <= 1; x++) {

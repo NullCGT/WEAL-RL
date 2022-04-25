@@ -101,14 +101,12 @@ void display_file_text(const char *fname) {
     }
 }
 
-/* TODO: Implement. */
 void create_popup_win(const char *title, const char *msg) {
     (void) title;
     (void) msg;
     return;
 }
 
-/* TODO: Implement. */
 void display_energy_win(void) {
     return;
 }
