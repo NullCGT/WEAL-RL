@@ -5,7 +5,8 @@
 
 int move_mon(struct actor*, int, int);
 int get_action(void);
-void execute_action(int);
+int dir_to_action(int, int);
+int execute_action(struct actor*, int);
 
 enum actionnum {
     A_NONE,

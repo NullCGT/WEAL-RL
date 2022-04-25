@@ -7,11 +7,11 @@
 
 int make_visible(int, int);
 void magic_mapping(void);
-void change_depth(int);
+int change_depth(int);
 void create_heatmap(void);
 
 #define in_bounds(x, y) \
-    (x > 0 && x < MAPW && y > 0 && y < MAPH)
+    (x >= 0 && x < MAPW && y >= 0 && y < MAPH)
 /* permtile attributes */
 #define is_opaque(x, y) \
     (g.levmap[x][y].pt->opaque)
@@ -24,5 +24,9 @@ void create_heatmap(void);
     (g.levmap[x][y].explored)
 #define is_lit(x, y) \
     (g.levmap[x][y].lit)
+
+/* actor lookup */
+#define mon_at(x, y) \
+    (g.levmap[x][y].actor)
 
 #endif

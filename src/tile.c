@@ -8,4 +8,5 @@ struct permtile permtiles[] = {
 void init_tile(struct tile *intile, int tindex) {
     intile->color = permtiles[tindex].color;
     intile->pt = &permtiles[tindex];
+    intile->actor = NULL;
 }

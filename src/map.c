@@ -24,13 +24,14 @@ void magic_mapping(void) {
 }
 
 /* Change the depth via ascending or descending. */
-void change_depth(int change) {
+int change_depth(int change) {
     if (g.depth + change < 0) {
         logm("I look up. It's too cloudy to make out any stars.");
-        return;
+        return 0;
     }
     g.depth += change;
     make_level();
+    return 50;
 }
 
 /* Create a heatmap */

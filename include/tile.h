@@ -22,6 +22,8 @@ struct tile {
     int chr;
     int color;
     struct permtile *pt;
+    /* Maintain a pointer to the actor at this location. */
+    struct actor *actor;
     /* Heatmaps */
     int player_heat;
     int explore_heat;

@@ -5,6 +5,7 @@
 #include <execinfo.h>
 #include <unistd.h>
 
+#include "ai.h"
 #include "map.h"
 #include "register.h"
 #include "windows.h"
@@ -60,7 +61,7 @@ void handle_sigsegv(int sig) {
 
 /* Main function. */
 int main(void) {
-    int c;
+    struct actor *cur_actor;
 
     /* handle exits and resizes */
     atexit(handle_exit);
@@ -83,32 +84,32 @@ int main(void) {
     g.player.y = 20;
     g.player.chr = '@';
     g.player.tile_offset = 0x2000;
-    g.player.energy = 10;
-    g.player.emax = 100;
+    g.player.energy = 0;
     g.player.next = NULL;
-    g.player.playable = 1;
+    g.player.ai = NULL;
 
     struct actor test_npc = {
         .name = "Troll",
         .chr = 'T',
         .tile_offset = 0x2001,
-        .x = g.player.x + 1,
-        .y = g.player.y + 1,
-        .energy = 10,
-        .emax = 100,
-        .actions = NULL,
+        .x = g.player.x + 5,
+        .y = g.player.y + 5,
+        .energy = 0,
         .next = NULL,
-        .playable = 0
+        .ai = NULL
     };
     g.player.next = &test_npc;
     
     /* Main Loop */
-    c = A_NONE;
+    cur_actor = &g.player;
+    render_all();
     while (1) {
-        clear_npcs();
-        execute_action(c);
-        render_all();
-        c = get_action(); /* Blocking input occurs here */
+        while (cur_actor != NULL) {
+            take_turn(cur_actor);
+            cur_actor = cur_actor->next;
+            if (cur_actor == NULL)
+                cur_actor = &g.player;
+        }
     }
     exit(0);
 }

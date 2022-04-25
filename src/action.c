@@ -19,35 +19,40 @@ int is_player(struct actor* mon) {
 }
 
 int move_mon(struct actor* mon, int x, int y) {
+    struct actor *target;
     int nx = mon->x + x;
     int ny = mon->y + y;
-    if ((nx < 0 || ny < 0|| nx >= MAPW || ny >= MAPH)
-        && is_player(mon)) {
+    if (!in_bounds(nx, ny)) {
+        if (is_player(mon)) {
             logm("I'm not leaving until I find Kate.");
             f.mode_run = 0;
-            return 1;
-    } else if (is_blocked(nx, ny) && is_player(mon)) {
+            return 0;
+        } else {
+            return 100;
+        }
+    } else if (is_blocked(nx, ny)) {
         if (is_player(mon)) {
             logm("I press my hand to the wall. The concrete is cold.");
             f.mode_run = 0;
+            return 0;
+        } else {
+	        return 100;
         }
-	    return 1;
     }
-    g.turns++;
-    mon->x = nx;
-    mon->y = ny;
-    /* For testing energy */ 
-    mon->energy -= 1;
-    if (mon->energy < 0) {
-        mon->energy = mon->emax;
+    /* If there is someone there, attack them! */
+    target = mon_at(nx, ny);
+    if (target && target != mon) {
+        return do_attack(mon, target);
     }
+    /* Perform movement */
+    push_actor(mon, nx, ny);
     /* This is just temporary. In the future, we can cut down on this
        to prevent excessive map updates. */
     if (is_player(mon)) {
         f.update_map = 1;
         f.update_fov = 1;
     }
-    return 0;
+    return 100;
 }
 
 int look_down() {
@@ -58,7 +63,7 @@ int look_down() {
 int pick_up() {
     logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
          g.levmap[g.player.x][g.player.y].pt->name);
-    return 1;
+    return 0;
 }
 
 int autoexplore(void) {
@@ -107,47 +112,60 @@ int get_action(void) {
     return handle_keys();
 }
 
-void execute_action(int actnum) {
+static int dir_array[3][3] = {
+    { A_NORTHWEST, A_NORTH, A_NORTHEAST },
+    { A_WEST,      A_REST,  A_EAST },
+    { A_SOUTHWEST, A_SOUTH, A_SOUTHEAST }
+};
+
+/* Given a relative coordinate movement, return a direction. */
+int dir_to_action(int x, int y) {
+    return dir_array[y + 1][x + 1];
+}
+
+/* Executes an action and returns the cost in energy. */
+int execute_action(struct actor *actor, int actnum) {
+    int ret = 0;
     if (actnum) g.prev_action = actnum;
     switch(actnum) {
         case A_WEST:
-            move_mon(&g.player, -1, 0);
+            ret = move_mon(actor, -1, 0);
             break;
         case A_SOUTH:
-            move_mon(&g.player, 0, 1);
+            ret = move_mon(actor, 0, 1);
             break;
         case A_NORTH:
-            move_mon(&g.player, 0, -1);
+            ret = move_mon(actor, 0, -1);
             break;
         case A_EAST:
-            move_mon(&g.player, 1, 0);
+            ret = move_mon(actor, 1, 0);
             break;
         case A_NORTHWEST:
-            move_mon(&g.player, -1, -1);
+            ret = move_mon(actor, -1, -1);
             break;
         case A_NORTHEAST:
-            move_mon(&g.player, 1, -1);
+            ret = move_mon(actor, 1, -1);
             break;
         case A_SOUTHEAST:
-            move_mon(&g.player, 1, 1);
+            ret = move_mon(actor, 1, 1);
             break;
         case A_SOUTHWEST:
-            move_mon(&g.player, -1, 1);
+            ret = move_mon(actor, -1, 1);
             break;
         case A_REST:
-            move_mon(&g.player, 0, 0);
+            ret = move_mon(actor, 0, 0);
             break;
         case A_ASCEND:
-            change_depth(-1);
+            ret = change_depth(-1);
             break;
         case A_DESCEND:
-            change_depth(1);
+            ret = change_depth(1);
             break;
         case A_LOOK_DOWN:
-            look_down();
+            ret = look_down();
             break;
         case A_PICK_UP:
-            pick_up();
+            ret = pick_up();
             break;
         case A_FULLSCREEN:
             draw_msg_window(term.h, 1);
@@ -174,4 +192,5 @@ void execute_action(int actnum) {
             logma(RED, "Action %d? I don't understand.", actnum);
             break;
     }
+    return ret;
 }

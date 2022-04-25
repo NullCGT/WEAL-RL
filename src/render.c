@@ -18,7 +18,6 @@ void render_all(void) {
     if (f.update_fov) {
         clear_fov();
         calculate_fov(g.player.x, g.player.y, 7);
-        create_heatmap(); /* VERY EXPENSIVE. */
     }
     if (f.update_map) {
         render_map();

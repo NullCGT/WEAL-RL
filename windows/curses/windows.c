@@ -180,25 +180,22 @@ void display_energy_win(void) {
 
     new_win = newwin(term.h, term.sb_w, 0, term.sb_x);
     box(new_win, 0, 0);
-    
-    while(cur_npc != NULL) {
-        sprintf(buf, "Player Location: (%d, %d)", cur_npc->x, cur_npc->y);
-        mvwprintw(new_win, 1, 1, buf);
-        memset(buf, 0, 128);
-        sprintf(buf, "Camera Origin: (%d, %d)", g.cx, g.cy);
-        mvwprintw(new_win, 2, 1, buf);
-        memset(buf, 0, 128);
-        sprintf(buf, "Turn: %d", g.turns);
-        mvwprintw(new_win, 3, 1, buf);
-        memset(buf, 0, 128);
-        sprintf(buf, "Depth: %d meters", g.depth * 4);
-        mvwprintw(new_win, 4, 1, buf);
 
-        mvwprintw(new_win, 6, 1, "Energy");
-        render_bar(new_win, cur_npc->energy, cur_npc->emax, 1, 6, term.sb_w - 2, ACS_CKBOARD, '_');
-        
-        cur_npc = cur_npc->next;
-    }
+    sprintf(buf, "Player Location: (%d, %d)", cur_npc->x, cur_npc->y);
+    mvwprintw(new_win, 1, 1, buf);
+    memset(buf, 0, 128);
+    sprintf(buf, "Camera Origin: (%d, %d)", g.cx, g.cy);
+    mvwprintw(new_win, 2, 1, buf);
+    memset(buf, 0, 128);
+    sprintf(buf, "Turn: %d", g.turns);
+    mvwprintw(new_win, 3, 1, buf);
+    memset(buf, 0, 128);
+    sprintf(buf, "Depth: %d meters", g.depth * 4);
+    mvwprintw(new_win, 4, 1, buf);
+
+    mvwprintw(new_win, 6, 1, "Energy");
+    render_bar(new_win, cur_npc->energy, 100, 1, 6, term.sb_w - 2, ACS_CKBOARD, '_');
+
     wrefresh(new_win);
 }
 

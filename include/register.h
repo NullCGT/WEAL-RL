@@ -1,6 +1,7 @@
 #ifndef REGISTER_H
 #define REGISTER_H
 
+#include "actor.h"
 #include "color.h"
 #include "tile.h"
 
@@ -17,21 +18,6 @@
 
 /* Func Proto */
 void setup_term_dimensions(int, int, int, int);
-
-struct actor {
-    char name[20];
-    int chr;
-    int tile_offset;
-    int x;
-    int y;
-    int energy;
-    int emax;
-    struct action *actions;
-    struct actor *next;
-    /* bitfields */
-    unsigned int playable : 1;
-    /* 7 free bits */
-};
 
 typedef struct global {
     struct tile levmap[MAPW][MAPH];
