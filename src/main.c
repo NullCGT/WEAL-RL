@@ -99,6 +99,8 @@ int main(void) {
         .ai = NULL
     };
     g.player.next = &test_npc;
+    push_actor(&g.player, g.player.x, g.player.y);
+    push_actor(&test_npc, test_npc.x, test_npc.y);
     
     /* Main Loop */
     cur_actor = &g.player;

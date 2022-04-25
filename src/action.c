@@ -87,12 +87,11 @@ int autoexplore(void) {
             logma(YELLOW, "I begin cautiously exploring the area.");
             f.mode_explore = 1;
         }
-        move_mon(&g.player, lx, ly);
-        return 0;
+        return dir_to_action(lx, ly);
     } else {
         logm("I don't think there's anywhere else I can explore from here.");
         f.mode_explore = 0;
-        return 1;
+        return 0;
     }
 }
 
@@ -101,8 +100,7 @@ int get_action(void) {
     /* TODO: Fix the kludge happening here and make autoexplore return an
        action. */
     if (f.mode_explore) {
-        autoexplore();
-        return A_NONE;
+        return autoexplore();
     }
     /* If running, move in the previously input direction. */
     if (f.mode_run) {
@@ -127,6 +125,9 @@ int dir_to_action(int x, int y) {
 int execute_action(struct actor *actor, int actnum) {
     int ret = 0;
     if (actnum) g.prev_action = actnum;
+    if (actnum == A_EXPLORE) {
+        actnum = autoexplore();
+    }
     switch(actnum) {
         case A_WEST:
             ret = move_mon(actor, -1, 0);
@@ -169,9 +170,6 @@ int execute_action(struct actor *actor, int actnum) {
             break;
         case A_FULLSCREEN:
             draw_msg_window(term.h, 1);
-            break;
-        case A_EXPLORE:
-            autoexplore();
             break;
         case A_HELP:
             display_file_text("data/text/help.txt");
