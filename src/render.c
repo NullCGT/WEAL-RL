@@ -17,7 +17,7 @@ void render_all(void) {
     }
     if (f.update_fov) {
         clear_fov();
-        calculate_fov(g.player.x, g.player.y, 7);
+        calculate_fov(g.player->x, g.player->y, 7);
     }
     if (f.update_map) {
         render_map();
@@ -31,8 +31,8 @@ void render_all(void) {
    Loops over the entirety of the map, and works in O(n) time. */
 void render_map(void) {
     clear_map();
-    g.cx = min(max(0, g.player.x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
-    g.cy = min(max(0, g.player.y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
+    g.cx = min(max(0, g.player->x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
+    g.cy = min(max(0, g.player->y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
     for (int i = 0; i < term.mapwin_w; i++) {
         for (int j = 0; j < term.mapwin_h; j++) {
             if (i + g.cx < MAPW && j + g.cy < MAPH
@@ -55,11 +55,11 @@ void render_map(void) {
 }
 
 void render_all_npcs(void) {
-    struct actor *cur = &g.player;
+    struct actor *cur = g.player;
     while (cur != NULL && is_visible(cur->x, cur->y)) {
         map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, GREEN);
         /* TODO: Handle visibility and runmode in ai.c */
-        if (cur != &g.player) {
+        if (cur != g.player) {
             f.mode_explore = 0;
             f.mode_run = 0;
         }
@@ -69,7 +69,7 @@ void render_all_npcs(void) {
 }
 
 void clear_npcs(void) {
-    struct actor *cur = &g.player;
+    struct actor *cur = g.player;
     while (cur != NULL && is_visible(cur->x, cur->y)) {
         map_put_tile(cur->x - g.cx, cur->y - g.cy, cur->x, cur->y, g.levmap[cur->x][cur->y].pt->color);
         cur = cur->next;

@@ -1,4 +1,7 @@
+#include <stdlib.h>
+
 #include "actor.h"
+#include "invent.h"
 #include "map.h"
 #include "message.h"
 #include "register.h"
@@ -28,11 +31,31 @@ void actor_sanity_checks(struct actor *actor) {
 
 /* Returns action cost. */
 int do_attack(struct actor *aggressor, struct actor *target) {
-    if (aggressor == &g.player)
+    if (aggressor == g.player)
         logma(YELLOW, "I thump %s.", target->name);
-    else if (target == &g.player)
+    else if (target == g.player)
         logma(RED, "%s thumps me.", aggressor->name);
     else
         logm("%s thumps %s.", aggressor->name, target->name);
     return 100;
+}
+
+/* Frees an actor and all data that is associated with it. */
+void free_actor(struct actor *actor) {
+    if (actor->invent)
+        free_invent(actor->invent);
+    if (actor->ai)
+        free(actor->ai);
+    if (actor->item)
+        free(actor->item);
+    free(actor);
+}
+
+void free_actor_list(struct actor *actor) {
+    struct actor *next;
+    while (actor != NULL) {
+        next = actor->next;
+        free_actor(actor);
+        actor = next;
+    }
 }

@@ -77,6 +77,7 @@ void display_file_text(const char *fname) {
             terminal_print_ext(0, y++, term.w, term.h, TK_ALIGN_LEFT, line);
         }
         terminal_refresh();
+        free(line);
         fclose(fp);
         action = handle_keys();
         switch (action) {

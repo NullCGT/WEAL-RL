@@ -34,7 +34,10 @@ void dump_levmap(FILE *fp) {
     fputs("\n== Level Map ==\n", fp);
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
-            fputc(g.levmap[x][y].pt->chr, fp);
+            if (g.levmap[x][y].actor)
+                fputc(g.levmap[x][y].actor->chr, fp);
+            else
+                fputc(g.levmap[x][y].pt->chr, fp);
         }
         fputc('\n', fp);
     }

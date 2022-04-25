@@ -130,6 +130,7 @@ void display_file_text(const char *fname) {
     while (getline(&line, &len, fp) != -1) {
         ncplane_printf(text_plane, "%s", line);
     }
+    free(line);
     fclose(fp);
     /* Handle player input */
     while (1) {

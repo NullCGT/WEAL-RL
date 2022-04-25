@@ -4,7 +4,7 @@
 
 struct global g = {
     .levmap = {{ {0} }},
-    .player = { {0} },
+    .player = NULL,
     .msg_list = NULL,
     .msg_last = NULL,
     .turns = 0,

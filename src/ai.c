@@ -14,13 +14,13 @@ void take_turn(struct actor *actor) {
     /* Refill energy */
     actor->energy += 100;
     /* Increment turn counter */
-    if (actor == &g.player) {
+    if (actor == g.player) {
         g.turns++;
         render_all();
     }
 
     while (actor->energy > 0) {
-        if (actor == &g.player && !ai) {
+        if (actor == g.player && !ai) {
             /* Player input */
             action = get_action();
         } else {

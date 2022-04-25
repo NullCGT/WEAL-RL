@@ -15,7 +15,7 @@ int look_down(void);
 int pick_up(void);
 
 int is_player(struct actor* mon) {
-    return (mon == &g.player);
+    return (mon == g.player);
 }
 
 int move_mon(struct actor* mon, int x, int y) {
@@ -56,13 +56,13 @@ int move_mon(struct actor* mon, int x, int y) {
 }
 
 int look_down() {
-    logm("I glance down. I am standing on %s.", g.levmap[g.player.x][g.player.y].pt->name);
+    logm("I glance down. I am standing on %s.", g.levmap[g.player->x][g.player->y].pt->name);
     return 0;
 }
 
 int pick_up() {
     logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
-         g.levmap[g.player.x][g.player.y].pt->name);
+         g.levmap[g.player->x][g.player->y].pt->name);
     return 0;
 }
 
@@ -71,12 +71,12 @@ int autoexplore(void) {
     int lowest = MAX_HEAT;
     // Do things
     for (int x = -1; x <= 1; x++) {
-        if (x + g.player.x < 0 || x + g.player.x >= MAPW) continue;
+        if (x + g.player->x < 0 || x + g.player->x >= MAPW) continue;
         for (int y = -1; y <= 1; y++) {
             if (!x && !y) continue;
-            if (y + g.player.y < 0 || y + g.player.y >= MAPH) continue;
-            if (g.levmap[x + g.player.x][y + g.player.y].explore_heat <= lowest) {
-                lowest = g.levmap[x + g.player.x][y + g.player.y].explore_heat;
+            if (y + g.player->y < 0 || y + g.player->y >= MAPH) continue;
+            if (g.levmap[x + g.player->x][y + g.player->y].explore_heat <= lowest) {
+                lowest = g.levmap[x + g.player->x][y + g.player->y].explore_heat;
                 lx = x;
                 ly = y;
             }

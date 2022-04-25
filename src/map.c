@@ -50,7 +50,7 @@ void create_heatmap(void) {
                 g.levmap[x][y].explore_heat = MAX_HEAT;
             }
 
-            if (g.player.x == x && g.player.y == y)
+            if (g.player->x == x && g.player->y == y)
                 g.levmap[x][y].player_heat = 0;
             if (!g.levmap[x][y].explored)
                 g.levmap[x][y].explore_heat = 0;

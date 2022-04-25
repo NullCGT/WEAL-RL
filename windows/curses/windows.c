@@ -145,6 +145,7 @@ void display_file_text(const char *fname) {
     while (getline(&line, &len, fp) != -1) {
         mvwprintw(new_win, i++, 0, line);
     }
+    free(line);
     fclose(fp);
     /* Handle player input */
     f.mode_map = 0;
@@ -176,7 +177,7 @@ void display_file_text(const char *fname) {
 void display_energy_win(void) {
     WINDOW* new_win;
     char buf[128];
-    struct actor *cur_npc = &g.player;
+    struct actor *cur_npc = g.player;
 
     new_win = newwin(term.h, term.sb_w, 0, term.sb_x);
     box(new_win, 0, 0);
@@ -285,7 +286,7 @@ void clear_map(void) {
 }
 
 void refresh_map(void) {
-    wmove(map_win, g.player.y - g.cy, g.player.x - g.cx);
+    wmove(map_win, g.player->y - g.cy, g.player->x - g.cx);
     wrefresh(map_win);
 }
 

@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <execinfo.h>
 #include <unistd.h>
+#include <string.h> /* for strcpy */
 
 #include "ai.h"
+#include "invent.h"
 #include "map.h"
 #include "register.h"
 #include "windows.h"
@@ -24,6 +26,8 @@ void handle_exit(void) {
     cleanup_screen();
     printf("Freeing message list...\n");
     free_message_list(g.msg_list);
+    printf("Freeing actor list...\n");
+    free_actor_list(g.player);
     if (g.saved_locale != NULL) {
         printf("Restoring locale...\n");
         setlocale (LC_ALL, g.saved_locale);
@@ -79,37 +83,41 @@ int main(void) {
     make_level();
 
     // Create the player
-    g.player.x = 20;
-    g.player.y = 20;
-    g.player.chr = '@';
-    g.player.tile_offset = 0x2000;
-    g.player.energy = 0;
-    g.player.next = NULL;
-    g.player.ai = NULL;
+    g.player = (struct actor *) malloc(sizeof(struct actor));
+    g.player->x = 20;
+    g.player->y = 20;
+    g.player->chr = '@';
+    g.player->tile_offset = 0x2000;
+    g.player->energy = 0;
+    g.player->next = NULL;
+    g.player->ai = NULL;
+    g.player->invent = NULL;
+    g.player->item = NULL;
+    init_invent(g.player);
 
-    struct actor test_npc = {
-        .name = "Troll",
-        .chr = 'T',
-        .tile_offset = 0x2001,
-        .x = g.player.x + 5,
-        .y = g.player.y + 5,
-        .energy = 0,
-        .next = NULL,
-        .ai = NULL
-    };
-    g.player.next = &test_npc;
-    push_actor(&g.player, g.player.x, g.player.y);
-    push_actor(&test_npc, test_npc.x, test_npc.y);
+    g.player->next = (struct actor *) malloc(sizeof(struct actor));
+    strcpy(g.player->next->name, "Wurm");
+    g.player->next->chr = 'W';
+    g.player->next->tile_offset = 0x2001;
+    g.player->next->x = g.player->x + 5;
+    g.player->next->y = g.player->y + 5;
+    g.player->next->energy = 0;
+    g.player->next->next = NULL;
+    g.player->next->invent = NULL;
+    g.player->next->item = NULL;
+    g.player->next->ai = NULL;
+    push_actor(g.player, g.player->x, g.player->y);
+    push_actor(g.player->next, g.player->next->x, g.player->next->y);
     
     /* Main Loop */
-    cur_actor = &g.player;
+    cur_actor = g.player;
     render_all();
     while (1) {
         while (cur_actor != NULL) {
             take_turn(cur_actor);
             cur_actor = cur_actor->next;
             if (cur_actor == NULL)
-                cur_actor = &g.player;
+                cur_actor = g.player;
         }
     }
     exit(0);
