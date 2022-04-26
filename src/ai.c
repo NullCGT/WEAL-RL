@@ -21,6 +21,7 @@ void take_turn(struct actor *actor) {
 
     while (actor->energy > 0) {
         if (actor == g.player && !ai) {
+            render_all();
             /* Player input */
             action = get_action();
         } else {
@@ -46,6 +47,5 @@ void take_turn(struct actor *actor) {
         actor_sanity_checks(actor);
         if (f.update_fov)
             create_heatmap(); /* VERY EXPENSIVE. */
-        render_all();
     }
 }
