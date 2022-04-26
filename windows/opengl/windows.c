@@ -77,7 +77,6 @@ void display_file_text(const char *fname) {
             terminal_print_ext(0, y++, term.w, term.h, TK_ALIGN_LEFT, line);
         }
         terminal_refresh();
-        free(line);
         fclose(fp);
         action = handle_keys();
         switch (action) {
@@ -93,6 +92,7 @@ void display_file_text(const char *fname) {
             case A_HELP:
                 terminal_clear();
                 terminal_layer(MAP_LAYER);
+                free(line);
                 f.update_map = 1;
                 f.update_msg = 1;
                 f.mode_map = 1;
@@ -221,6 +221,8 @@ int handle_keys(void) {
         ret = A_HELP;
     } else if ((keycode == TK_SEMICOLON) && shift) {
         ret = A_LOOK_DOWN;
+    } else if ((keycode == TK_S) && shift) {
+        ret = A_SAVE;
     } else if ((keycode == TK_Q) && shift) {
         ret = A_QUIT;
     } else if ((keycode == TK_R) && terminal_check(TK_CONTROL)) {

@@ -387,6 +387,8 @@ int handle_keys(void) {
             return A_EXPLORE;
         case '?':
             return A_HELP;
+        case 'S':
+            return A_SAVE;
         case 'Q':
             return A_QUIT;
         default:

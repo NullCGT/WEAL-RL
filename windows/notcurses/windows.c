@@ -297,6 +297,9 @@ int handle_keys(void) {
         case 'x':
             ret = A_EXPLORE;
             break;
+        case 'S':
+            ret = A_SAVE;
+            break;
         case 'Q':
         case NCKEY_EXIT:
         case NCKEY_ESC:

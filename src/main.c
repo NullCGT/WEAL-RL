@@ -16,6 +16,7 @@
 #include "mapgen.h"
 #include "random.h"
 #include "action.h"
+#include "save.h"
 
 void handle_exit(void);
 void handle_sigwinch(int);
@@ -65,6 +66,7 @@ void handle_sigsegv(int sig) {
 /* Main function. */
 int main(void) {
     struct actor *cur_actor;
+    FILE *fp;
 
     /* handle exits and resizes */
     atexit(handle_exit);
@@ -76,38 +78,45 @@ int main(void) {
 
     // Set up the screen
     setup_screen();
-    logma(CYAN, "I've arrived at Fort Tarn."); 
-    logma(CYAN, "Icicles creep down the concrete crenelations high above, and the wind howls past barbed wire before cutting straight through my jacket.");
 
-    // Create the map
-    make_level();
+    fp = fopen("save.bin", "r");
+    if (fp) {
+        fclose(fp);
+        logma(CYAN, "Welcome back. You ready for this?");
+        load_game("save.bin");
+    } else {
+        logma(CYAN, "I've arrived at Fort Tarn."); 
+        logma(CYAN, "Icicles creep down the concrete crenelations high above, and the wind howls past barbed wire before cutting straight through my jacket.");
+        make_level();
 
-    // Create the player
-    g.player = (struct actor *) malloc(sizeof(struct actor));
-    g.player->x = 20;
-    g.player->y = 20;
-    g.player->chr = '@';
-    g.player->tile_offset = 0x2000;
-    g.player->energy = 0;
-    g.player->next = NULL;
-    g.player->ai = NULL;
-    g.player->invent = NULL;
-    g.player->item = NULL;
-    init_invent(g.player);
+        // Create the player
+        g.player = (struct actor *) malloc(sizeof(struct actor));
+        strcpy(g.player->name, "Player");
+        g.player->x = 20;
+        g.player->y = 20;
+        g.player->chr = '@';
+        g.player->tile_offset = 0x2000;
+        g.player->energy = 0;
+        g.player->next = NULL;
+        g.player->ai = NULL;
+        g.player->invent = NULL;
+        g.player->item = NULL;
+        init_invent(g.player);
 
-    g.player->next = (struct actor *) malloc(sizeof(struct actor));
-    strcpy(g.player->next->name, "Wurm");
-    g.player->next->chr = 'W';
-    g.player->next->tile_offset = 0x2001;
-    g.player->next->x = g.player->x + 5;
-    g.player->next->y = g.player->y + 5;
-    g.player->next->energy = 0;
-    g.player->next->next = NULL;
-    g.player->next->invent = NULL;
-    g.player->next->item = NULL;
-    g.player->next->ai = NULL;
-    push_actor(g.player, g.player->x, g.player->y);
-    push_actor(g.player->next, g.player->next->x, g.player->next->y);
+        g.player->next = (struct actor *) malloc(sizeof(struct actor));
+        strcpy(g.player->next->name, "Wurm");
+        g.player->next->chr = 'W';
+        g.player->next->tile_offset = 0x2001;
+        g.player->next->x = g.player->x + 5;
+        g.player->next->y = g.player->y + 5;
+        g.player->next->energy = 0;
+        g.player->next->next = NULL;
+        g.player->next->invent = NULL;
+        g.player->next->item = NULL;
+        g.player->next->ai = NULL;
+        push_actor(g.player, g.player->x, g.player->y);
+        push_actor(g.player->next, g.player->next->x, g.player->next->y);
+    }
     
     /* Main Loop */
     cur_actor = g.player;
@@ -121,4 +130,5 @@ int main(void) {
         }
     }
     exit(0);
+    return 0;
 }

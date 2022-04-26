@@ -8,6 +8,7 @@
 #include "windows.h"
 #include "render.h"
 #include "gameover.h"
+#include "save.h"
 
 int is_player(struct actor *);
 int autoexplore(void);
@@ -171,6 +172,9 @@ int execute_action(struct actor *actor, int actnum) {
             break;
         case A_HELP:
             display_file_text("data/text/help.txt");
+            break;
+        case A_SAVE:
+            save_exit();
             break;
         case A_QUIT:
             logm("I give up...");
