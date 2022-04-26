@@ -13,7 +13,6 @@ struct global g = {
     .cy = 0,
     .display_heat = 0,
     .prev_action = 0,
-    .saved_locale = NULL
 };
 
 struct bitflags f = {

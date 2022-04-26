@@ -57,8 +57,8 @@ void setup_gui(void) {
 void setup_locale(void) {
     char *old_locale;
     old_locale = setlocale(LC_ALL, NULL);
-    g.saved_locale = strdup(old_locale);
-    if (g.saved_locale == NULL)
+    term.saved_locale = strdup(old_locale);
+    if (term.saved_locale == NULL)
         return;
     setlocale(LC_ALL, "en_US.UTF-8");
     return;

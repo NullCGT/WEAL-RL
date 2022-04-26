@@ -29,10 +29,10 @@ void handle_exit(void) {
     free_message_list(g.msg_list);
     printf("Freeing actor list...\n");
     free_actor_list(g.player);
-    if (g.saved_locale != NULL) {
+    if (term.saved_locale != NULL) {
         printf("Restoring locale...\n");
-        setlocale (LC_ALL, g.saved_locale);
-        free(g.saved_locale);
+        setlocale (LC_ALL, term.saved_locale);
+        free(term.saved_locale);
     }
     printf("Goodbye!\n");
     return;
@@ -82,8 +82,8 @@ int main(void) {
     fp = fopen("save.bin", "r");
     if (fp) {
         fclose(fp);
-        logma(CYAN, "Welcome back. You ready for this?");
         load_game("save.bin");
+        logma(CYAN, "Welcome back. You ready for this?");
     } else {
         logma(CYAN, "I've arrived at Fort Tarn."); 
         logma(CYAN, "Icicles creep down the concrete crenelations high above, and the wind howls past barbed wire before cutting straight through my jacket.");

@@ -30,7 +30,6 @@ typedef struct global {
     int cy;
     int display_heat;
     int prev_action; /* for the moment, only used for runmode */
-    char *saved_locale;
 } global;
 
 typedef struct bitflags {
@@ -55,6 +54,7 @@ typedef struct terminal {
     int msg_h;
     int sb_w;
     int sb_x;
+    char *saved_locale;
 } terminal;
 
 extern struct global g;

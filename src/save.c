@@ -24,17 +24,22 @@ void save_game(const char *fname) {
     struct actor *cur_actor = g.player;
     int actor_count = 0;
 
-    /* Assume it is the player's turn, and adjust their energy down
-       in preparation for when the game is reloaded. */
-    g.player->energy -= 100;
-
     fp = fopen(fname, "w");
     if (!fp) {
         logma(MAGENTA, "Save Error: Could not open save file %d.", fname);
         return;
     }
+
+    /* This is a bit of a kludge. Essentially, we have to roll back the current
+       turn a bit, so that when the game starts up again the player does not
+       lose a turn or get a free turn. If we change the main loop logic at some
+       point, we can change this as well. */
+    g.player->energy -= 100;
+    g.turns -= 1;
+
+    /* Write the global struct. */
+    fwrite(&g, sizeof(struct global), 1, fp);
     /* Write level map */
-    fwrite(&g.levmap, sizeof(g.levmap), 1, fp);
     for (int x = 0; x < MAPW; x++) {
         for (int y = 0; y < MAPH; y++) {
             fwrite(&(g.levmap[x][y].pt->id), sizeof(int), 1, fp);
@@ -84,8 +89,13 @@ void load_game(const char *fname) {
         logma(MAGENTA, "Load Error: Could not open save file %d.", fname);
         return;
     }
+    /* Read the global struct */
+    fread(&g, sizeof(struct global), 1, fp);
+    /* Clean up message pointers. We could save the message log fairly easily,
+       but it would take up a lot of space, so we don't. */
+    g.msg_list = NULL;
+    g.msg_last = NULL;
     /* Read level map */
-    fread(&g.levmap, sizeof(g.levmap), 1, fp);
     for (int x = 0; x < MAPW; x++) {
         for (int y = 0; y < MAPH; y++) {
             fread(&tile_id, sizeof(int), 1, fp);
