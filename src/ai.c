@@ -16,7 +16,6 @@ void take_turn(struct actor *actor) {
     /* Increment turn counter */
     if (actor == g.player) {
         g.turns++;
-        render_all();
     }
 
     while (actor->energy > 0) {
