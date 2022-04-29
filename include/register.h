@@ -22,6 +22,7 @@ void setup_term_dimensions(int, int, int, int);
 typedef struct global {
     struct tile levmap[MAPW][MAPH];
     struct actor *player; /* Assume player is first NPC */
+    struct actor *killer;
     struct msg *msg_list;
     struct msg *msg_last;
     int turns;

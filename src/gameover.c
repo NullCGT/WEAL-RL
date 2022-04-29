@@ -6,6 +6,7 @@
 #include "windows.h"
 
 int write_dumplog(const char *);
+void dump_killer(FILE *fp);
 void dump_levmap(FILE *);
 void dump_messages(FILE *);
 
@@ -23,11 +24,27 @@ int write_dumplog(const char *fname) {
         return 1;
     }
     fputs("== Cause of Death ==\n", fp);
-    fprintf(fp, "I quit on turn %d.\n", g.turns);
+    if (g.killer) {
+        fprintf(fp, "I was killed by %s on turn %d.\n", g.killer->name, g.turns);
+    } else {
+        fprintf(fp, "I quit on turn %d.\n", g.turns);
+    }
+    fprintf(fp, "I had %d health, with a maximum of %d.\n", g.player->hp, g.player->hpmax);
+
+    if (g.killer) {
+        dump_killer(fp);
+    }
+
     dump_levmap(fp);
     dump_messages(fp);
     fclose(fp);
     return 0;
+}
+
+void dump_killer(FILE *fp) {
+    fputs("\n== Killer Statistics ==\n", fp);
+    fprintf(fp, "Name: %s\n", g.killer->name);
+    fprintf(fp, "HP: (%d/%d)\n", g.killer->hp, g.killer->hpmax);
 }
 
 void dump_levmap(FILE *fp) {

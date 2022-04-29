@@ -74,6 +74,8 @@ void new_game(void) {
     strcpy(g.player->name, "Player");
     g.player->x = 20;
     g.player->y = 20;
+    g.player->hp = 100;
+    g.player->hpmax = 100;
     g.player->chr = '@';
     g.player->tile_offset = 0x2000;
     g.player->energy = 0;
@@ -89,6 +91,8 @@ void new_game(void) {
     g.player->next->tile_offset = 0x2001;
     g.player->next->x = g.player->x + 5;
     g.player->next->y = g.player->y + 5;
+    g.player->next->hp = 5;
+    g.player->next->hpmax = 5;
     g.player->next->energy = 0;
     g.player->next->next = NULL;
     g.player->next->invent = NULL;

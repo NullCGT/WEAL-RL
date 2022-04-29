@@ -5,6 +5,7 @@
 struct global g = {
     .levmap = {{ {0} }},
     .player = NULL,
+    .killer = NULL,
     .msg_list = NULL,
     .msg_last = NULL,
     .turns = 0,

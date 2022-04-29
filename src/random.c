@@ -28,3 +28,12 @@ int rndrng(int x, int y) {
 int rndbool() {
     return (rand() % 2);
 }
+
+/* Roll xdy and return the result. */
+int d(int x, int y) {
+    int ret = 0;
+    for (int i = 0; i < x; i++) {
+        ret += rndrng(1, 7);
+    }
+    return ret;
+}

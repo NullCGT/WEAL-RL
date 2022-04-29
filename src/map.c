@@ -31,6 +31,7 @@ int change_depth(int change) {
     }
     g.depth += change;
     make_level();
+    push_actor(g.player, g.player->x, g.player->y);
     return 50;
 }
 

@@ -26,7 +26,9 @@ void create_heatmap(void);
     (g.levmap[x][y].lit)
 
 /* actor lookup */
-#define mon_at(x, y) \
+#define MON_AT(x, y) \
     (g.levmap[x][y].actor)
+#define ITEM_AT(x, y) \
+    (g.levmap[x][y].item_actor);
 
 #endif

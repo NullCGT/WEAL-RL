@@ -9,6 +9,7 @@
 #include "render.h"
 #include "message.h"
 #include "action.h"
+#include "map.h"
 
 void setup_gui(void);
 void setup_locale(void);
@@ -178,6 +179,7 @@ void display_energy_win(void) {
     WINDOW* new_win;
     char buf[128];
     struct actor *cur_npc = g.player;
+    int i = 0;
 
     new_win = newwin(term.h, term.sb_w, 0, term.sb_x);
     box(new_win, 0, 0);
@@ -188,14 +190,26 @@ void display_energy_win(void) {
     sprintf(buf, "Camera Origin: (%d, %d)", g.cx, g.cy);
     mvwprintw(new_win, 2, 1, buf);
     memset(buf, 0, 128);
-    sprintf(buf, "Turn: %d", g.turns);
+    sprintf(buf, "HP: (%d/%d) EN: (%d/%d)", cur_npc->hp, cur_npc->hpmax, cur_npc->energy, 100);
     mvwprintw(new_win, 3, 1, buf);
     memset(buf, 0, 128);
     sprintf(buf, "Depth: %d meters", g.depth * 4);
     mvwprintw(new_win, 4, 1, buf);
+    memset(buf, 0, 128);
+    sprintf(buf, "Turn %d", g.turns);
+    mvwprintw(new_win, 5, 1, buf);
 
-    mvwprintw(new_win, 6, 1, "Energy");
-    render_bar(new_win, cur_npc->energy, 100, 1, 6, term.sb_w - 2, ACS_CKBOARD, '_');
+    memset(buf, 0, 128);
+    sprintf(buf, "Nearby: ");
+    mvwprintw(new_win, 7, 1, buf);
+    while (cur_npc != NULL) {
+        if (is_visible(cur_npc->x, cur_npc->y) && cur_npc != g.player) {
+            memset(buf, 0, 128);
+            sprintf(buf, "%s", cur_npc->name);
+            mvwprintw(new_win, 8 + i, 1, buf);
+        }
+        cur_npc = cur_npc->next;
+    }
 
     wrefresh(new_win);
 }

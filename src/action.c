@@ -41,7 +41,7 @@ int move_mon(struct actor* mon, int x, int y) {
         }
     }
     /* If there is someone there, attack them! */
-    target = mon_at(nx, ny);
+    target = MON_AT(nx, ny);
     if (target && target != mon) {
         return do_attack(mon, target);
     }

@@ -33,6 +33,13 @@ In all seriousness, your computer can almost certainly run this, especially if y
 are playing the ncurses version of the game. If you're reall, really hurting for
 computational power, it might take a few seconds to generate level maps.
 
+# Are save files compatible across computers?
+
+Short answer: No.
+
+Long answer: It depends. The save file architecture depends on one's platform, operating
+system, the compiler that the binary was compiled with, and more.
+
 # Building from Source
 In order to compile WEAL, you will need the following:
 - CMake
