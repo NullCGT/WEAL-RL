@@ -5,11 +5,22 @@
 #define MAX_HEAT 999
 #define IMPASSABLE MAX_HEAT + 1
 
+/* Coord struct. May move elsewhere later. */
+struct coord {
+    int x, y;
+};
+
+/* Function declarations */
 int make_visible(int, int);
+struct coord rand_open_coord(void);
 void magic_mapping(void);
+int climb(int);
 int change_depth(int);
 void create_heatmap(void);
 
+/* MACROS */
+
+/* bounds */
 #define in_bounds(x, y) \
     (x >= 0 && x < MAPW && y >= 0 && y < MAPH)
 /* permtile attributes */
@@ -25,10 +36,12 @@ void create_heatmap(void);
 #define is_lit(x, y) \
     (g.levmap[x][y].lit)
 
-/* actor lookup */
+/* lookup */
 #define MON_AT(x, y) \
     (g.levmap[x][y].actor)
 #define ITEM_AT(x, y) \
     (g.levmap[x][y].item_actor);
+#define TILE_AT(x, y) \
+    (g.levmap[x][y].pt->id)
 
 #endif

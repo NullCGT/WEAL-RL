@@ -205,8 +205,13 @@ void display_energy_win(void) {
     while (cur_npc != NULL) {
         if (is_visible(cur_npc->x, cur_npc->y) && cur_npc != g.player) {
             memset(buf, 0, 128);
-            sprintf(buf, "%s", cur_npc->name);
+            sprintf(buf, "%c ", cur_npc->chr);
+            wattron(new_win, COLOR_PAIR(cur_npc->color));
             mvwprintw(new_win, 8 + i, 1, buf);
+            wattroff(new_win, COLOR_PAIR(cur_npc->color));
+            memset(buf, 0, 128);
+            sprintf(buf, "%s", actor_name(cur_npc, 0));
+            mvwprintw(new_win, 8 + i, 3, buf);
         }
         cur_npc = cur_npc->next;
     }

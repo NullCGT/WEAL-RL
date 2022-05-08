@@ -3,8 +3,13 @@
 
 struct ai {
     struct actor *parent;
-    int hostility;
+    /* Stats */
+    int max_seek;
+    int gx, gy;
+    /* Mutable values */
+    int seektime;
     /* Various bitfields */
+    unsigned long faction;
 };
 
 void take_turn(struct actor*);

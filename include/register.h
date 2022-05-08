@@ -15,6 +15,7 @@
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #define signum(x) ((x > 0) - (x < 0))
+#define vowel(x) (x == 'a' || x == 'e' || x == 'i' || x == 'o' || x == 'u')
 
 /* Func Proto */
 void setup_term_dimensions(int, int, int, int);

@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "actor.h"
 #include "color.h"
@@ -9,6 +11,7 @@
 #include "register.h"
 #include "windows.h"
 #include "gameover.h"
+#include "creature.h"
 
 /* Pushes an actor to a new location and updates the levmap
    accordingly. */
@@ -17,10 +20,17 @@ void push_actor(struct actor *actor, int dx, int dy) {
     if (is_visible(actor->x, actor->y))
         map_put_tile(actor->x - g.cx, actor->y - g.cy, actor->x, actor->y, 
                      g.levmap[actor->x][actor->y].pt->color);
-    g.levmap[actor->x][actor->y].actor = NULL;
-    actor->x = dx;
-    actor->y = dy;
-    g.levmap[actor->x][actor->y].actor = actor;
+    if (actor->item) {
+        g.levmap[actor->x][actor->y].item_actor = NULL;
+        actor->x = dx;
+        actor->y = dy;
+        g.levmap[actor->x][actor->y].item_actor = actor;
+    } else {
+        g.levmap[actor->x][actor->y].actor = NULL;
+        actor->x = dx;
+        actor->y = dy;
+        g.levmap[actor->x][actor->y].actor = actor;
+    }
 }
 
 /* Removes an actor from both the map and the linked list
@@ -54,17 +64,20 @@ void actor_sanity_checks(struct actor *actor) {
         logma(MAGENTA, "Sanity check fail: Actor claims to be at (%d, %d), but is not there.",
               actor->x, actor->y);
     }
+    if (actor->cindex < 0) {
+        logma(MAGENTA, "Sanity check fail: Actor with bad cindex %d.", actor->cindex);
+    }
 }
 
 /* Returns action cost. */
 int do_attack(struct actor *aggressor, struct actor *target) {
     int damage = d(1, 6);
     if (aggressor == g.player)
-        logma(YELLOW, "I thump %s for %d damage.", target->name, damage);
+        logma(YELLOW, "I thump %s for %d damage.", actor_name(target, NAME_THE), damage);
     else if (target == g.player)
-        logma(RED, "%s thumps me for %d damage.", aggressor->name, damage);
+        logma(RED, "%s thumps me for %d damage.", actor_name(aggressor, NAME_THE | NAME_CAP), damage);
     else
-        logm("%s thumps %s.", aggressor->name, target->name);
+        logm("%s thumps %s.", actor_name(aggressor, NAME_THE | NAME_CAP), actor_name(target, NAME_THE));
     /* Apply damage */
     target->hp -= damage;
     if (target == g.player && target->hp <= 0) {
@@ -72,7 +85,7 @@ int do_attack(struct actor *aggressor, struct actor *target) {
         logm("It's all over...");
         end_game();
     } else if (target != g.player && target->hp <= 0) {
-        logm("%s dies.", target->name);
+        logm("%s dies.", actor_name(target, NAME_THE | NAME_CAP));
         remove_actor(target);
         free_actor(target);
     }
@@ -97,4 +110,36 @@ void free_actor_list(struct actor *actor) {
         free_actor(actor);
         actor = next;
     }
+}
+
+/* TODO: Remove magic numbers. */
+/* Make use of a rotating set of buffers, just like how NetHack does it. */
+static int nbi = -1;
+static char namebuf[4][64];
+
+/* Return the name of the actor. */
+char *actor_name(struct actor *actor, unsigned flags) {
+    /* Increase the namebuffer index. */
+    nbi = (nbi + 1) % 4;
+    
+    /* Reset the name buffer. */
+    memset(namebuf[nbi], 0, 64);
+    const char *actname;
+    if (actor->given_name) actname = actor->name;
+    else actname = permcreatures[actor->cindex].name;
+
+    if ((flags & NAME_THE) && !actor->unique) {
+        sprintf(namebuf[nbi], "the %s", actname);
+    } else if ((flags & NAME_MY) && !actor->unique) {
+        sprintf(namebuf[nbi], "my %s", actname);
+    } else if ((flags & NAME_A) && !actor->unique) {
+        sprintf(namebuf[nbi], "%s %s", !vowel(namebuf[nbi][0]) ? "a" : "an", actname);
+    } else {
+        sprintf(namebuf[nbi], "%s", actname);
+    }
+
+    if (flags & NAME_CAP) {
+        namebuf[nbi][0] = namebuf[nbi][0] - 32;
+    }
+    return namebuf[nbi];
 }

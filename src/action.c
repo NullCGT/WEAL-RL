@@ -156,10 +156,10 @@ int execute_action(struct actor *actor, int actnum) {
             ret = move_mon(actor, 0, 0);
             break;
         case A_ASCEND:
-            ret = change_depth(-1);
+            ret = climb(-1);
             break;
         case A_DESCEND:
-            ret = change_depth(1);
+            ret = climb(1);
             break;
         case A_LOOK_DOWN:
             ret = look_down();

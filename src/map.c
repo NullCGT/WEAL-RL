@@ -2,6 +2,7 @@
 #include"mapgen.h"
 #include "register.h"
 #include "message.h"
+#include "random.h"
 
 /* Make a point on the map visible. */
 int make_visible(int x, int y) {
@@ -10,6 +11,20 @@ int make_visible(int x, int y) {
     if (is_opaque(x, y))
         return 1;
     return 0;
+}
+
+/* Return a random open coordinate on the map. */
+struct coord rand_open_coord(void) {
+    int x, y;
+
+    do {
+        x = rndmx(MAPW);
+        y = rndmx(MAPH);
+    } while (is_blocked(x, y));
+
+    struct coord c = {x, y};
+
+    return c;
 }
 
 /* Explores the entire map. */
@@ -23,12 +38,36 @@ void magic_mapping(void) {
     f.update_map = 1;
 }
 
-/* Change the depth via ascending or descending. */
-int change_depth(int change) {
+/* Climb a set of stairs. Calls change_depth. */
+int climb(int change) {
     if (g.depth + change < 0) {
         logm("I look up. It's too cloudy to make out any stars.");
         return 0;
     }
+    if (change == 1) {
+        if (TILE_AT(g.player->x, g.player->y) == T_STAIR_DOWN) {
+            logm("I descend deeper into the complex.");
+            return change_depth(change);
+        } else {
+            logm("I need to find a staircase in order to descend.");
+            return 0;
+        }
+    }
+    if (change == -1) {
+        if (TILE_AT(g.player->x, g.player->y) == T_STAIR_UP) {
+            logm("I ascend to an unfamiliar level.");
+            return change_depth(change);
+        } else {
+            logm("Unless I'm supposed to literally climb the walls, I need to find some stairs.");
+            return 0;
+        }
+    }
+    logma(MAGENTA, "How odd. I appear to be climbing multiple levels?");
+    return change_depth(change);
+}
+
+/* Change the depth via ascending or descending. */
+int change_depth(int change) {
     g.depth += change;
     make_level();
     push_actor(g.player, g.player->x, g.player->y);

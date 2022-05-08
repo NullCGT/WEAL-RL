@@ -17,6 +17,7 @@
 #include "random.h"
 #include "action.h"
 #include "save.h"
+#include "creature.h"
 
 void handle_exit(void);
 void handle_sigwinch(int);
@@ -70,36 +71,12 @@ void new_game(void) {
     make_level();
 
     // Create the player
-    g.player = (struct actor *) malloc(sizeof(struct actor));
+    g.player = spawn_creature(M_HUMAN, -1, -1);
     strcpy(g.player->name, "Player");
-    g.player->x = 20;
-    g.player->y = 20;
-    g.player->hp = 100;
-    g.player->hpmax = 100;
-    g.player->chr = '@';
-    g.player->tile_offset = 0x2000;
-    g.player->energy = 0;
-    g.player->next = NULL;
-    g.player->ai = NULL;
-    g.player->invent = NULL;
-    g.player->item = NULL;
-    init_invent(g.player);
+    g.player->given_name = 1;
+    g.player->unique = 1;
 
-    g.player->next = (struct actor *) malloc(sizeof(struct actor));
-    strcpy(g.player->next->name, "Wurm");
-    g.player->next->chr = 'W';
-    g.player->next->tile_offset = 0x2001;
-    g.player->next->x = g.player->x + 5;
-    g.player->next->y = g.player->y + 5;
-    g.player->next->hp = 5;
-    g.player->next->hpmax = 5;
-    g.player->next->energy = 0;
-    g.player->next->next = NULL;
-    g.player->next->invent = NULL;
-    g.player->next->item = NULL;
-    g.player->next->ai = NULL;
-    push_actor(g.player, g.player->x, g.player->y);
-    push_actor(g.player->next, g.player->next->x, g.player->next->y);
+    spawn_creature(M_GLASSWORM, -1, -1);
 }
 
 /* Main function. */

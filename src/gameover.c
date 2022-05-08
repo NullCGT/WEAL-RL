@@ -25,7 +25,7 @@ int write_dumplog(const char *fname) {
     }
     fputs("== Cause of Death ==\n", fp);
     if (g.killer) {
-        fprintf(fp, "I was killed by %s on turn %d.\n", g.killer->name, g.turns);
+        fprintf(fp, "I was killed by %s on turn %d.\n", actor_name(g.killer, NAME_A), g.turns);
     } else {
         fprintf(fp, "I quit on turn %d.\n", g.turns);
     }
@@ -43,7 +43,7 @@ int write_dumplog(const char *fname) {
 
 void dump_killer(FILE *fp) {
     fputs("\n== Killer Statistics ==\n", fp);
-    fprintf(fp, "Name: %s\n", g.killer->name);
+    fprintf(fp, "Name: %s\n", actor_name(g.killer, NAME_CAP));
     fprintf(fp, "HP: (%d/%d)\n", g.killer->hp, g.killer->hpmax);
 }
 
