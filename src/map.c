@@ -82,7 +82,7 @@ void create_heatmap(void) {
     for (y = 0; y < MAPH; y++) {
         for (x = 0; x < MAPW; x++) {
             /* Non-goals */
-            if (is_blocked(x, y)) {
+            if (is_blocked(x, y) && TILE_AT(x, y) != T_DOOR_CLOSED) {
                 g.levmap[x][y].player_heat = IMPASSABLE;
                 g.levmap[x][y].explore_heat = IMPASSABLE;
             } else {

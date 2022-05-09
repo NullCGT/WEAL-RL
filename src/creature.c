@@ -17,6 +17,7 @@ struct permcreature permcreatures[] = {
 /* Initialize an actor's attributes from a permcreature struct. */
 void init_creature(struct actor *actor, int cindex) {
     actor->chr = permcreatures[cindex].chr;
+    actor->tile_offset = permcreatures[cindex].tile_offset;
     actor->color = permcreatures[cindex].color;
     actor->weight = permcreatures[cindex].weight;
     actor->hp = permcreatures[cindex].base_hp;
