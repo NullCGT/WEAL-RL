@@ -63,9 +63,11 @@ int wfc_mapgen(void) {
         }
     }
 
-    /* Test out stairs */
+    /* Test out tiles */
     init_tile(&g.levmap[20][20], T_STAIR_DOWN);
     init_tile(&g.levmap[25][25], T_STAIR_UP);
+    init_tile(&g.levmap[21][21], T_DOOR_OPEN);
+    init_tile(&g.levmap[22][22], T_DOOR_CLOSED);
     /* Clean leftover data from xml parser. */
     free(image.data);
     /* Clean other memory. */

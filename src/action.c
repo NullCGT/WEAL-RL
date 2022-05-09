@@ -23,6 +23,9 @@ int move_mon(struct actor* mon, int x, int y) {
     struct actor *target;
     int nx = mon->x + x;
     int ny = mon->y + y;
+    int ret = 0;
+
+    /* Immediately exit if out of bounds */
     if (!in_bounds(nx, ny)) {
         if (is_player(mon)) {
             logm("I'm not leaving until I find Kate.");
@@ -31,19 +34,28 @@ int move_mon(struct actor* mon, int x, int y) {
         } else {
             return 100;
         }
-    } else if (is_blocked(nx, ny)) {
-        if (is_player(mon)) {
-            logm("I press my hand to the wall. The concrete is cold.");
-            f.mode_run = 0;
-            return 0;
-        } else {
-	        return 100;
-        }
     }
     /* If there is someone there, attack them! */
     target = MON_AT(nx, ny);
     if (target && target != mon) {
         return do_attack(mon, target);
+    }
+    /* Tile-based effects, such as walls and doors. */
+    if (g.levmap[nx][ny].pt->func) {
+        ret = g.levmap[nx][ny].pt->func(mon, nx, ny);
+        if (ret) {
+            f.mode_run = 0;
+            return ret;
+        }
+    }
+    /* Handle blocked movement */
+    if (is_blocked(nx, ny)) {
+        if (is_player(mon)) {
+            f.mode_run = 0;
+            return 0;
+        } else {
+            return 100;
+        }
     }
     /* Perform movement */
     push_actor(mon, nx, ny);

@@ -3,6 +3,7 @@
 
 #include <wchar.h>
 #include "color.h"
+#include "actor.h"
 
 /* Attributes are fixed */
 struct permtile {
@@ -11,6 +12,7 @@ struct permtile {
     char chr;
     wchar_t wchr;
     int color;
+    int (* func) (struct actor *, int, int);
     /* bitfields */
     unsigned int blocked : 1;
     unsigned int opaque : 1;
@@ -35,21 +37,24 @@ struct tile {
 };
 
 /* Function prototypes */
-void init_tile(struct tile *intile, int tindex);
+void init_tile(struct tile *, int);
+int open_door(struct actor *, int, int);
 
 /* Tile definitions */
 #define PERMTILES \
-    FLOOR(FLOOR,      "tile floor",    '.', L'.', WHITE), \
-    FLOOR(STAIR_DOWN, "stairs down",   '>', L'>', YELLOW), \
-    FLOOR(STAIR_UP,   "stairs up",     '<', L'<', YELLOW), \
-    WALL(WALL,        "concrete wall", '#', L'█', WHITE)
+    FLOOR(FLOOR,      "tile floor",    '.', L'.', 0,         WHITE),  \
+    FLOOR(STAIR_DOWN, "stairs down",   '>', L'>', 0,         YELLOW), \
+    FLOOR(STAIR_UP,   "stairs up",     '<', L'<', 0,         YELLOW), \
+    WALL(WALL,        "concrete wall", '#', L'█', 0,         WHITE),  \
+    FLOOR(DOOR_OPEN,  "open door",     '|', L'▒', 0,         CYAN),  \
+    WALL(DOOR_CLOSED, "closed door",   '+', L'+', open_door, CYAN)
 
 /* Welcome to Macro Hell */
-#define TILE(id, name, chr, wchr, color, blocked, opaque) \
+#define TILE(id, name, chr, wchr, func, color, blocked, opaque) \
     T_##id
-#define WALL(id, name, chr, wchr, color) \
+#define WALL(id, name, chr, wchr, func, color) \
     T_##id
-#define FLOOR(id, name, chr, wchr, color) \
+#define FLOOR(id, name, chr, wchr, func, color) \
     T_##id
 
 enum permtilenum {
@@ -60,12 +65,12 @@ enum permtilenum {
 #undef FLOOR
 #undef WALL
 
-#define TILE(id, name, chr, wchr, color, blocked, opaque) \
-    { T_##id, name, chr, wchr, color, blocked, opaque }
-#define WALL(id, name, chr, wchr, color) \
-    { T_##id, name, chr, wchr, color, 1, 1 }
-#define FLOOR(id, name, chr, wchr, color) \
-    { T_##id, name, chr, wchr, color, 0, 0 }
+#define TILE(id, name, chr, wchr, func, color, blocked, opaque) \
+    { T_##id, name, chr, wchr, color, func, blocked, opaque }
+#define WALL(id, name, chr, wchr, func, color) \
+    { T_##id, name, chr, wchr, color, func, 1, 1 }
+#define FLOOR(id, name, chr, wchr, func, color) \
+    { T_##id, name, chr, wchr, color, func, 0, 0 }
 
 extern struct permtile permtiles[];
 
