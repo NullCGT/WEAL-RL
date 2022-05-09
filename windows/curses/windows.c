@@ -21,6 +21,21 @@ int handle_mouse(void);
 
 #define MAX_FILE_LEN 200
 
+struct curse_color {
+    int r, g, b;
+};
+
+static struct curse_color colors[] = {
+    { 0, 0, 0 },          // Black
+    { 1000, 0, 0 },       // Red
+    { 0, 500, 0 },        // Green
+    { 1000, 1000, 0 },    // Yellow
+    { 0, 0, 1000 },       // Blue
+    { 1000, 0, 1000 },    // Magenta
+    { 0, 1000, 1000 },    // Cyan
+    { 1000, 1000, 1000 }, // White
+};
+
 WINDOW *map_win;
 WINDOW *msg_win;
 
@@ -79,6 +94,15 @@ void setup_screen(void) {
 /* Set up the color pairs necessary for rendering the game in color. This function
    is only called if color is supported by the terminal. */
 void setup_colors(void) {
+    /* Set colors to desired shades if able. */
+    if (can_change_color()) {
+        for (int i = COLOR_BLACK; i <= COLOR_WHITE; i++) {
+            if (i >= COLORS) break;
+            init_color(i, colors[i].r, colors[i].g, colors[i].b);
+        }
+        
+    }
+    /* Initialize color pairs */
     for (int i = COLOR_BLACK; i <= COLOR_WHITE; i++) {
         init_pair(i, i, COLOR_BLACK);
     }
