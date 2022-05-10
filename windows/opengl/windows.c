@@ -205,6 +205,10 @@ int handle_keys(void) {
         ret = A_SOUTHEAST;
     } else if (keycode == TK_B) {
         ret = A_SOUTHWEST;
+    } else if (keycode == TK_O) {
+        ret = A_OPEN;
+    } else if (keycode == TK_C) {
+        ret = A_CLOSE;
     } else if ((keycode == TK_PERIOD) && shift) {
         ret = A_DESCEND;
     } else if ((keycode == TK_COMMA) && shift) {
@@ -223,7 +227,7 @@ int handle_keys(void) {
         ret = A_LOOK_DOWN;
     } else if ((keycode == TK_S) && shift) {
         ret = A_SAVE;
-    } else if ((keycode == TK_Q) && shift) {
+    } else if (((keycode == TK_Q) && shift) || keycode == TK_ESCAPE) {
         ret = A_QUIT;
     } else if ((keycode == TK_R) && terminal_check(TK_CONTROL)) {
         ret = A_DEBUG_MAGICMAP;

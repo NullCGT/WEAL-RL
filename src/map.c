@@ -20,7 +20,7 @@ struct coord rand_open_coord(void) {
     do {
         x = rndmx(MAPW);
         y = rndmx(MAPH);
-    } while (is_blocked(x, y));
+    } while (is_blocked(x, y) || g.levmap[x][y].actor);
 
     struct coord c = {x, y};
 

@@ -56,12 +56,14 @@ void render_map(void) {
 
 void render_all_npcs(void) {
     struct actor *cur = g.player;
-    while (cur != NULL && is_visible(cur->x, cur->y)) {
-        map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, cur->color);
-        /* TODO: Handle visibility and runmode in ai.c */
-        if (cur != g.player) {
-            f.mode_explore = 0;
-            f.mode_run = 0;
+    while (cur != NULL) {
+        if (is_visible(cur->x, cur->y)) {
+            map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, cur->color);
+            /* TODO: Handle visibility and runmode in ai.c */
+            if (cur != g.player) {
+                f.mode_explore = 0;
+                f.mode_run = 0;
+            }
         }
         cur = cur->next;
     }

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "register.h"
 #include "action.h"
@@ -14,6 +15,8 @@ int is_player(struct actor *);
 int autoexplore(void);
 int look_down(void);
 int pick_up(void);
+int directional_action(const char *, int (* act)(struct actor *, int, int));
+struct coord action_to_dir(int);
 
 int is_player(struct actor* mon) {
     return (mon == g.player);
@@ -24,6 +27,9 @@ int move_mon(struct actor* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
     int ret = 0;
+    
+    /* TEMP */
+    f.update_map = 1;
 
     /* Immediately exit if out of bounds */
     if (!in_bounds(nx, ny)) {
@@ -62,7 +68,6 @@ int move_mon(struct actor* mon, int x, int y) {
     /* This is just temporary. In the future, we can cut down on this
        to prevent excessive map updates. */
     if (is_player(mon)) {
-        f.update_map = 1;
         f.update_fov = 1;
     }
     return 100;
@@ -108,6 +113,25 @@ int autoexplore(void) {
     }
 }
 
+
+int directional_action(const char *actstr, int (* act)(struct actor *, int, int)) {
+    int actnum;
+    struct coord c;
+    
+    logma(GREEN, "What direction should I %s in?", actstr);
+    render_all(); /* TODO: Figure out why this needs render all. */
+    while (1) {
+        actnum = get_action();
+        if (actnum == A_QUIT) {
+            logm("Scratch that.");
+            return 0;
+        } else if (is_movement(actnum))
+            break;
+    }
+    c = action_to_dir(actnum);
+    return act(g.player, g.player->x + c.x, g.player->y + c.y);
+}
+
 int get_action(void) {
     /* If we are in runmode or are exploring, don't block input. */
     if (f.mode_explore) {
@@ -121,51 +145,58 @@ int get_action(void) {
     return handle_keys();
 }
 
-static int dir_array[3][3] = {
+static int dir_act_array[3][3] = {
     { A_NORTHWEST, A_NORTH, A_NORTHEAST },
     { A_WEST,      A_REST,  A_EAST },
     { A_SOUTHWEST, A_SOUTH, A_SOUTHEAST }
 };
 
+static struct coord act_dir_array[] = {
+    { 0, 0 },
+    { -1, 0 },
+    { 1, 0 },
+    { 0, -1 },
+    { 0, 1 },
+    { -1, -1 },
+    { 1, -1 },
+    { -1, 1 }, 
+    { 1, 1 }
+};
+
 /* Given a relative coordinate movement, return a direction. */
 int dir_to_action(int x, int y) {
-    return dir_array[y + 1][x + 1];
+    return dir_act_array[y + 1][x + 1];
+}
+
+/* Given a movement-based action, return a coordinate. */
+struct coord action_to_dir(int actnum) {
+    if (!is_movement(actnum)) {
+        return act_dir_array[0];
+    }
+    return act_dir_array[actnum];
 }
 
 /* Executes an action and returns the cost in energy. */
 int execute_action(struct actor *actor, int actnum) {
     int ret = 0;
-    if (actnum) g.prev_action = actnum;
+    struct coord move_coord;
+    if (actnum && actor == g.player) g.prev_action = actnum;
     if (actnum == A_EXPLORE) {
         actnum = autoexplore();
     }
+    if (is_movement(actnum)) {
+        move_coord = action_to_dir(actnum);
+        return move_mon(actor, move_coord.x, move_coord.y);
+    }
     switch(actnum) {
-        case A_WEST:
-            ret = move_mon(actor, -1, 0);
-            break;
-        case A_SOUTH:
-            ret = move_mon(actor, 0, 1);
-            break;
-        case A_NORTH:
-            ret = move_mon(actor, 0, -1);
-            break;
-        case A_EAST:
-            ret = move_mon(actor, 1, 0);
-            break;
-        case A_NORTHWEST:
-            ret = move_mon(actor, -1, -1);
-            break;
-        case A_NORTHEAST:
-            ret = move_mon(actor, 1, -1);
-            break;
-        case A_SOUTHEAST:
-            ret = move_mon(actor, 1, 1);
-            break;
-        case A_SOUTHWEST:
-            ret = move_mon(actor, -1, 1);
-            break;
         case A_REST:
             ret = move_mon(actor, 0, 0);
+            break;
+        case A_OPEN:
+            ret = directional_action("open", open_door);
+            break;
+        case A_CLOSE:
+            ret = directional_action("close", close_door);
             break;
         case A_ASCEND:
             ret = climb(-1);

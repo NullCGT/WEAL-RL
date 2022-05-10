@@ -55,6 +55,8 @@ Key     Function        Explanation
 -----------------------------------------------------------
  :      Look Down       Describe the current tile.
  x      Autoexplore     Automatically explore the area.
+ o      Open            Open a door or container.
+ c      Close           Close a door or container.
 
               |= DEBUG KEYBINDS =|
 

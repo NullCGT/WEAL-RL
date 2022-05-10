@@ -8,6 +8,7 @@ int get_action(void);
 int dir_to_action(int, int);
 int execute_action(struct actor*, int);
 
+/* Order is important! */
 enum actionnum {
     A_NONE,
     /* Movement actions */
@@ -21,6 +22,8 @@ enum actionnum {
     A_SOUTHEAST,
     /* End movement actions */
     A_REST,
+    A_OPEN,
+    A_CLOSE,
     A_ASCEND,
     A_DESCEND,
     A_PICK_UP,

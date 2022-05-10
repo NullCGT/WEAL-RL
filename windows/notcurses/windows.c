@@ -284,6 +284,12 @@ int handle_keys(void) {
         case '5':
             ret = A_REST;
             break;
+        case 'o':
+            ret = A_OPEN;
+            break;
+        case 'c':
+            ret = A_CLOSE;
+            break;
         case ',':
             if (shift) {
                 ret = A_ASCEND;

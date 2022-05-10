@@ -76,7 +76,9 @@ void new_game(void) {
     g.player->given_name = 1;
     g.player->unique = 1;
 
-    spawn_creature(M_GLASSWORM, -1, -1);
+    for (int i = 0; i < 3; i++) {
+        spawn_creature(M_GLASSWORM, -1, -1);
+    }
 }
 
 /* Main function. */

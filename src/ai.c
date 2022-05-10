@@ -25,12 +25,16 @@ void take_turn(struct actor *actor) {
             action = get_action();
         } else {
             /* AI Decision-Making */
-            int lx, ly;
+            int lx, ly = -99;
             int lowest = MAX_HEAT;
             for (int x = -1; x <= 1; x++) {
                 if (x + actor->x < 0 || x + actor->x >= MAPW) continue;
                 for (int y = -1; y <= 1; y++) {
                     if (!x && !y) continue;
+                    /* Hack to prevent monsters eating each other. Will need to be revised in
+                      the future. */
+                    if (g.levmap[actor->x + x][actor->y + y].actor &&
+                        g.levmap[actor->x + x][actor->y + y].actor != g.player) continue;
                     if (y + actor->y < 0 || y + actor->y >= MAPH) continue;
                     if (g.levmap[x + actor->x][y + actor->y].player_heat <= lowest) {
                         lowest = g.levmap[x + actor->x][y + actor->y].player_heat;
@@ -39,12 +43,16 @@ void take_turn(struct actor *actor) {
                     }
                 }
             }
-            action = dir_to_action(lx, ly);
+            if (lx == -99 || ly == -99) {
+                action = A_REST;
+            } else {
+                action = dir_to_action(lx, ly);
+            }
         }
         cost = execute_action(actor, action);
         actor->energy -= cost;
         actor_sanity_checks(actor);
-        if (f.update_fov)
+        if (f.update_fov && actor == g.player)
             create_heatmap(); /* VERY EXPENSIVE. */
     }
 }

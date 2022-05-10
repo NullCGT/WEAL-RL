@@ -234,8 +234,9 @@ void display_energy_win(void) {
             mvwprintw(new_win, 8 + i, 1, buf);
             wattroff(new_win, COLOR_PAIR(cur_npc->color));
             memset(buf, 0, 128);
-            sprintf(buf, "%s", actor_name(cur_npc, 0));
+            sprintf(buf, "%s (%d, %d)", actor_name(cur_npc, 0), cur_npc->x, cur_npc->y);
             mvwprintw(new_win, 8 + i, 3, buf);
+            i++;
         }
         cur_npc = cur_npc->next;
     }
@@ -414,6 +415,10 @@ int handle_keys(void) {
         case '.':
         case '5':
             return A_REST;
+        case 'o':
+            return A_OPEN;
+        case 'c':
+            return A_CLOSE;
         case KEY_MOUSE:
             return handle_mouse();
         case 'p':
@@ -433,6 +438,7 @@ int handle_keys(void) {
         case 'S':
             return A_SAVE;
         case 'Q':
+        case 27:
             return A_QUIT;
         default:
             break;

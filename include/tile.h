@@ -39,6 +39,7 @@ struct tile {
 /* Function prototypes */
 void init_tile(struct tile *, int);
 int open_door(struct actor *, int, int);
+int close_door(struct actor *, int, int);
 
 /* Tile definitions */
 #define PERMTILES \
