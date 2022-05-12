@@ -83,7 +83,7 @@ int do_attack(struct actor *aggressor, struct actor *target) {
     if (target == g.player && target->hp <= 0) {
         g.killer = aggressor;
         logm("It's all over...");
-        end_game();
+        end_game(0);
     } else if (target != g.player && target->hp <= 0) {
         logm("%s dies.", actor_name(target, NAME_THE | NAME_CAP));
         remove_actor(target);

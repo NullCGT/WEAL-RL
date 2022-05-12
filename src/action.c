@@ -221,7 +221,7 @@ int execute_action(struct actor *actor, int actnum) {
             break;
         case A_QUIT:
             logm("I give up...");
-            end_game();
+            end_game(0);
             break;
         case A_DEBUG_MAGICMAP:
             magic_mapping();

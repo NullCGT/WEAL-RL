@@ -5,26 +5,28 @@
 #include "message.h"
 #include "windows.h"
 
-int write_dumplog(const char *);
+int write_dumplog(const char *, int);
 void dump_killer(FILE *fp);
 void dump_levmap(FILE *);
 void dump_messages(FILE *);
 
-void end_game(void) {
-    if (!write_dumplog("dumplog.txt")) {
+void end_game(int winner) {
+    if (!write_dumplog("dumplog.txt", winner)) {
         display_file_text("dumplog.txt");
     }
     exit(0);
 }
 
-int write_dumplog(const char *fname) {
+int write_dumplog(const char *fname, int winner) {
     FILE *fp;
     fp = fopen(fname, "w");
     if (!fp) {
         return 1;
     }
-    fputs("== Cause of Death ==\n", fp);
-    if (g.killer) {
+    fputs("== Final Statics ==\n", fp);
+    if (winner) {
+        fprintf(fp, "I won on turn %d.\n", g.turns);
+    } else if (g.killer) {
         fprintf(fp, "I was killed by %s on turn %d.\n", actor_name(g.killer, NAME_A), g.turns);
     } else {
         fprintf(fp, "I quit on turn %d.\n", g.turns);

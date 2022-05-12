@@ -3,6 +3,7 @@
 #include "register.h"
 #include "message.h"
 #include "random.h"
+#include "gameover.h"
 
 /* Make a point on the map visible. */
 int make_visible(int x, int y) {
@@ -69,6 +70,10 @@ int climb(int change) {
 /* Change the depth via ascending or descending. */
 int change_depth(int change) {
     g.depth += change;
+    if (g.depth >= 50) {
+        /* A winner is you. */
+        end_game(1);
+    }
     make_level();
     push_actor(g.player, g.player->x, g.player->y);
     return 50;
