@@ -30,6 +30,7 @@ typedef struct global {
     int depth;
     int cx, cy; /* Camera location */
     int cursor_x, cursor_y; /* In-game cursor location */
+    int goal_x, goal_y; /* Traveling */
     int display_heat;
     int prev_action; /* for the moment, only used for runmode */
 } global;

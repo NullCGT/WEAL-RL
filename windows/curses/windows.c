@@ -336,7 +336,8 @@ void refresh_map(void) {
 
 /* handle mouse inputs */
 int handle_mouse(void) {
-    int x, y;
+    int x, y;   /* Mouse cell */
+    int gx, gy; /* Map cell */
     MEVENT event;
 
     if (getmouse(&event) != OK)
@@ -344,6 +345,8 @@ int handle_mouse(void) {
     
     x = event.x;
     y = event.y;
+    gx = x + g.cx;
+    gy = y - g.cy - term.mapwin_y;
     
     if (event.bstate & BUTTON1_CLICKED) {
         if (y <= term.msg_h - 1 && x <= term.msg_w) {
@@ -352,12 +355,22 @@ int handle_mouse(void) {
     }
 
     if (f.mode_look) {
-        g.cursor_x = x + g.cx;
-        g.cursor_y = y - g.cy - term.mapwin_y;
+        g.cursor_x = gx;
+        g.cursor_y = gy;
     }
-    
+
+    /* Left click to travel. */
+    if ((event.bstate & BUTTON1_CLICKED)
+        && in_bounds(gx, gy)
+        && is_explored(gx, gy)) {
+        g.goal_x = gx;
+        g.goal_y = gy;
+        f.mode_run = 1;
+        return A_NONE;
+    }
+    /* Right click to examine. */
     if (event.bstate & BUTTON3_CLICKED) {
-        look_at(x + g.cx, y - g.cy - term.mapwin_y);
+        look_at(gx, gy);
     }
 
     return A_NONE;

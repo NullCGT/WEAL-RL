@@ -5,6 +5,7 @@
 
 int move_mon(struct actor*, int, int);
 int look_at(int, int);
+void stop_running(void);
 int get_action(void);
 int dir_to_action(int, int);
 int execute_action(struct actor*, int);

@@ -14,6 +14,8 @@ struct global g = {
     .cy = 0,
     .cursor_x = 0,
     .cursor_y = 0,
+    .goal_x = -1,
+    .goal_y = -1,
     .display_heat = 0,
     .prev_action = 0,
 };

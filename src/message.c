@@ -131,7 +131,7 @@ int logma(int attr, const char *format, ...) {
 
 /* Return "a" or "an," depending on which is grammatically correct. */
 const char *an(const char *str) {
-    if (str && vowel(&str[0]))
+    if (str && vowel(str[0]))
         return "an";
     return "a";
 }

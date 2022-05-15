@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "register.h"
 #include "windows.h"
 #include "render.h"
 #include "message.h"
 #include "action.h"
+#include "map.h"
 
 void setup_gui(void);
 void setup_locale(void);
@@ -217,9 +217,18 @@ void refresh_map(void) {
 }
 
 int handle_mouse(struct ncinput input) {
+    int gx = input.x + g.cx;
+    int gy = input.y - g.cy - term.mapwin_y;
     if (f.mode_look) {
-        g.cursor_x = input.x + g.cx;
-        g.cursor_y = input.y - g.cy - term.mapwin_y;
+        g.cursor_x = gx;
+        g.cursor_y = gy;
+    }
+    if (input.evtype == NCTYPE_RELEASE && input.id == NCKEY_BUTTON1
+        && in_bounds(gx, gy) && is_explored(gx, gy)) {
+        g.goal_x = gx;
+        g.goal_y = gy;
+        f.mode_run = 1;
+        return A_NONE;
     }
     if (input.evtype == NCTYPE_PRESS && input.id == NCKEY_BUTTON3) {
         look_at(input.x + g.cx, input.y - g.cy - term.mapwin_y);
@@ -234,10 +243,10 @@ int handle_keys(void) {
     int ret = A_NONE;
 
     notcurses_get(nc, NULL, &input);
+    if (input.x && input.y)
+        handle_mouse(input);
     if (input.evtype == NCTYPE_RELEASE)
         return ret;
-    if (input.x && input.y && input.evtype == NCTYPE_PRESS)
-        handle_mouse(input);
     shift = (input.modifiers & NCKEY_MOD_SHIFT);
     switch(input.id) {
         case 'h':

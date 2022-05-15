@@ -29,6 +29,7 @@ struct tile {
     /* Heatmaps */
     int player_heat;
     int explore_heat;
+    int goal_heat;
     /* bitfields */
     unsigned int visible : 1;
     unsigned int lit : 1;

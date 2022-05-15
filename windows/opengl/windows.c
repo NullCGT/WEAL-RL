@@ -6,6 +6,7 @@
 #include "render.h"
 #include "message.h"
 #include "action.h"
+#include "map.h"
 #include "BearLibTerminal.h"
 
 #define MAP_LAYER 0
@@ -188,13 +189,21 @@ void refresh_map(void) {
 int handle_mouse(int event) {
     int x = terminal_state(TK_MOUSE_X);
     int y = terminal_state(TK_MOUSE_Y);
+    int gx = (x / WIDTH_MUL) + g.cx;
+    int gy = y + g.cy - term.mapwin_y;
     if (f.mode_look) {
-        g.cursor_x = (x / WIDTH_MUL) + g.cx;
-        g.cursor_y = y + g.cy - term.mapwin_y;
+        g.cursor_x = gx;
+        g.cursor_y = gy;
     }
 
+    if (event == TK_MOUSE_LEFT && in_bounds(gx, gy) && is_explored(gx, gy)) {
+        g.goal_x = gx;
+        g.goal_y = gy;
+        f.mode_run = 1;
+        return A_NONE;
+    }
     if (event == TK_MOUSE_RIGHT) {
-        look_at((x / WIDTH_MUL) + g.cx, y + g.cy - term.mapwin_y);
+        look_at(gx, gy);
     }
     return A_NONE;
 }

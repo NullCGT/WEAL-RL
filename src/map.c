@@ -90,15 +90,19 @@ void create_heatmap(void) {
             if (is_blocked(x, y) && TILE_AT(x, y) != T_DOOR_CLOSED) {
                 g.levmap[x][y].player_heat = IMPASSABLE;
                 g.levmap[x][y].explore_heat = IMPASSABLE;
+                g.levmap[x][y].goal_heat = IMPASSABLE;
             } else {
                 g.levmap[x][y].player_heat = MAX_HEAT;
                 g.levmap[x][y].explore_heat = MAX_HEAT;
+                g.levmap[x][y].goal_heat = IMPASSABLE;
             }
 
             if (g.player->x == x && g.player->y == y)
                 g.levmap[x][y].player_heat = 0;
             if (!g.levmap[x][y].explored)
                 g.levmap[x][y].explore_heat = 0;
+            if (g.goal_x == x && g.goal_y == y)
+                g.levmap[x][y].goal_heat = 0;
         }
     }
     /* Iterate until nothing has been changed */
@@ -119,6 +123,10 @@ void create_heatmap(void) {
                         }
                         if (g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1) {
                             g.levmap[x1][y1].explore_heat = g.levmap[x][y].explore_heat + 1;
+                            changed = 1;
+                        }
+                        if (g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1) {
+                            g.levmap[x1][y1].goal_heat = g.levmap[x][y].goal_heat + 1;
                             changed = 1;
                         }
                     }

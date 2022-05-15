@@ -6,6 +6,7 @@
 #include "render.h"
 #include "windows.h"
 #include "message.h"
+#include "action.h"
 
 void put_heatmap(int, int);
 void render_cursor(void);
@@ -71,7 +72,7 @@ void render_all_npcs(void) {
             /* TODO: Handle visibility and runmode in ai.c */
             if (cur != g.player) {
                 f.mode_explore = 0;
-                f.mode_run = 0;
+                stop_running();
             }
         }
         cur = cur->next;
@@ -101,7 +102,8 @@ const char heatmap[MAX_HEATMAP_DISPLAY] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ?
 enum viewmode {
     V_STANDARD,
     V_HM_PLAYER,
-    V_HM_EXPLORE
+    V_HM_EXPLORE,
+    V_HM_GOAL
 };
 #define V_MAX V_HM_EXPLORE
 
@@ -109,6 +111,9 @@ enum viewmode {
 void put_heatmap(int x, int y) {
     int i;
     switch(g.display_heat) {
+        case V_HM_GOAL:
+            i = g.levmap[x + g.cx][y + g.cy].goal_heat;
+            break;
         case V_HM_EXPLORE:
             i = g.levmap[x +g.cx][y + g.cy].explore_heat;
             break;

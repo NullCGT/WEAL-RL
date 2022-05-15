@@ -13,6 +13,7 @@
 
 int is_player(struct actor *);
 int autoexplore(void);
+int travel(void);
 int look_down(void);
 int pick_up(void);
 int lookmode(void);
@@ -36,7 +37,7 @@ int move_mon(struct actor* mon, int x, int y) {
     if (!in_bounds(nx, ny)) {
         if (is_player(mon)) {
             logm("I'm not leaving until I find Kate.");
-            f.mode_run = 0;
+            stop_running();
             return 0;
         } else {
             return 100;
@@ -51,14 +52,14 @@ int move_mon(struct actor* mon, int x, int y) {
     if (g.levmap[nx][ny].pt->func) {
         ret = g.levmap[nx][ny].pt->func(mon, nx, ny);
         if (ret) {
-            f.mode_run = 0;
+            stop_running();
             return ret;
         }
     }
     /* Handle blocked movement */
     if (is_blocked(nx, ny)) {
         if (is_player(mon)) {
-            f.mode_run = 0;
+            stop_running();
             return 0;
         } else {
             return 100;
@@ -121,10 +122,10 @@ int look_at(int x, int y) {
         if (MON_AT(x, y)) {
             logm("That is %s.", actor_name(MON_AT(x, y), NAME_A));
         } else {
-            logm("That is %s %s.", an(g.levmap[g.cursor_x][g.cursor_y].pt->name), g.levmap[g.cursor_x][g.cursor_y].pt->name);
+            logm("That is %s %s.", an(g.levmap[x][y].pt->name), g.levmap[x][y].pt->name);
         }
     } else if (is_explored(x, y)) {
-        logm("That is %s %s.", an(g.levmap[g.cursor_x][g.cursor_y].pt->name), g.levmap[g.cursor_x][g.cursor_y].pt->name);
+        logm("That is %s %s.", an(g.levmap[x][y].pt->name), g.levmap[x][y].pt->name);
     } else {
         logm("I haven't explored that area.");
     }
@@ -132,7 +133,8 @@ int look_at(int x, int y) {
 }
 
 int autoexplore(void) {
-    int lx, ly;
+    int lx = IMPASSABLE;
+    int ly = IMPASSABLE;
     int lowest = MAX_HEAT;
     // Do things
     for (int x = -1; x <= 1; x++) {
@@ -147,6 +149,10 @@ int autoexplore(void) {
             }
         }
     }
+    if (lx == IMPASSABLE || ly == IMPASSABLE) {
+        f.mode_explore = 0;
+        return A_NONE;
+    }
     if (lowest < MAX_HEAT) {
         if (!f.mode_explore) {
             logma(YELLOW, "I begin cautiously exploring the area.");
@@ -156,8 +162,43 @@ int autoexplore(void) {
     } else {
         logm("I don't think there's anywhere else I can explore from here.");
         f.mode_explore = 0;
-        return 0;
+        return A_NONE;
     }
+}
+
+int travel(void) {
+    int lx = IMPASSABLE;
+    int ly = IMPASSABLE;
+    int lowest = MAX_HEAT;
+    if (g.goal_x == g.player->x && g.goal_y == g.player->y) {
+        stop_running();
+        return A_NONE;
+    }
+
+    // Do things
+    for (int x = -1; x <= 1; x++) {
+        if (x + g.player->x < 0 || x + g.player->x >= MAPW) continue;
+        for (int y = -1; y <= 1; y++) {
+            if (!x && !y) continue;
+            if (y + g.player->y < 0 || y + g.player->y >= MAPH) continue;
+            if (g.levmap[x + g.player->x][y + g.player->y].goal_heat <= lowest) {
+                lowest = g.levmap[x + g.player->x][y + g.player->y].goal_heat;
+                lx = x;
+                ly = y;
+            }
+        }
+    }
+    if (lx == IMPASSABLE || ly == IMPASSABLE) {
+        stop_running();
+        return A_NONE;
+    }
+    return dir_to_action(lx, ly);
+}
+
+void stop_running(void) {
+    f.mode_run = 0;
+    g.goal_x = -1;
+    g.goal_y = -1;
 }
 
 
@@ -184,8 +225,11 @@ int get_action(void) {
     if (f.mode_explore) {
         return autoexplore();
     }
-    /* If running, move in the previously input direction. */
-    if (f.mode_run) {
+    /* If running, move towards the goal location if there is one. Otherwise, move 
+       in the previously input direction. */
+    if (f.mode_run && in_bounds(g.goal_x, g.goal_y) && is_explored(g.goal_x, g.goal_y)) {
+        return travel();
+    } else if (f.mode_run) {
         return g.prev_action;
     }
     /* Otherwise, block input all day :) */
