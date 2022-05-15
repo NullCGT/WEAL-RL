@@ -32,11 +32,14 @@ static color_t colors[] = {
     0xFFFFFFFF  // White
 };
 
+int handle_mouse(int);
+
 void setup_screen(void) {
     terminal_open();
     terminal_set("window: title='WEAL', cellsize=8x16, size=90x40, resizeable=true");
     terminal_set("0x1000: tiles.png, size=16x16, resize=16x16, resize-filter=nearest, spacing=2x1");
     terminal_set("0x2000: monsters.png, size=16x16, resize=16x16, resize-filter=nearest, spacing=2x1");
+    terminal_set("input: filter='keyboard, mouse'");
     terminal_layer(MAP_LAYER);
     terminal_color(colors[WHITE]);
 
@@ -181,11 +184,30 @@ void refresh_map(void) {
     terminal_refresh();
 }
 
+/* Handle mouse events. Non-blocking. */
+int handle_mouse(int event) {
+    int x = terminal_state(TK_MOUSE_X);
+    int y = terminal_state(TK_MOUSE_Y);
+    if (f.mode_look) {
+        g.cursor_x = (x / WIDTH_MUL) + g.cx;
+        g.cursor_y = y + g.cy - term.mapwin_y;
+    }
+
+    if (event == TK_MOUSE_RIGHT) {
+        look_at((x / WIDTH_MUL) + g.cx, y + g.cy - term.mapwin_y);
+    }
+    return A_NONE;
+}
+
 /* Handle key inputs. Blocking. */
 int handle_keys(void) {
     int keycode = terminal_read();
     int ret = A_NONE;
     int shift = 0;
+
+    if (keycode >= TK_MOUSE_LEFT && keycode <= TK_MOUSE_CLICKS) {
+        ret = handle_mouse(keycode);
+    }
     if (terminal_check(TK_SHIFT)) {
         shift = 1;
     }
@@ -209,6 +231,8 @@ int handle_keys(void) {
         ret = A_OPEN;
     } else if (keycode == TK_C) {
         ret = A_CLOSE;
+    } else if (keycode == TK_SEMICOLON) {
+        return A_LOOK;
     } else if ((keycode == TK_PERIOD) && shift) {
         ret = A_DESCEND;
     } else if ((keycode == TK_COMMA) && shift) {

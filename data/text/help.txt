@@ -22,12 +22,23 @@ numpad, arrow keys, or vikeys, as diagrammed below:
 456   h.l
 123   bjn
 
+Moving into a hostile will cause you to automatically attack
+them. Remember that.
+
 Holding shift while inputting a direction will cause you to
 move in that direction until you encounter an obstacle or
 something that requires your attention.
 
 Remember: You can move in all eight cardinal directions, not
 just four.
+
+                 |= MOUSE INPUT =|
+In addition to keyboard inputs, mouse input is also an option.
+
+Input          Function        Explanation
+-----------------------------------------------------------
+Left Click     Move            Move to the cursor's location.
+Right Click    Look            Look at the cursor's location.
 
               |= DEFAULT KEYBINDS =|
 
@@ -41,6 +52,7 @@ Key     Function        Explanation
  >      Descend         Descend to a lower level.
  <      Ascend          Ascend to a higher level.
  ,      Get             Pick up an item.
+ ;      Look            Look at a character on the screen.
  ?      Help            View this manual.
 
              |= ADVANCED KEYBINDS =|

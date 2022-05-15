@@ -28,8 +28,8 @@ typedef struct global {
     struct msg *msg_last;
     int turns;
     int depth;
-    int cx;
-    int cy;
+    int cx, cy; /* Camera location */
+    int cursor_x, cursor_y; /* In-game cursor location */
     int display_heat;
     int prev_action; /* for the moment, only used for runmode */
 } global;
@@ -43,7 +43,8 @@ typedef struct bitflags {
     unsigned int mode_explore : 1;
     unsigned int mode_run : 1;
     unsigned int mode_map : 1;
-    /* 2 free bits */
+    unsigned int mode_look : 1;
+    /* 1 free bit */
 } bitflags;
 
 typedef struct terminal {

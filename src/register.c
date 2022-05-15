@@ -12,6 +12,8 @@ struct global g = {
     .depth = 1,
     .cx = 0,
     .cy = 0,
+    .cursor_x = 0,
+    .cursor_y = 0,
     .display_heat = 0,
     .prev_action = 0,
 };
@@ -23,6 +25,7 @@ struct bitflags f = {
     .mode_explore = 0,
     .mode_run = 0,
     .mode_map = 1,
+    .mode_look = 0,
 };
 
 struct terminal term = {

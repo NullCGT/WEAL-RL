@@ -4,6 +4,7 @@
 #define DEBUG_CUTOFF 100
 
 int move_mon(struct actor*, int, int);
+int look_at(int, int);
 int get_action(void);
 int dir_to_action(int, int);
 int execute_action(struct actor*, int);
@@ -24,6 +25,7 @@ enum actionnum {
     A_REST,
     A_OPEN,
     A_CLOSE,
+    A_LOOK,
     A_ASCEND,
     A_DESCEND,
     A_PICK_UP,

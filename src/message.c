@@ -128,3 +128,10 @@ int logma(int attr, const char *format, ...) {
     va_end(arg);
     return ret;
 }
+
+/* Return "a" or "an," depending on which is grammatically correct. */
+const char *an(const char *str) {
+    if (str && vowel(&str[0]))
+        return "an";
+    return "a";
+}

@@ -15,6 +15,7 @@ int is_player(struct actor *);
 int autoexplore(void);
 int look_down(void);
 int pick_up(void);
+int lookmode(void);
 int directional_action(const char *, int (* act)(struct actor *, int, int));
 struct coord action_to_dir(int);
 
@@ -81,6 +82,52 @@ int look_down() {
 int pick_up() {
     logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
          g.levmap[g.player->x][g.player->y].pt->name);
+    return 0;
+}
+
+int lookmode(void) {
+    int act;
+    struct coord move_coord;
+
+    f.mode_look = 1;
+    g.cursor_x = g.player->x;
+    g.cursor_y = g.player->y;
+    logm("What should I examine?");
+    while (1) {
+        f.update_map= 1;
+        render_all();
+        act = get_action();
+        if (is_movement(act)) {
+            move_coord = action_to_dir(act);
+            g.cursor_x += move_coord.x;
+            g.cursor_y += move_coord.y;
+        } else if (act == A_QUIT) {
+            f.mode_look = 0;
+            f.update_map= 1;
+            render_all();
+            return 0;
+        } else if (act == A_LOOK) {
+            look_at(g.cursor_x, g.cursor_y);
+        }
+    }
+    return 0;
+}
+
+int look_at(int x, int y) {
+    if (!in_bounds(x, y)) {
+        logm("There is nothing to see there.");
+        return 0;
+    } else if (is_visible(x, y)) {
+        if (MON_AT(x, y)) {
+            logm("That is %s.", actor_name(MON_AT(x, y), NAME_A));
+        } else {
+            logm("That is %s %s.", an(g.levmap[g.cursor_x][g.cursor_y].pt->name), g.levmap[g.cursor_x][g.cursor_y].pt->name);
+        }
+    } else if (is_explored(x, y)) {
+        logm("That is %s %s.", an(g.levmap[g.cursor_x][g.cursor_y].pt->name), g.levmap[g.cursor_x][g.cursor_y].pt->name);
+    } else {
+        logm("I haven't explored that area.");
+    }
     return 0;
 }
 
@@ -197,6 +244,9 @@ int execute_action(struct actor *actor, int actnum) {
             break;
         case A_CLOSE:
             ret = directional_action("close", close_door);
+            break;
+        case A_LOOK:
+            ret = lookmode();
             break;
         case A_ASCEND:
             ret = climb(-1);

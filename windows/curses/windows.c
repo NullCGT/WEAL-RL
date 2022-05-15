@@ -350,6 +350,16 @@ int handle_mouse(void) {
             return A_FULLSCREEN;
         }
     }
+
+    if (f.mode_look) {
+        g.cursor_x = x + g.cx;
+        g.cursor_y = y - g.cy - term.mapwin_y;
+    }
+    
+    if (event.bstate & BUTTON3_CLICKED) {
+        look_at(x + g.cx, y - g.cy - term.mapwin_y);
+    }
+
     return A_NONE;
 }
 
@@ -419,6 +429,8 @@ int handle_keys(void) {
             return A_OPEN;
         case 'c':
             return A_CLOSE;
+        case ';':
+            return A_LOOK;
         case KEY_MOUSE:
             return handle_mouse();
         case 'p':

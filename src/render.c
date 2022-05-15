@@ -8,6 +8,7 @@
 #include "message.h"
 
 void put_heatmap(int, int);
+void render_cursor(void);
 
 
 /* Perform all rendering tasks. Often called from the main loop. */
@@ -23,8 +24,16 @@ void render_all(void) {
         render_map();
     }
     render_all_npcs();
+    if (f.mode_look) {
+        render_cursor();
+    }
     display_energy_win();
     refresh_map();
+}
+
+/* Render the cursor when in lookmode. */
+void render_cursor(void) {
+    map_putch(g.cursor_x - g.cx, g.cursor_y - g.cy, 'X', GREEN);
 }
 
 /* Render the map, tile by tile.

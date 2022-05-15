@@ -13,7 +13,7 @@
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
-int handle_mouse(void);
+int handle_mouse(struct ncinput);
 
 #define MAX_FILE_LEN 300
 
@@ -78,6 +78,7 @@ void setup_screen(void) {
     if ((nc = notcurses_init(&nopts, stdout)) == NULL) {
         exit(1);
     }
+    notcurses_mice_enable(nc, NCMICE_MOVE_EVENT | NCMICE_BUTTON_EVENT);
 
     nstd = notcurses_stddim_yx(nc, &h, &w);
     if (h > 1 && w > 1) {
@@ -215,6 +216,17 @@ void refresh_map(void) {
     notcurses_render(nc);
 }
 
+int handle_mouse(struct ncinput input) {
+    if (f.mode_look) {
+        g.cursor_x = input.x + g.cx;
+        g.cursor_y = input.y - g.cy - term.mapwin_y;
+    }
+    if (input.evtype == NCTYPE_PRESS && input.id == NCKEY_BUTTON3) {
+        look_at(input.x + g.cx, input.y - g.cy - term.mapwin_y);
+    }
+    return A_NONE;
+}
+
 /* Handle key inputs. Blocking. */
 int handle_keys(void) {
     struct ncinput input;
@@ -224,6 +236,8 @@ int handle_keys(void) {
     notcurses_get(nc, NULL, &input);
     if (input.evtype == NCTYPE_RELEASE)
         return ret;
+    if (input.x && input.y && input.evtype == NCTYPE_PRESS)
+        handle_mouse(input);
     shift = (input.modifiers & NCKEY_MOD_SHIFT);
     switch(input.id) {
         case 'h':
@@ -319,6 +333,8 @@ int handle_keys(void) {
             if (shift) {
                 ret = A_LOOK_DOWN;
                 break;
+            } else {
+                return A_LOOK;
             }
             break;
         case 'R':

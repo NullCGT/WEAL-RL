@@ -33,7 +33,7 @@ int rndbool() {
 int d(int x, int y) {
     int ret = 0;
     for (int i = 0; i < x; i++) {
-        ret += rndrng(1, 7);
+        ret += rndrng(1, y + 1);
     }
     return ret;
 }
