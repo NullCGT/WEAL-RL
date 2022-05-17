@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "message.h"
 #include "register.h"
@@ -61,7 +62,11 @@ void save_game(const char *fname) {
 }
 
 void save_actor(FILE *fp, struct actor *actor) {
+
     fwrite(actor, sizeof(struct actor), 1, fp);
+    if (actor->name) {
+        fwrite(actor->name, sizeof(struct name), 1, fp);
+    }
     if (actor->ai) {
         fwrite(actor->ai, sizeof(struct ai), 1, fp);
     }
@@ -122,6 +127,10 @@ void load_game(const char *fname) {
 struct actor *load_actor(FILE *fp, struct actor *actor) {
     actor = (struct actor *) malloc(sizeof(struct actor));
     fread(actor, sizeof(struct actor), 1, fp);
+    if (actor->name) {
+        actor->name = (struct name *) malloc(sizeof(struct name));
+        fread(actor->name, sizeof(struct name), 1, fp);
+    }
     if (actor->ai) {
         fread(actor->ai, sizeof(struct ai), 1, fp);
         actor->ai->parent = actor;

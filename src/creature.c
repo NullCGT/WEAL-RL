@@ -6,41 +6,30 @@
 #include "map.h"
 #include "register.h"
 #include "random.h"
+#include "actor.h"
+#include "message.h"
 
 void mod_attributes(struct actor *);
 void mod_ai(struct ai *);
 
-struct permcreature permcreatures[] = {
+struct actor permcreatures[] = {
     PERMCREATURES
 };
 
-/* Initialize an actor's attributes from a permcreature struct. */
+static const char *permnames[] = {
+    "human",
+    "glassworm"
+};
+
 void init_creature(struct actor *actor, int cindex) {
-    actor->chr = permcreatures[cindex].chr;
-    actor->tile_offset = permcreatures[cindex].tile_offset;
-    actor->color = permcreatures[cindex].color;
-    actor->weight = permcreatures[cindex].weight;
-    actor->hp = permcreatures[cindex].base_hp;
-    actor->hpmax = actor->hp;
-    actor->cindex = cindex;
-    /* Stuff that isn't done yet */
-    actor->invent = NULL;
-    actor->item = NULL;
-    actor->ai = NULL;
-    actor->energy = 0;
-    /* Bitfields */
-    actor->given_name = 0;
-    actor->unique = 0;
-    /* Copy AI */
-    #if 0
-    if (&permcreatures[cindex].ai)
-        memcpy(actor->ai, &permcreatures[cindex].ai, sizeof(struct ai));
-    #endif
-    /* Individual Variance */
+    memcpy(actor, &permcreatures[cindex], sizeof(struct actor));
     mod_attributes(actor);
-    #if 0
-    mod_ai(actor->ai);
-    #endif
+    /* Set up actor name struct. */
+    actor->name = (struct name *) malloc(sizeof(struct name));
+    memset(actor->name->given_name, 0, MAXNAMESIZ);
+    memset(actor->name->real_name, 0, MAXNAMESIZ);
+    strcpy(actor->name->real_name, permnames[cindex]);
+    actor->name->given_name[0] = '\0';
 }
 
 /* Spawn a creature-like actor. Passing in coordinates that are not in bounds
@@ -81,7 +70,8 @@ struct actor *spawn_creature(int cindex, int x, int y) {
 /* Assign some variance to the creature's attributes. */
 void mod_attributes(struct actor *actor) {
     actor->weight += min(actor->weight * 2, rndmx(g.depth * 10));
-    actor->hp += rndmx(g.depth);
+    actor->hpmax += rndmx(g.depth);
+    actor->hp = actor->hpmax;
 }
 
 /* Assign some slight variance to the ai. */

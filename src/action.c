@@ -136,6 +136,12 @@ int autoexplore(void) {
     int lx = IMPASSABLE;
     int ly = IMPASSABLE;
     int lowest = MAX_HEAT;
+    
+    /* Regenerate the heatmap if exploration is just beginning. */
+    if (!f.mode_explore) {
+        f.mode_explore = 1;
+        create_heatmap();
+    }
     // Do things
     for (int x = -1; x <= 1; x++) {
         if (x + g.player->x < 0 || x + g.player->x >= MAPW) continue;

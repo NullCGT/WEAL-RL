@@ -91,6 +91,7 @@ void create_heatmap(void) {
                 g.levmap[x][y].player_heat = IMPASSABLE;
                 g.levmap[x][y].explore_heat = IMPASSABLE;
                 g.levmap[x][y].goal_heat = IMPASSABLE;
+                continue;
             } else {
                 g.levmap[x][y].player_heat = MAX_HEAT;
                 g.levmap[x][y].explore_heat = MAX_HEAT;
@@ -121,11 +122,11 @@ void create_heatmap(void) {
                             g.levmap[x1][y1].player_heat = g.levmap[x][y].player_heat + 1;
                             changed = 1;
                         }
-                        if (g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1) {
+                        if (f.mode_explore && g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1) {
                             g.levmap[x1][y1].explore_heat = g.levmap[x][y].explore_heat + 1;
                             changed = 1;
                         }
-                        if (g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1) {
+                        if (f.mode_run && g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1) {
                             g.levmap[x1][y1].goal_heat = g.levmap[x][y].goal_heat + 1;
                             changed = 1;
                         }

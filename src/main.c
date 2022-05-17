@@ -72,8 +72,7 @@ void new_game(void) {
 
     // Create the player
     g.player = spawn_creature(M_HUMAN, -1, -1);
-    strcpy(g.player->name, "Player");
-    g.player->given_name = 1;
+    strcpy(g.player->name->given_name, "Player");
     g.player->unique = 1;
 
     for (int i = 0; i < 3; i++) {

@@ -23,24 +23,4 @@ struct permcreature {
 void init_creature(struct actor *, int);
 struct actor *spawn_creature(int, int, int);
 
-#define MON(id, name, chr, tile, color, base_hp, weight, ai) \
-    M_##id
-
-#define PERMCREATURES \
-    MON(HUMAN,     "human",     '@', 0x2000, WHITE, 100, 120, NULL), \
-    MON(GLASSWORM, "glassworm", 'w', 0x2001, RED,   6, 60, NULL)
-
-enum permcreaturenum {
-    PERMCREATURES,
-    M_MAX
-};
-
-#undef MON
-
-#define MON(id, name, chr, tile, color, base_hp, weight, ai) \
-    { M_##id, name, chr, tile, color, base_hp, weight, ai, \
-        0, 0, 0, 0 }
-
-extern struct permcreature permcreatures[];
-
 #endif

@@ -94,6 +94,8 @@ int do_attack(struct actor *aggressor, struct actor *target) {
 
 /* Frees an actor and all data that is associated with it. */
 void free_actor(struct actor *actor) {
+    if (actor->name)
+        free(actor->name);
     if (actor->invent)
         free_invent(actor->invent);
     if (actor->ai)
@@ -125,8 +127,8 @@ char *actor_name(struct actor *actor, unsigned flags) {
     /* Reset the name buffer. */
     memset(namebuf[nbi], 0, 64);
     const char *actname;
-    if (actor->given_name) actname = actor->name;
-    else actname = permcreatures[actor->cindex].name;
+    if (actor->name->given_name[0] != '\0') actname = actor->name->given_name;
+    else actname = actor->name->real_name;
 
     if ((flags & NAME_THE) && !actor->unique) {
         sprintf(namebuf[nbi], "the %s", actname);
