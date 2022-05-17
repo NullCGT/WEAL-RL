@@ -12,6 +12,7 @@
 #include "windows.h"
 #include "gameover.h"
 #include "creature.h"
+#include "ai.h"
 
 /* Pushes an actor to a new location and updates the levmap
    accordingly. */
@@ -67,29 +68,6 @@ void actor_sanity_checks(struct actor *actor) {
     if (actor->cindex < 0) {
         logma(MAGENTA, "Sanity check fail: Actor with bad cindex %d.", actor->cindex);
     }
-}
-
-/* Returns action cost. */
-int do_attack(struct actor *aggressor, struct actor *target) {
-    int damage = d(1, 6);
-    if (aggressor == g.player)
-        logma(YELLOW, "I thump %s for %d damage.", actor_name(target, NAME_THE), damage);
-    else if (target == g.player)
-        logma(RED, "%s thumps me for %d damage.", actor_name(aggressor, NAME_THE | NAME_CAP), damage);
-    else
-        logm("%s thumps %s.", actor_name(aggressor, NAME_THE | NAME_CAP), actor_name(target, NAME_THE));
-    /* Apply damage */
-    target->hp -= damage;
-    if (target == g.player && target->hp <= 0) {
-        g.killer = aggressor;
-        logm("It's all over...");
-        end_game(0);
-    } else if (target != g.player && target->hp <= 0) {
-        logm("%s dies.", actor_name(target, NAME_THE | NAME_CAP));
-        remove_actor(target);
-        free_actor(target);
-    }
-    return 100;
 }
 
 /* Frees an actor and all data that is associated with it. */

@@ -11,7 +11,7 @@ struct permtile {
     const char *name;
     char chr;
     wchar_t wchr;
-    int color;
+    unsigned char color;
     int (* func) (struct actor *, int, int);
     /* bitfields */
     unsigned int blocked : 1;
@@ -21,7 +21,7 @@ struct permtile {
 
 /* Attributes modifiable during runtime. */
 struct tile {
-    int color;
+    unsigned char color;
     struct permtile *pt;
     /* Maintain a pointer to the actor at this location. */
     struct actor *actor;

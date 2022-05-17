@@ -3,6 +3,7 @@
 #include "register.h"
 #include "render.h"
 #include "map.h"
+#include "random.h"
 
 #include <stdlib.h>
 
@@ -13,6 +14,8 @@ void take_turn(struct actor *actor) {
     
     /* Refill energy */
     actor->energy += 100;
+    if (actor->energy > 0 && actor->energy < 100)
+        actor->energy = 100;
     /* Increment turn counter */
     if (actor == g.player) {
         g.turns++;
@@ -55,4 +58,18 @@ void take_turn(struct actor *actor) {
         if (f.update_fov && actor == g.player)
             create_heatmap(); /* VERY EXPENSIVE. */
     }
+}
+
+/* Randomly pick an attack from among available attacks. Eventually, implement
+   smart monsters favoring attacks that the target is vulnerable to. */
+struct attack choose_attack(struct actor *aggressor, struct actor *target) {
+    int i, j;
+    (void) target; /* TODO: Implement attack favoring. */
+    for (i = 0; i < MAX_ATTK; i++) {
+        if (is_noatk(aggressor->attacks[i]))
+            break;
+    }
+    if (i == 1) return aggressor->attacks[0];
+    j = rndmx(i);
+    return aggressor->attacks[j];
 }

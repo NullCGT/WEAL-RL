@@ -10,6 +10,7 @@
 #include "render.h"
 #include "gameover.h"
 #include "save.h"
+#include "combat.h"
 
 int is_player(struct actor *);
 int autoexplore(void);

@@ -18,7 +18,7 @@ struct actor permcreatures[] = {
 
 static const char *permnames[] = {
     "human",
-    "glassworm"
+    "zombie"
 };
 
 void init_creature(struct actor *actor, int cindex) {

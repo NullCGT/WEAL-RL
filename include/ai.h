@@ -13,5 +13,6 @@ struct ai {
 };
 
 void take_turn(struct actor*);
+struct attack choose_attack(struct actor *, struct actor *);
 
 #endif
