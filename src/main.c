@@ -66,18 +66,22 @@ void handle_sigsegv(int sig) {
 }
 
 void new_game(void) {
+    struct coord c;
     logma(CYAN, "I've arrived at Fort Tarn."); 
     logma(CYAN, "Icicles creep down the concrete crenelations high above, and the wind howls past barbed wire before cutting straight through my jacket.");
-    make_level();
-
-    // Create the player
-    g.player = spawn_creature(M_HUMAN, -1, -1);
-    strcpy(g.player->name->given_name, "Player");
-    g.player->unique = 1;
-
-    for (int i = 0; i < 3; i++) {
-        spawn_creature(M_ZOMBIE, -1, -1);
+    /* Spawn player */
+    if (g.player == NULL) {
+        g.player = spawn_creature(M_HUMAN, 0, 0);
+        strcpy(g.player->name->given_name, "Player");
+        g.player->unique = 1;
     }
+    /* Make level */
+    make_level();
+    c = rand_open_coord();
+    /* Put player in a random spot */
+    push_actor(g.player, c.x, c.y);
+
+    
 }
 
 /* Main function. */

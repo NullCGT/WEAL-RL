@@ -8,8 +8,8 @@
 /* Map and window constants */
 #define MAPW 80
 #define MAPH 40
-#define MIN_TERM_H 80
-#define MIN_TERM_W 40
+#define MIN_TERM_H 20
+#define MIN_TERM_W 60
 
 /* Common functions */
 #define max(x, y) (((x) > (y)) ? (x) : (y))

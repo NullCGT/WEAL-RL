@@ -70,10 +70,11 @@ int climb(int change) {
 /* Change the depth via ascending or descending. */
 int change_depth(int change) {
     g.depth += change;
-    if (g.depth >= 50) {
+    if (g.depth >= 25) {
         /* A winner is you. */
         end_game(1);
     }
+    free_actor_list(g.player->next);
     make_level();
     push_actor(g.player, g.player->x, g.player->y);
     return 50;
@@ -95,7 +96,7 @@ void create_heatmap(void) {
             } else {
                 g.levmap[x][y].player_heat = MAX_HEAT;
                 g.levmap[x][y].explore_heat = MAX_HEAT;
-                g.levmap[x][y].goal_heat = IMPASSABLE;
+                g.levmap[x][y].goal_heat = !is_explored(x, y) ? IMPASSABLE : MAX_HEAT;
             }
 
             if (g.player->x == x && g.player->y == y)
@@ -116,17 +117,19 @@ void create_heatmap(void) {
                     for (y1 = y - 1; y1 <= y + 1; y1++) {
                         if (y1 < 0 || y1 >= MAPH) continue;
                         if (x1 == 0 && y1 == 0) continue;
-                        if (g.levmap[x1][y1].player_heat == IMPASSABLE) continue;
                         /* Heatmap updates */
-                        if (g.levmap[x1][y1].player_heat > g.levmap[x][y].player_heat + 1) {
+                        if (g.levmap[x1][y1].player_heat > g.levmap[x][y].player_heat + 1
+                            && g.levmap[x1][y1].player_heat != IMPASSABLE) {
                             g.levmap[x1][y1].player_heat = g.levmap[x][y].player_heat + 1;
                             changed = 1;
                         }
-                        if (f.mode_explore && g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1) {
+                        if (f.mode_explore && g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1
+                            && g.levmap[x1][y1].explore_heat != IMPASSABLE) {
                             g.levmap[x1][y1].explore_heat = g.levmap[x][y].explore_heat + 1;
                             changed = 1;
                         }
-                        if (f.mode_run && g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1) {
+                        if (f.mode_run && g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1
+                            && g.levmap[x1][y1].goal_heat != IMPASSABLE) {
                             g.levmap[x1][y1].goal_heat = g.levmap[x][y].goal_heat + 1;
                             changed = 1;
                         }

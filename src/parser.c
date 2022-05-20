@@ -63,6 +63,7 @@ int parser_getint(xmlDocPtr doc, xmlNodePtr cur) {
     return ret;
 }
 
+#if 0
 /* Parses a file with wfc data and returns a wfc_image. */
 /* IMPORTANT: This function does not actually free the memory allocated to
    tempdata. This MUST be freed after use. */
@@ -98,3 +99,4 @@ struct wfc_image parse_wfc_xml(const char *infile) {
 
     return image;
 }
+#endif
