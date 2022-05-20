@@ -11,6 +11,7 @@
 #include "map.h"
 
 void setup_gui(void);
+void refresh_gui(void);
 void setup_locale(void);
 void setup_colors(void);
 int handle_mouse(struct ncinput);
@@ -21,6 +22,7 @@ int handle_mouse(struct ncinput);
 struct notcurses *nc;
 struct ncplane* nstd;
 struct ncplane* nmsg_plane;
+struct ncplane* nmsgui_plane;
 
 static unsigned colors[] = {
     0x000000, // Black
@@ -38,6 +40,16 @@ static unsigned colors[] = {
 /* Perform the first-time setup for the game's GUI. */
 void setup_gui(void) {
     struct ncplane_options msgplane_opts = {
+        .y = 1,
+        .x = 1,
+        .rows = term.msg_h - 2,
+        .cols = term.msg_w - 2,
+        .userptr = NULL,
+        .name = "Log Plane",
+        .resizecb = NULL,
+        .flags = 0
+    };
+    struct ncplane_options msguiplane_opts = {
         .y = 0,
         .x = 0,
         .rows = term.msg_h,
@@ -47,8 +59,16 @@ void setup_gui(void) {
         .resizecb = NULL,
         .flags = 0
     };
-    nmsg_plane =  ncplane_create(nstd, &msgplane_opts);
+    nmsgui_plane = ncplane_create(nstd, &msguiplane_opts);
+    refresh_gui();
+    nmsg_plane =  ncplane_create(nmsgui_plane, &msgplane_opts);
     ncplane_set_scrolling(nmsg_plane, 1);
+}
+
+/* Refresh the message plane GUI */
+void refresh_gui(void) {
+    ncplane_double_box(nmsgui_plane, 0, 0, term.msg_h - 1, term.msg_w - 1, 0);
+    ncplane_printf_aligned(nmsgui_plane, 0, NCALIGN_CENTER, "Messages");
 }
 
 /* Set the locale of the terminal for the purposes of consistency, bug
@@ -113,6 +133,7 @@ void display_file_text(const char *fname) {
     /* Clear existing planes */
     ncplane_erase(nmsg_plane);
     ncplane_erase(nstd);
+    ncplane_erase(nmsgui_plane);
     f.mode_map = 0;
     /* Set up new plane */
     struct ncplane_options text_plane_opts = {
@@ -152,6 +173,7 @@ void display_file_text(const char *fname) {
                 f.update_map = 1;
                 f.update_msg = 1;
                 f.mode_map = 1;
+                refresh_gui();
                 return;
         }
     }
@@ -224,7 +246,7 @@ int handle_mouse(struct ncinput input) {
         g.cursor_y = gy;
     }
     if (input.evtype == NCTYPE_RELEASE && input.id == NCKEY_BUTTON1
-        && in_bounds(gx, gy) && is_explored(gx, gy)) {
+        && in_bounds(gx, gy) && is_explored(gx, gy) && !is_blocked(gx, gy)) {
         g.goal_x = gx;
         g.goal_y = gy;
         f.mode_run = 1;

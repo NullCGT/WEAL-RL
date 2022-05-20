@@ -362,6 +362,7 @@ int handle_mouse(void) {
     /* Left click to travel. */
     if ((event.bstate & BUTTON1_CLICKED)
         && in_bounds(gx, gy)
+        && !is_blocked(gx, gy)
         && is_explored(gx, gy)) {
         g.goal_x = gx;
         g.goal_y = gy;

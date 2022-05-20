@@ -196,7 +196,8 @@ int handle_mouse(int event) {
         g.cursor_y = gy;
     }
 
-    if (event == TK_MOUSE_LEFT && in_bounds(gx, gy) && is_explored(gx, gy)) {
+    if (event == TK_MOUSE_LEFT && in_bounds(gx, gy) && is_explored(gx, gy)
+        && !is_blocked(gx, gy)) {
         g.goal_x = gx;
         g.goal_y = gy;
         f.mode_run = 1;
