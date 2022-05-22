@@ -16,7 +16,7 @@ int is_player(struct actor *);
 int autoexplore(void);
 int travel(void);
 int look_down(void);
-int pick_up(void);
+int pick_up(struct actor *);
 int lookmode(void);
 int directional_action(const char *, int (* act)(struct actor *, int, int));
 struct coord action_to_dir(int);
@@ -77,14 +77,28 @@ int move_mon(struct actor* mon, int x, int y) {
 }
 
 int look_down() {
-    logm("I glance down. I am standing on %s.", g.levmap[g.player->x][g.player->y].pt->name);
+    if (ITEM_AT(g.player->x, g.player->y)) {
+        logm("I glance down. There is %s resting on the %s here.", 
+            actor_name(ITEM_AT(g.player->x, g.player->y), NAME_A),
+            g.levmap[g.player->x][g.player->y].pt->name);
+    } else {
+        logm("I glance down. I am standing on %s.", g.levmap[g.player->x][g.player->y].pt->name);
+    }
     return 0;
 }
 
-int pick_up() {
-    logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
-         g.levmap[g.player->x][g.player->y].pt->name);
-    return 0;
+int pick_up(struct actor *creature) {
+    struct actor *item = ITEM_AT(creature->x, creature->y);
+    if (!item) {
+        logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
+            g.levmap[creature->x][creature->y].pt->name);
+        return 0;
+    } else {
+        logm("I pick up %s.", actor_name(item, NAME_THE));
+        remove_actor(item);
+        creature->invent = item;
+        return 50;
+    }
 }
 
 int lookmode(void) {
@@ -121,7 +135,9 @@ int look_at(int x, int y) {
         return 0;
     } else if (is_visible(x, y)) {
         if (MON_AT(x, y)) {
-            logm("That is %s.", actor_name(MON_AT(x, y), NAME_A));
+            logm("That is %s", actor_name(MON_AT(x, y), NAME_A));
+        } else if (ITEM_AT(x, y)) {
+            logm("That is %s.", actor_name(ITEM_AT(x, y), NAME_A));
         } else {
             logm("That is %s %s.", an(g.levmap[x][y].pt->name), g.levmap[x][y].pt->name);
         }
@@ -309,7 +325,7 @@ int execute_action(struct actor *actor, int actnum) {
             ret = look_down();
             break;
         case A_PICK_UP:
-            ret = pick_up();
+            ret = pick_up(g.player);
             break;
         case A_FULLSCREEN:
             draw_msg_window(term.h, 1);

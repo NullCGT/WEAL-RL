@@ -27,7 +27,7 @@ struct ncplane* nmsgui_plane;
 static unsigned colors[] = {
     0x000000, // Black
     0xFF0000, // Red
-    0x008000, // Green
+    0x00FF00, // Green
     0xFFFF00, // Yellow
     0x0000FF, // Blue
     0xFF00FF, // Magenta

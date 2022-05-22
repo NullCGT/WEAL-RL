@@ -80,8 +80,7 @@ void new_game(void) {
     c = rand_open_coord();
     /* Put player in a random spot */
     push_actor(g.player, c.x, c.y);
-
-    
+    spawn_item(M_LONGSWORD, g.player->x + 1, g.player->y);
 }
 
 /* Main function. */

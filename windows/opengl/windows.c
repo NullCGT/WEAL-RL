@@ -25,7 +25,7 @@
 static color_t colors[] = {
     0xFF000000, // Black
     0xFFFF0000, // Red
-    0xFF008000, // Green
+    0xFF00FF00, // Green
     0xFFFFFF00, // Yellow
     0xFF0000FF, // Blue
     0xFFFF00FF, // Magenta

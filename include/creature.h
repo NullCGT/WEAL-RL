@@ -2,7 +2,7 @@
 #define CREATURE_H
 
 /* Function prototypes */
-void init_creature(struct actor *, int);
 struct actor *spawn_creature(int, int, int);
+struct actor *spawn_item(int, int, int);
 
 #endif

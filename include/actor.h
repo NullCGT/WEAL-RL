@@ -46,12 +46,13 @@ struct actor {
     struct name *name;
     struct actor *next;
     struct ai *ai;
-    struct invent *invent;
+    struct actor *invent;
     struct item *item;
     /* bitfields */
     unsigned short weak;
     unsigned short resist;
     unsigned int unique : 1;
+    unsigned int saved : 1; /* Infinite file write loop prevention. */
     /* 7 free bits */
 };
 
@@ -81,29 +82,40 @@ void free_actor_list(struct actor *);
 #define is_noatk(x) \
     (!(x.dam_n || x.dam_d))
 
-#define ACTMON(id, chr, tile, color, hpmax, weight, attacks, weakness, resist, unique) \
+#define ACTOR(id, chr, tile, color, hpmax, weight, attacks, weakness, resist) \
     M_##id
 
 #define PERMCREATURES \
-    ACTMON(HUMAN,     '@', 0x2000, WHITE, 100, 100, \
+    ACTOR(HUMAN,     '@', 0x2000, WHITE, 100, 100, \
             ATKS(ATK(1, 6, 0, DM_BLDG), NO_ATK, NO_ATK, NO_ATK), \
-            0, 0, 0), \
-    ACTMON(ZOMBIE, 'Z', 0x2001, GREEN,     6,  60, \
+            0, 0), \
+    ACTOR(ZOMBIE, 'Z', 0x2001, GREEN,      6, 60, \
             ATKS(ATK(1, 6, 0, DM_BLDG), ATK(1, 3, 0, DM_STAB), NO_ATK, NO_ATK), \
-            DM_FIRE | DM_HOLY, DM_POIS, 0)
+            DM_FIRE | DM_HOLY, DM_POIS)
+
+#define PERMITEMS \
+    ACTOR(LONGSWORD,    '/', 0x2000, WHITE, 10, 5, \
+            ATKS(ATK(1, 6, 0, DM_CUT), NO_ATK, NO_ATK, NO_ATK), \
+            DM_BLDG, DM_CUT | DM_STAB)
 
 enum permcreaturenum {
     PERMCREATURES,
     M_MAX
 };
 
-#undef ACTMON
+enum permitems {
+    PERMITEMS,
+    I_MAX,
+};
 
-#define ACTMON(id, chr, tile, color, hpmax, weight, attacks, weakness, resist, unique) \
-    { chr, tile, color, -1, -1, 0, hpmax, hpmax, weight, M_##id, attacks, NULL, NULL, NULL, NULL, NULL, weakness, resist, unique }
+#undef ACTOR
+
+#define ACTOR(id, chr, tile, color, hpmax, weight, attacks, weakness, resist) \
+    { chr, tile, color, -1, -1, 0, hpmax, hpmax, weight, M_##id, attacks, NULL, NULL, NULL, NULL, NULL, weakness, resist, 0, 0 }
 
 
 extern struct actor permcreatures[];
+extern struct actor permitems[];
 
 
 

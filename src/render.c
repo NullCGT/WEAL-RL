@@ -68,7 +68,10 @@ void render_all_npcs(void) {
     struct actor *cur = g.player;
     while (cur != NULL) {
         if (is_visible(cur->x, cur->y)) {
-            map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, cur->color);
+            if (cur->item && !MON_AT(cur->x, cur->y))
+                map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, cur->color);
+            else if (!cur->item)
+                map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, cur->color);
             /* TODO: Handle visibility and runmode in ai.c */
             if (cur != g.player) {
                 f.mode_explore = 0;

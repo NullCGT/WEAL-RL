@@ -40,7 +40,7 @@ void create_heatmap(void);
 #define MON_AT(x, y) \
     (g.levmap[x][y].actor)
 #define ITEM_AT(x, y) \
-    (g.levmap[x][y].item_actor);
+    (g.levmap[x][y].item_actor)
 #define TILE_AT(x, y) \
     (g.levmap[x][y].pt->id)
 

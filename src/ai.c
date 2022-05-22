@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "ai.h"
 #include "action.h"
 #include "register.h"
@@ -5,12 +7,20 @@
 #include "map.h"
 #include "random.h"
 
-#include <stdlib.h>
+void init_ai(struct actor *actor) {
+    struct ai *new_ai = (struct ai *) malloc(sizeof(struct ai));
+    new_ai->parent = actor;
+    new_ai->seektime = 0;
+    new_ai->faction = 0;
+    actor->ai = new_ai;
+}
 
 void take_turn(struct actor *actor) {
     int cost;
     int action = A_NONE;
-    struct ai *ai = actor->ai;
+
+    if (actor != g.player && !actor->ai)
+        return;
     
     /* Refill energy */
     actor->energy += 100;
@@ -22,7 +32,7 @@ void take_turn(struct actor *actor) {
     }
 
     while (actor->energy > 0) {
-        if (actor == g.player && !ai) {
+        if (actor == g.player) {
             render_all();
             /* Player input */
             action = get_action();

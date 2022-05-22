@@ -38,7 +38,7 @@ void save_game(const char *fname) {
     g.player->energy -= 100;
     g.turns -= 1;
 
-    /* Write the global struct. */
+    /* Write the global strustart_menuct. */
     fwrite(&g, sizeof(struct global), 1, fp);
     /* Write level map */
     for (int x = 0; x < MAPW; x++) {
@@ -62,7 +62,19 @@ void save_game(const char *fname) {
 }
 
 void save_actor(FILE *fp, struct actor *actor) {
+    int item_count;
+    struct actor *cur_item = actor->invent;
 
+    /* If some wires get crossed and we end up with an actor that
+       refers to itself, immediately kill the process. We don't
+       want to fill the user's entire hard drive. */
+    if (actor->saved) {
+        fclose(fp);
+        exit(1);
+    }
+    actor->saved = 1;
+
+    /* Write the actor, then write each of the actor's components. */
     fwrite(actor, sizeof(struct actor), 1, fp);
     if (actor->name) {
         fwrite(actor->name, sizeof(struct name), 1, fp);
@@ -71,10 +83,15 @@ void save_actor(FILE *fp, struct actor *actor) {
         fwrite(actor->ai, sizeof(struct ai), 1, fp);
     }
     if (actor->invent) {
-        fwrite(actor->invent, sizeof(struct invent), 1, fp);
-        for (int i = 0; i < MAX_INVENT_SIZE; i++) {
-            if (actor->invent->items[i])
-                save_actor(fp, actor->invent->items[i]);
+        while (cur_item != NULL) {
+            cur_item = actor->invent->next;
+            item_count++;
+        }
+        fwrite(&item_count, sizeof(int), 1, fp);
+        cur_item = actor->invent;
+        while (cur_item != NULL) {
+            save_actor(fp, cur_item);
+            cur_item = cur_item->next;
         }
     }
     if (actor->item) {
@@ -125,6 +142,10 @@ void load_game(const char *fname) {
 }
 
 struct actor *load_actor(FILE *fp, struct actor *actor) {
+    int item_count;
+    struct actor *cur_item;
+    struct actor **addr;
+
     actor = (struct actor *) malloc(sizeof(struct actor));
     fread(actor, sizeof(struct actor), 1, fp);
     if (actor->name) {
@@ -132,21 +153,27 @@ struct actor *load_actor(FILE *fp, struct actor *actor) {
         fread(actor->name, sizeof(struct name), 1, fp);
     }
     if (actor->ai) {
+        actor->ai = (struct ai *) malloc(sizeof(struct ai));
         fread(actor->ai, sizeof(struct ai), 1, fp);
         actor->ai->parent = actor;
     }
     if (actor->invent) {
-        actor->invent = (struct invent *) malloc(sizeof(struct invent));
-        fread(actor->invent, sizeof(struct invent), 1, fp);
-        for (int i = 0; i < MAX_INVENT_SIZE; i++) {
-            if (actor->invent->items[i])
-                actor->invent->items[i] = load_actor(fp, actor->invent->items[i]);
-            actor->invent->parent = actor;
+        fread(&item_count, sizeof(int), 1, fp);
+        cur_item = actor->invent;
+        addr = &(actor->invent);
+        for (int i = 0; i < item_count; i++) {
+            cur_item = load_actor(fp, cur_item);
+            *addr = cur_item;
+            addr = &((*addr)->next);
+            cur_item->next = NULL;
+            cur_item = cur_item->next;
         }
     }
     if (actor->item) {
+        actor->item = (struct item *) malloc(sizeof(struct item));
         fread(actor->item, sizeof(struct item), 1, fp);
         actor->item->parent = actor;
     }
+    actor->saved = 0;
     return actor;
 }

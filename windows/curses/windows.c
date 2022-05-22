@@ -28,7 +28,7 @@ struct curse_color {
 static struct curse_color colors[] = {
     { 0, 0, 0 },          // Black
     { 1000, 0, 0 },       // Red
-    { 0, 500, 0 },        // Green
+    { 0, 1000, 0 },        // Green
     { 1000, 1000, 0 },    // Yellow
     { 0, 0, 1000 },       // Blue
     { 1000, 0, 1000 },    // Magenta

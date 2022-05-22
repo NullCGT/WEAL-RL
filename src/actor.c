@@ -17,10 +17,6 @@
 /* Pushes an actor to a new location and updates the levmap
    accordingly. */
 void push_actor(struct actor *actor, int dx, int dy) {
-    /* TODO: WHY do we have rendering code here???/ */
-    if (is_visible(actor->x, actor->y))
-        map_put_tile(actor->x - g.cx, actor->y - g.cy, actor->x, actor->y, 
-                     g.levmap[actor->x][actor->y].pt->color);
     if (actor->item) {
         g.levmap[actor->x][actor->y].item_actor = NULL;
         actor->x = dx;
@@ -32,6 +28,14 @@ void push_actor(struct actor *actor, int dx, int dy) {
         actor->y = dy;
         g.levmap[actor->x][actor->y].actor = actor;
     }
+    /* TODO: WHY do we have rendering code here???/ */
+    if (is_visible(actor->x, actor->y)) {
+        if (g.levmap[actor->x][actor->y].item_actor)
+            map_put_actor(actor->x - g.cx, actor->y - g.cy, actor, actor->color);
+        else
+            map_put_tile(actor->x - g.cx, actor->y - g.cy, actor->x, actor->y, 
+                        g.levmap[actor->x][actor->y].pt->color);
+    }
 }
 
 /* Removes an actor from both the map and the linked list
@@ -40,7 +44,10 @@ void push_actor(struct actor *actor, int dx, int dy) {
 struct actor *remove_actor(struct actor *actor) {
     struct actor *cur = g.player;
     struct actor *prev = NULL;
-    g.levmap[actor->x][actor->y].actor = NULL;
+    if (actor->item)
+        g.levmap[actor->x][actor->y].item_actor = NULL;
+    else
+        g.levmap[actor->x][actor->y].actor = NULL;
     while (cur != NULL) {
         if (cur == actor) {
             if (prev != NULL) prev->next = cur->next;
@@ -75,7 +82,7 @@ void free_actor(struct actor *actor) {
     if (actor->name)
         free(actor->name);
     if (actor->invent)
-        free_invent(actor->invent);
+        free_actor_list(actor->invent);
     if (actor->ai)
         free(actor->ai);
     if (actor->item)
