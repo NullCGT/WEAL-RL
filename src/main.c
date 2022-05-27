@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief The main loop and functions necessary for running the game.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 #include <locale.h>
 #include <signal.h>
@@ -23,8 +34,11 @@ void handle_exit(void);
 void handle_sigwinch(int);
 void new_game(void);
 
-/* Called whenever the program exits. Cleans up the screen and (eventually)
-   saves the program state. */
+/**
+ * @brief Called whenever the program exits. Cleans up the screen and
+ frees used memory.
+ * 
+ */
 void handle_exit(void) {
     cleanup_screen();
     printf("Freeing message list...\n");
@@ -40,7 +54,11 @@ void handle_exit(void) {
     return;
 }
 
-/* Called when the terminal is resized. */
+/**
+ * @brief Handle instances of the terminal being resized. Extremely clumsy.
+ * 
+ * @param sig Signal.
+ */
 void handle_sigwinch(int sig) {
     (void) sig;
     cleanup_screen();
@@ -53,8 +71,13 @@ void handle_sigwinch(int sig) {
 }
 
 
-/* This is pulled directly from a stack overflow post by user Todd Gamblin.
-   https://stackoverflow.com/questions/77005/how-to-automatically-generate-a-stacktrace-when-my-program-crashes */
+/**
+ * @brief Handle segmentation faults and dump a meaningful backtrace.
+ This is pulled directly from a stack overflow post by user Todd Gamblin.
+   https://stackoverflow.com/questions/77005/how-to-automatically-generate-a-stacktrace-when-my-program-crashes
+ * 
+ * @param sig Signal.
+ */
 void handle_sigsegv(int sig) {
     (void) sig;
     void *array[10];
@@ -65,6 +88,10 @@ void handle_sigsegv(int sig) {
     exit(1);
 }
 
+/**
+ * @brief Set up a new game.
+ * 
+ */
 void new_game(void) {
     struct coord c;
     logma(CYAN, "I've arrived at Fort Tarn."); 
@@ -85,7 +112,11 @@ void new_game(void) {
     spawn_item(M_DAGGER, g.player->x - 1, g.player->y);
 }
 
-/* Main function. */
+/**
+ * @brief Main function.
+ * 
+ * @return int Returns zero.
+ */
 int main(void) {
     struct actor *cur_actor;
     FILE *fp;
