@@ -1,8 +1,20 @@
+
+/**
+ * @file spawn.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality related to spawning a new actor.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "ai.h"
-#include "creature.h"
+#include "spawn.h"
 #include "map.h"
 #include "register.h"
 #include "random.h"
@@ -36,6 +48,12 @@ static const char *permitemnames[] = {
     "dagger"
 };
 
+/**
+ * @brief Initialize an actor from the permcreatures array.
+ * 
+ * @param actor Actor to be initialized. Mutated by this function.
+ * @param cindex Index of the permcreatures array.
+ */
 void init_permcreature(struct actor *actor, int cindex) {
     memcpy(actor, &permcreatures[cindex], sizeof(struct actor));
     mod_attributes(actor);
@@ -43,6 +61,12 @@ void init_permcreature(struct actor *actor, int cindex) {
     init_permname(actor, permcreaturenames[cindex]);
 }
 
+/**
+ * @brief Initialize an actor from the permitems array.
+ * 
+ * @param actor Actor to be initialized. Mutated by this function.
+ * @param cindex Index of the permitems array.
+ */
 void init_permitem(struct actor *actor, int cindex) {
     memcpy(actor, &permitems[cindex], sizeof(struct actor));
     mod_attributes(actor);
@@ -50,6 +74,12 @@ void init_permitem(struct actor *actor, int cindex) {
     init_permname(actor, permitemnames[cindex]);
 }
 
+/**
+ * @brief Initialize the name struct of an actor.
+ * 
+ * @param actor The actor to initialize the name for.
+ * @param permname The real name of the actor.
+ */
 void init_permname(struct actor *actor, const char *permname) {
     actor->name = (struct name *) malloc(sizeof(struct name));
     memset(actor->name->given_name, 0, MAXNAMESIZ);
@@ -58,16 +88,41 @@ void init_permname(struct actor *actor, const char *permname) {
     actor->name->given_name[0] = '\0';
 }
 
+/**
+ * @brief Spawn a creature at a given location.
+ * 
+ * @param cindex index of the creature to be spawned.
+ * @param x x coordinate. If out of bounds, then spawn in a random location.
+ * @param y y coordinate. If out of bounds, then spawn in a random location.
+ * @return struct actor* Pointer to the actor spawned.
+ */
 struct actor *spawn_creature(int cindex, int x, int y) {
     return spawn_actor(cindex, 1, x, y);
 }
 
+/**
+ * @brief Spawn an item at a given location.
+ * 
+ * @param cindex index of the item to be spawned.
+ * @param x x coordinate. If out of bounds, then spawn in a random location.
+ * @param y y coordinate. If out of bounds, then spawn in a random location.
+ * @return struct actor* Pointer to the actor spawned.
+ */
 struct actor *spawn_item(int cindex, int x, int y) {
     return spawn_actor(cindex, 0, x, y);
 }
 
 /* Spawn an actor. Passing in coordinates that are not in bounds
    will spawn the actor in a random location. */
+/**
+ * @brief Spawn an actor in a given location.
+ * 
+ * @param cindex index of the actor to be spawned.
+ * @param creature Whether the actor is a creature or not.
+ * @param x x coordinate. If out of bounds, then spawn in a random location.
+ * @param y y coordinate. If out of bounds, then spawn in a random location.
+ * @return struct actor* Pointer to the actor spawned.
+ */
 struct actor *spawn_actor(int cindex, int creature, int x, int y) {
     struct actor *cur_actor = g.player;
     struct actor *prev_actor = cur_actor;
@@ -104,14 +159,24 @@ struct actor *spawn_actor(int cindex, int creature, int x, int y) {
     return actor;
 }
 
-/* Assign some variance to the actor's attributes. */
+/**
+ * @brief Mutate a given actor's attributes in order to provide some variance.
+ * 
+ * @param actor The actor to be mutated.
+ */
 void mod_attributes(struct actor *actor) {
+    if (!actor)
+        return;
     actor->weight += rndmx(actor->weight + g.depth);
     actor->hpmax += rndmx(g.depth);
     actor->hp = actor->hpmax;
 }
 
-/* Assign some slight variance to the ai. */
+/**
+ * @brief Mutate an actor's ai in order to provide some slight variance.
+ * 
+ * @param ai The ai to be mutated.
+ */
 void mod_ai(struct ai *ai) {
     if (!ai)
         return;

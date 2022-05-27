@@ -1,3 +1,14 @@
+/**
+ * @file parser.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality for parsing xml files.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -6,9 +17,13 @@
 #include "parser.h"
 
 void remove_whitespace(unsigned char *);
-void parser_tiles(const char *infile);
 
-/* Strips whitespace characters from a string. */
+/**
+ * @brief Strips the whitespace characters from a string, including
+ internal whitespace characters. Also used in message.c.
+ * 
+ * @param str The string to be mutated.
+ */
 void remove_whitespace(unsigned char *str) {
     int len = strlen((const char *) str);
     int j = 0;
@@ -21,7 +36,13 @@ void remove_whitespace(unsigned char *str) {
     str[j] = '\0';
 }
 
-/* Parses an XML file and returns a pointer to it. */
+/**
+ * @brief Parses an XML file and returns a document pointer to it.
+ * 
+ * @param filename The name of the file to be parsed.
+ * @param root The root node of the XML.
+ * @return xmlDocPtr Pointer to the parsed document.
+ */
 xmlDocPtr parse_xml(const char *filename, const char *root) {
     xmlDocPtr doc;
     xmlNodePtr cur;
@@ -52,7 +73,14 @@ xmlDocPtr parse_xml(const char *filename, const char *root) {
     return doc;
 }
 
-/* Fetches the entry in the current node and returns it as an integer. */
+/**
+ * @brief Fetches the entry in the current node and returns it as an integer
+ using atoi.
+ * 
+ * @param doc Pointer to the document being parsed.
+ * @param cur Pointer to the current XML node.
+ * @return int The integer that was parsed.
+ */
 int parser_getint(xmlDocPtr doc, xmlNodePtr cur) {
     int ret;
     xmlChar *item;
@@ -62,41 +90,3 @@ int parser_getint(xmlDocPtr doc, xmlNodePtr cur) {
     free(item);
     return ret;
 }
-
-#if 0
-/* Parses a file with wfc data and returns a wfc_image. */
-/* IMPORTANT: This function does not actually free the memory allocated to
-   tempdata. This MUST be freed after use. */
-/* TODO: Return a pointer instead of a struct? */
-struct wfc_image parse_wfc_xml(const char *infile) {
-    int width = 0;
-    int height = 0;
-    unsigned char *tempdata;
-
-    xmlDocPtr doc = parse_xml(infile, "wfc");
-    xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
-    while (cur != NULL) {
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"width"))) {
-            width = parser_getint(doc, cur);
-        } else if ((!xmlStrcmp(cur->name, (const xmlChar *)"height"))) {
-            height = parser_getint(doc, cur);
-        } else if ((!xmlStrcmp(cur->name, (const xmlChar *)"map"))) {
-            tempdata = (unsigned char *) xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-            remove_whitespace(tempdata);
-        }
-        cur = cur->next;
-    }
-    xmlFreeDoc(doc);
-    free(cur);
-    xmlCleanupParser();
-
-    struct wfc_image image = {
-        .data = tempdata,
-        .component_cnt = 1,
-        .width = width,
-        .height = height
-    };
-
-    return image;
-}
-#endif

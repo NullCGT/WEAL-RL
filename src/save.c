@@ -1,3 +1,14 @@
+/**
+ * @file save.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality related to saving and restoring the gamestate.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,12 +24,20 @@ void save_game(const char *);
 void save_actor(FILE *, struct actor *);
 struct actor *load_actor(FILE *, struct actor *);
 
-int save_exit(void) {
+/**
+ * @brief Save the game and immediately exit.
+ * 
+ */
+void save_exit(void) {
     save_game("save.bin");
     exit(0);
-    return 0;
 }
 
+/**
+ * @brief Save the current gamestate to a file.
+ * 
+ * @param fname The name of the file to save the state to.
+ */
 void save_game(const char *fname) {
     FILE *fp;
 
@@ -61,6 +80,13 @@ void save_game(const char *fname) {
     fclose(fp);
 }
 
+/**
+ * @brief Save an actor struct to a file. Called recursively in
+ order to save objects contained in the inventory of an actor.
+ * 
+ * @param fp The name of the file to save the actor to.
+ * @param actor The actor struct to be saved.
+ */
 void save_actor(FILE *fp, struct actor *actor) {
     int item_count;
     struct actor *cur_item = actor->invent;
@@ -99,6 +125,12 @@ void save_actor(FILE *fp, struct actor *actor) {
     }
 }
 
+/**
+ * @brief Load a previously saved gamestate. The gamestate must have been
+ made on the same platform.
+ * 
+ * @param fname The file to be read.
+ */
 void load_game(const char *fname) {
     FILE *fp;
     int actor_count;
@@ -141,6 +173,14 @@ void load_game(const char *fname) {
     fclose(fp);
 }
 
+/**
+ * @brief Load an actor struct from a file.
+ * 
+ * @param fp The file to be loaded from.
+ * @param actor The location in memory to allocate memory for and
+ load the actor. Mutated by this function call.
+ * @return struct actor* The actor that was loaded.
+ */
 struct actor *load_actor(FILE *fp, struct actor *actor) {
     int item_count;
     struct actor *cur_item;

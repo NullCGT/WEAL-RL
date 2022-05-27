@@ -1,3 +1,15 @@
+/**
+ * @file action.c
+ * @author Kestrle (kestrelg@kestrelscry.com)
+ * @brief Contains functionality related to actions. Actions are decisions
+ made by the player or other actors which may cost energy.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -22,10 +34,24 @@ int lookmode(void);
 int directional_action(const char *, int (* act)(struct actor *, int, int));
 struct coord action_to_dir(int);
 
-int is_player(struct actor* mon) {
-    return (mon == g.player);
+/**
+ * @brief Determine if a given actor is the player
+ * 
+ * @param actor The actor to check. 
+ * @return int True if the actor passed in is the player.
+ */
+int is_player(struct actor* actor) {
+    return (actor == g.player);
 }
 
+/**
+ * @brief Moves a creature a relative amount in a given direction.
+ * 
+ * @param mon The creature to be moved.
+ * @param x The number of cells to move in along the x axis.
+ * @param y The number of cells to move along the y axis.
+ * @return int The cost of the action in energy.
+ */
 int move_mon(struct actor* mon, int x, int y) {
     struct actor *target;
     int nx = mon->x + x;
@@ -77,6 +103,11 @@ int move_mon(struct actor* mon, int x, int y) {
     return 100;
 }
 
+/**
+ * @brief Describe the current cell the player is located at.
+ * 
+ * @return int The cost of the action in energy.
+ */
 int look_down() {
     if (ITEM_AT(g.player->x, g.player->y)) {
         logm("I glance down. There is %s resting on the %s here.", 
@@ -88,6 +119,15 @@ int look_down() {
     return 0;
 }
 
+/**
+ * @brief Pick up an item located at a given creature's location.
+ * 
+ * @param creature 
+ * @return int The cost of picking up an item in energy.
+ Failing to pick up an item costs 100 energy.
+ Picking up an item costs 50 energy.
+ Fumbling an item in an attempt to pick it up costs 50 energy.
+ */
 int pick_up(struct actor *creature) {
     struct actor *item = ITEM_AT(creature->x, creature->y);
     if (!item) {
@@ -107,6 +147,12 @@ int pick_up(struct actor *creature) {
     }
 }
 
+/**
+ * @brief Enter into lookmode. Takes in blocking input, wresting control
+ of the player away from the user.
+ * 
+ * @return int The cost in energy. Should always return zero.
+ */
 int lookmode(void) {
     int act;
     struct coord move_coord;
@@ -125,7 +171,7 @@ int lookmode(void) {
             g.cursor_y += move_coord.y;
         } else if (act == A_QUIT) {
             f.mode_look = 0;
-            f.update_map= 1;
+            f.update_map = 1;
             render_all();
             return 0;
         } else if (act == A_LOOK) {
@@ -135,6 +181,15 @@ int lookmode(void) {
     return 0;
 }
 
+/**
+ * @brief Describe a location and the actors at that location.
+ * 
+ * @param x The x coordinate of the location to be described.
+ * @param y The y coordinate of the location to be described.
+ * @return int The cost in energy of looking at the location.
+ Should always return zero, unless we implement some sort of bizarre monster
+ that can steal turns if you examine it.
+ */
 int look_at(int x, int y) {
     if (!in_bounds(x, y)) {
         logm("There is nothing to see there.");
@@ -155,6 +210,11 @@ int look_at(int x, int y) {
     return 0;
 }
 
+/**
+ * @brief Calculates a direction to automatically explore in.
+ * 
+ * @return int The index of the action that the player will perform.
+ */
 int autoexplore(void) {
     int lx = IMPASSABLE;
     int ly = IMPASSABLE;
@@ -195,6 +255,11 @@ int autoexplore(void) {
     }
 }
 
+/**
+ * @brief Calculates the next step when traveling to a specific location.
+ * 
+ * @return int The index of the action that the player will perform.
+ */
 int travel(void) {
     int lx = IMPASSABLE;
     int ly = IMPASSABLE;
@@ -224,13 +289,23 @@ int travel(void) {
     return dir_to_action(lx, ly);
 }
 
+/**
+ * @brief Cease all travel-related movement.
+ * 
+ */
 void stop_running(void) {
     f.mode_run = 0;
     g.goal_x = -1;
     g.goal_y = -1;
 }
 
-
+/**
+ * @brief Prompt the user for a direction in which to perform an action.
+ * 
+ * @param actstr A string denoting the action that the player user is preparing to take.
+ * @param act The function of the action that will be called.
+ * @return int The energy cost of the action that was called.
+ */
 int directional_action(const char *actstr, int (* act)(struct actor *, int, int)) {
     int actnum;
     struct coord c;
@@ -249,6 +324,11 @@ int directional_action(const char *actstr, int (* act)(struct actor *, int, int)
     return act(g.player, g.player->x + c.x, g.player->y + c.y);
 }
 
+/**
+ * @brief Determine the action that the player will be taking. Blocks input.
+ * 
+ * @return int The cost of the action to be taken.
+ */
 int get_action(void) {
     /* If we are in runmode or are exploring, don't block input. */
     if (f.mode_explore) {
@@ -283,12 +363,24 @@ static struct coord act_dir_array[] = {
     { 1, 1 }
 };
 
-/* Given a relative coordinate movement, return a direction. */
+/**
+ * @brief Given a relative coordinate movement, return a direction.
+ * 
+ * @param x The x coordinate: Should fall between -1 and 1 inclusive.
+ * @param y The y coordinate. Should fall between -1 and 1 inclusive.
+ * @return int The index of the action to be called.
+ */
 int dir_to_action(int x, int y) {
     return dir_act_array[y + 1][x + 1];
 }
 
-/* Given a movement-based action, return a coordinate. */
+/**
+ * @brief Given a movement-based action, return the coordinates associated
+ with that direction of movement.
+ * 
+ * @param actnum The index of the action.
+ * @return struct coord Coordinate representing the direction of the action.
+ */
 struct coord action_to_dir(int actnum) {
     if (!is_movement(actnum)) {
         return act_dir_array[0];
@@ -296,7 +388,13 @@ struct coord action_to_dir(int actnum) {
     return act_dir_array[actnum];
 }
 
-/* Executes an action and returns the cost in energy. */
+/**
+ * @brief Executes an action and returns the cost in energy.
+ * 
+ * @param actor The actor who will be performing the action.
+ * @param actnum The index of the action to be performed.
+ * @return int The cost in energy of the action.
+ */
 int execute_action(struct actor *actor, int actnum) {
     int ret = 0;
     struct coord move_coord;

@@ -1,3 +1,14 @@
+/**
+ * @file map.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functions related to the level map.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "map.h"
 #include"mapgen.h"
 #include "register.h"
@@ -5,7 +16,13 @@
 #include "random.h"
 #include "gameover.h"
 
-/* Make a point on the map visible. */
+/**
+ * @brief Make a point on the map visible and explored.
+ * 
+ * @param x x coordinate of the location.
+ * @param y y coordinate of the location.
+ * @return int Denotes whether tile is opaque.
+ */
 int make_visible(int x, int y) {
     g.levmap[x][y].visible = 1;
     g.levmap[x][y].explored = 1;
@@ -14,7 +31,11 @@ int make_visible(int x, int y) {
     return 0;
 }
 
-/* Return a random open coordinate on the map. */
+/**
+ * @brief Return a random open coordinate on the map.
+ * 
+ * @return struct coord The open coordinate found.
+ */
 struct coord rand_open_coord(void) {
     int x, y;
 
@@ -28,7 +49,10 @@ struct coord rand_open_coord(void) {
     return c;
 }
 
-/* Explores the entire map. */
+/**
+ * @brief Marks every cell in the map as explored.
+ * 
+ */
 void magic_mapping(void) {
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
@@ -39,7 +63,13 @@ void magic_mapping(void) {
     f.update_map = 1;
 }
 
-/* Climb a set of stairs. Calls change_depth. */
+/**
+ * @brief Climb a set of stairs. Calls change_depth().
+ * 
+ * @param change The number of levels climbed and direction of the climb. 
+ Must be -1 or 1.
+ * @return int Cost in energy of changing depth.
+ */
 int climb(int change) {
     if (g.depth + change < 0) {
         logm("I look up. It's too cloudy to make out any stars.");
@@ -53,8 +83,7 @@ int climb(int change) {
             logm("I need to find a staircase in order to descend.");
             return 0;
         }
-    }
-    if (change == -1) {
+    } else if (change == -1) {
         if (TILE_AT(g.player->x, g.player->y) == T_STAIR_UP) {
             logm("I ascend to an unfamiliar level.");
             return change_depth(change);
@@ -67,7 +96,12 @@ int climb(int change) {
     return change_depth(change);
 }
 
-/* Change the depth via ascending or descending. */
+/**
+ * @brief Change the player's depth.
+ * 
+ * @param change The number of levels to shift.
+ * @return int The cost in energy of climbing.
+ */
 int change_depth(int change) {
     g.depth += change;
     if (g.depth >= 25) {
@@ -80,7 +114,11 @@ int change_depth(int change) {
     return 50;
 }
 
-/* Create a heatmap */
+/**
+ * @brief Create the level's heatmap. An extremely expensive function that should
+ be called as little as possible.
+ * 
+ */
 void create_heatmap(void) {
     int y, x, y1, x1;
     int changed = 1;

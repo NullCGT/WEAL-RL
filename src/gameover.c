@@ -1,3 +1,14 @@
+/**
+ * @file gameover.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functions called when the game has ended, whether due to a loss or a win.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,6 +22,13 @@ void dump_levmap(FILE *);
 void dump_messages(FILE *);
 void dump_inventory(FILE *);
 
+/**
+ * @brief End the game.
+ * 
+ * @param winner Whether the game was won or lost.
+ 1 if the game was won.
+ 0 if the game was lost.
+ */
 void end_game(int winner) {
     if (!write_dumplog("dumplog.txt", winner)) {
         display_file_text("dumplog.txt");
@@ -18,6 +36,17 @@ void end_game(int winner) {
     exit(0);
 }
 
+/**
+ * @brief Write a dumplog to a file.
+ * 
+ * @param fname The name of the file to dump the log to.
+ * @param winner Whether the game was lost.
+ 1 if the game was won.
+ 0 if the game was lost.
+ * @return int Whether the file was successfully opened.
+ 1 if we could not acquire a file pointer.
+ 0 if the file was opened successfully.
+ */
 int write_dumplog(const char *fname, int winner) {
     FILE *fp;
     fp = fopen(fname, "w");
@@ -45,6 +74,11 @@ int write_dumplog(const char *fname, int winner) {
     return 0;
 }
 
+/**
+ * @brief Dump information about the creature that killed the player.
+ * 
+ * @param fp The dumplog file.
+ */
 void dump_killer(FILE *fp) {
     struct actor *cur = g.killer->invent;
 
@@ -61,6 +95,11 @@ void dump_killer(FILE *fp) {
     }
 }
 
+/**
+ * @brief Dump a textual representation of the current level.
+ * 
+ * @param fp The dumplog file.
+ */
 void dump_levmap(FILE *fp) {
     fputs("\n== Level Map ==\n", fp);
     for (int y = 0; y < MAPH; y++) {
@@ -76,6 +115,11 @@ void dump_levmap(FILE *fp) {
     }
 }
 
+/**
+ * @brief Dump all messages contained in the game's memory.
+ * 
+ * @param fp The dumplog file.
+ */
 void dump_messages(FILE *fp) {
     struct msg *cur_msg = g.msg_last;
     fputs("\n== Last Recorded Messages ==\n", fp);
@@ -85,6 +129,11 @@ void dump_messages(FILE *fp) {
     }
 }
 
+/**
+ * @brief Dump a record of all items in the player's inventory.
+ * 
+ * @param fp The dumplog file.
+ */
 void dump_inventory(FILE *fp) {
     struct actor *cur = g.player->invent;
 

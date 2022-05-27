@@ -1,3 +1,14 @@
+/**
+ * @file menu.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Menu-related code for the ncurses windowport.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +17,12 @@
 #include "windows.h"
 #include "menu.h"
 
+/**
+ * @brief Initialize a new menu and give it focus.
+ * 
+ * @param title The title of the new menu.
+ * @return struct menu* The menu that has been created.
+ */
 struct menu *menu_new(const char *title) {
     struct menu *new_menu = malloc(sizeof(struct menu));
     new_menu->title = title;
@@ -19,6 +36,13 @@ struct menu *menu_new(const char *title) {
     return new_menu;
 }
 
+/**
+ * @brief Add an item to an existing menu.
+ * 
+ * @param menu The menu the item is to be added to.
+ * @param index The letter associated with the item.
+ * @param text The text associated with the menu item. 
+ */
 void menu_add_item(struct menu *menu, unsigned char index, const char *text) {
     struct menu_item *cur = menu->items;
     struct menu_item *prev = menu->items;
@@ -38,6 +62,11 @@ void menu_add_item(struct menu *menu, unsigned char index, const char *text) {
     menu->max += 1;
 }
 
+/**
+ * @brief Render a menu and all associated items.
+ * 
+ * @param menu The menu to be rendered.
+ */
 void display_menu(struct menu *menu) {
     struct menu_item *cur = menu->items;
     char itembuf[128];
@@ -61,6 +90,15 @@ void display_menu(struct menu *menu) {
     }
 }
 
+/**
+ * @brief Menu driver. Gets blocking input from the user in order for
+them to navigate the menu and select different options.
+ * 
+ * @param menu The menu that is taking input.
+ * @param can_quit Defines whether the menu can be exited manually.
+ * @return signed char The index that was selected. Returns -1 if the menu is
+exited from and nothing is chosen. The caller must handle a response of -1.
+ */
 signed char menu_do_choice(struct menu *menu, int can_quit) {
     struct menu_item *cur_item = menu->items;
 
@@ -86,6 +124,11 @@ signed char menu_do_choice(struct menu *menu, int can_quit) {
     }
 }
 
+/**
+ * @brief Destroy a menu and free all memory associated with it.
+ * 
+ * @param menu The menu to be destroyed.
+ */
 void menu_destroy(struct menu *menu) {
     struct menu_item *cur = menu->items;
     struct menu_item *prev = menu->items;

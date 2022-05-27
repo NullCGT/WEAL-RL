@@ -1,3 +1,14 @@
+/**
+ * @file combat.c
+ * @author yKestrel (kestrelg@kestrelscry.com)
+ * @brief Combat-related functionality.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "actor.h"
 #include "ai.h"
 #include "combat.h"
@@ -6,7 +17,13 @@
 #include "message.h"
 #include "random.h"
 
-/* Returns action cost. */
+/**
+ * @brief Perform an attack.
+ * 
+ * @param aggressor The actor initiating the attack.
+ * @param target The target of the attack.
+ * @return int The cost in energy of making the attack.
+ */
 int do_attack(struct actor *aggressor, struct actor *target) {
     struct attack attack = choose_attack(aggressor, target); /* While, we can just use the first attack. */
     int damage = d(attack.dam_n, attack.dam_d);
@@ -54,6 +71,18 @@ int do_attack(struct actor *aggressor, struct actor *target) {
    - resist types > weak types = resist.
    - Weak types > resist types = weak.
    - resist types == weak types = normal */
+/**
+ * @brief Checks the weaknesses and resistances of a monster against an incoming damage
+   type.
+ * 
+ * @param dtype Bitfield denoting types of incoming damage.
+ * @param resist Bitfield denoting types of damage resisted.
+ * @param weak Bitfield denoting types of damage one is weak to.
+ * @return int The weakness and resistance staus.
+- resist types > weak types = resist = -1
+- Weak types > resist types = weak = 0
+- resist types == weak types = normal = 1
+ */
 int weak_res(unsigned short dtype, unsigned short resist, unsigned short weak) {
     int blocks = __builtin_popcount(dtype & resist);
     int hits = __builtin_popcount(dtype & weak);

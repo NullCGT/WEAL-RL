@@ -1,3 +1,14 @@
+/**
+ * @file fov.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality related to field-of-view.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 #include "map.h"
 #include "register.h"
@@ -10,7 +21,20 @@ void cast_light(int, int,
                 int, int);
 void calculate_fov(int, int, int);
 
-/* Cast light down an octant. Used for recursive shadowcasting. */
+/**
+ * @brief Cast light down an octant. Used for recursive shadowcasting.
+ * 
+ * @param cx x coordinate of the light source.
+ * @param cy y coordinate of the light source.
+ * @param start 
+ * @param end 
+ * @param row 
+ * @param radius 
+ * @param xx 
+ * @param xy 
+ * @param yx 
+ * @param yy 
+ */
 void cast_light(int cx, int cy,
                 double start, double end,
                 int row, int radius,
@@ -68,7 +92,8 @@ void cast_light(int cx, int cy,
     }
 }
 
-/* calculate the fov from a single point using recursive shadowcasting.
+/**
+ * @brief calculate the fov from a single point using recursive shadowcasting.
 
    Recursive shadowcasting is a 2001 FOV algorithm designed by
    Björn Bergström. It is described here:
@@ -76,7 +101,12 @@ void cast_light(int cx, int cy,
    
    This implementation is essentially a port of the python implementation
    by EricDB, described here:
-   http://roguebasin.com/index.php/Python_shadowcasting_implementation */
+   http://roguebasin.com/index.php/Python_shadowcasting_implementation
+ * 
+ * @param x x coordinate of the center.
+ * @param y y coordinate of the center.
+ * @param range radius in cells of the circle of light.
+ */
 void calculate_fov(int x, int y, int range) {
     /* Define octant multipliers. Due to the nature of static arrays in C,
        thses are initialized on the first call and remain in memory until

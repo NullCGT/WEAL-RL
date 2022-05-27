@@ -17,7 +17,7 @@
 #include "random.h"
 #include "action.h"
 #include "save.h"
-#include "creature.h"
+#include "spawn.h"
 
 void handle_exit(void);
 void handle_sigwinch(int);

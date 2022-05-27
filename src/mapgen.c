@@ -1,4 +1,14 @@
-#define WFC_IMPLEMENTATION
+/**
+ * @file mapgen.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Map generation functions. Currently undocumented due to high
+ volatility.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
 #include <random.h>
 #include <stdio.h>
@@ -6,7 +16,7 @@
 #include "message.h"
 #include "parser.h"
 #include "map.h"
-#include "creature.h"
+#include "spawn.h"
 
 #define MIN_ROOM_W 3
 #define MIN_ROOM_H 3

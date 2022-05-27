@@ -1,3 +1,14 @@
+/**
+ * @file render.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functions related to rendering the map and actors.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 
 #include "map.h"
@@ -12,7 +23,10 @@ void put_heatmap(int, int);
 void render_cursor(void);
 
 
-/* Perform all rendering tasks. Often called from the main loop. */
+/**
+ * @brief Perform all rendering tasks. Often called from the main loop.
+ * 
+ */
 void render_all(void) {
     if (f.update_msg) {
         draw_msg_window(term.msg_h, 0);
@@ -24,7 +38,7 @@ void render_all(void) {
     if (f.update_map) {
         render_map();
     }
-    render_all_npcs();
+    render_all_actors();
     if (f.mode_look) {
         render_cursor();
     }
@@ -32,13 +46,19 @@ void render_all(void) {
     refresh_map();
 }
 
-/* Render the cursor when in lookmode. */
+/**
+ * @brief Render the cursor when in lookmode.
+ * 
+ */
 void render_cursor(void) {
     map_putch(g.cursor_x - g.cx, g.cursor_y - g.cy, 'X', GREEN);
 }
 
-/* Render the map, tile by tile.
-   Loops over the entirety of the map, and works in O(n) time. */
+/**
+ * @brief Render the map, tile by tile.
+ Loops over the entirety of the map, and works in O(n) time.
+ * 
+ */
 void render_map(void) {
     clear_map();
     g.cx = min(max(0, g.player->x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
@@ -64,7 +84,11 @@ void render_map(void) {
     return;
 }
 
-void render_all_npcs(void) {
+/**
+ * @brief Render all actors on the map.
+ * 
+ */
+void render_all_actors(void) {
     struct actor *cur = g.player;
     while (cur != NULL) {
         if (is_visible(cur->x, cur->y)) {
@@ -83,7 +107,11 @@ void render_all_npcs(void) {
     return;
 }
 
-void clear_npcs(void) {
+/**
+ * @brief Clear all actors on the map.
+ * 
+ */
+void clear_actors(void) {
     struct actor *cur = g.player;
     while (cur != NULL && is_visible(cur->x, cur->y)) {
         map_put_tile(cur->x - g.cx, cur->y - g.cy, cur->x, cur->y, g.levmap[cur->x][cur->y].pt->color);
@@ -110,7 +138,12 @@ enum viewmode {
 };
 #define V_MAX V_HM_EXPLORE
 
-/* Display a heatmap on the main map. For debug purposes only. */
+/**
+ * @brief Display a heatmap on the main map. For debug purposes only.
+ * 
+ * @param x x coordinate of the map.
+ * @param y y coordinate of the map.
+ */
 void put_heatmap(int x, int y) {
     int i;
     switch(g.display_heat) {
@@ -133,6 +166,11 @@ void put_heatmap(int x, int y) {
     map_putch_truecolor(x, y, heatmap[i], color);
 }
 
+/**
+ * @brief Switfch viewmode to viwe a different heatmap.
+ * 
+ * @return int Cost of switching viewmode in energy.
+ */
 int switch_viewmode(void) {
     g.display_heat = g.display_heat + 1;
     if (g.display_heat > V_MAX) g.display_heat = 0;

@@ -1,3 +1,14 @@
+/**
+ * @file register.c
+ * @author your name (you@domain.com)
+ * @brief Holds information about the overall game state.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stddef.h>
 
 #include "register.h"
@@ -35,6 +46,14 @@ struct terminal term = {
     .w = 90
 };
 
+/**
+ * @brief Sets up the terminal dimensions.
+ * 
+ * @param h Height.
+ * @param w Width.
+ * @param height_mul Height multiplier if using scaled tiles.
+ * @param width_mul Width multiplier if using scaled tiles.
+ */
 void setup_term_dimensions(int h, int w, int height_mul, int width_mul) {
     term.h = h;
     term.w = w;

@@ -1,3 +1,15 @@
+/**
+ * @file actor.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality relating to the creation, destruction, and
+ description of actors.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,11 +23,17 @@
 #include "register.h"
 #include "windows.h"
 #include "gameover.h"
-#include "creature.h"
+#include "spawn.h"
 #include "ai.h"
 
-/* Pushes an actor to a new location and updates the levmap
-   accordingly. */
+/**
+ * @brief Pushes an actor to a new location and updates the levmap
+ accordingly.
+ * 
+ * @param actor The actor to be pushed.
+ * @param dx The x coordinate the actor is to be pushed to.
+ * @param dy The y coordinate the actor is to be pushed to.
+ */
 void push_actor(struct actor *actor, int dx, int dy) {
     if (actor->item) {
         g.levmap[actor->x][actor->y].item_actor = NULL;
@@ -38,9 +56,13 @@ void push_actor(struct actor *actor, int dx, int dy) {
     }
 }
 
-/* Removes an actor from both the map and the linked list
-   of actors. Does not free memory associated with the
-   actor. */
+/**
+ * @brief Removes an actor from both the map and the linked list
+ of actors. Does not free memory associated with the actor.
+ * 
+ * @param actor The actor to be removed.
+ * @return struct actor* The actor that has been removed.
+ */
 struct actor *remove_actor(struct actor *actor) {
     struct actor *cur = g.player;
     struct actor *prev = NULL;
@@ -66,8 +88,12 @@ struct actor *remove_actor(struct actor *actor) {
     return actor;
 }
 
-/* Perform sanity checks to ensure that any sort of redundant
-   data remains in sync. */
+/**
+ * @brief Perform sanity checks to ensure that any sort of redundant data
+ remains in sync.
+ * 
+ * @param actor The actor to perform sanity checks upon.
+ */
 void actor_sanity_checks(struct actor *actor) {
     if (g.levmap[actor->x][actor->y].actor != actor) {
         logma(MAGENTA, "Sanity check fail: Actor claims to be at (%d, %d), but is not there.",
@@ -78,7 +104,11 @@ void actor_sanity_checks(struct actor *actor) {
     }
 }
 
-/* Frees an actor and all data that is associated with it. */
+/**
+ * @brief Frees an actor and all members of the actor struct.
+ * 
+ * @param actor The actor to be freed.
+ */
 void free_actor(struct actor *actor) {
     if (actor->name)
         free(actor->name);
@@ -91,6 +121,11 @@ void free_actor(struct actor *actor) {
     free(actor);
 }
 
+/**
+ * @brief Frees a contiguous linked list of actors.
+ * 
+ * @param actor The head of the linked list.
+ */
 void free_actor_list(struct actor *actor) {
     struct actor *next;
     while (actor != NULL) {
@@ -105,7 +140,14 @@ void free_actor_list(struct actor *actor) {
 static int nbi = -1;
 static char namebuf[4][64];
 
-/* Return the name of the actor. */
+/**
+ * @brief Return the name of an actor.
+ * 
+ * @param actor The actor to be named.
+ * @param flags Flags that can modify the characteristics of the returned
+ string. For a full list, see actor.h.
+ * @return char* The name of the actor.
+ */
 char *actor_name(struct actor *actor, unsigned flags) {
     /* Increase the namebuffer index. */
     nbi = (nbi + 1) % 4;

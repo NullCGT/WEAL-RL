@@ -1,3 +1,14 @@
+/**
+ * @file invent.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Inventory and item-related functionality.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 
 #include "actor.h"
@@ -10,7 +21,11 @@
 struct actor *win_pick_invent(void);
 int win_use_item(struct actor *);
 
-/* Allocate memory for the item component of a given actor. */
+/**
+ * @brief Allocate memory for the item component of a given actor
+ * 
+ * @param actor The parent of the new item component.
+ */
 void init_item(struct actor *actor) {
     struct item *new_item = (struct item *) malloc(sizeof(struct item));
     new_item->parent = actor;
@@ -19,7 +34,11 @@ void init_item(struct actor *actor) {
     actor->item = new_item;
 }
 
-/* Select an item from the inventory menu */
+/**
+ * @brief Perform an action with an item picked from the inventory.
+ * 
+ * @return The costi n energy of the performed action. 
+ */
 int display_invent(void) {
     int ret = 0;
     struct actor *item;
@@ -29,11 +48,19 @@ int display_invent(void) {
     return ret;
 }
 
-/* Add an item to a given inventory. Letters are "sticky," in that
-   if you drop an item, it should have the same letter when you
-   pick it back up. If there is a collision, the letter is reassigned.
-   Returns 1 if item was successfully added.
-   Returns 0 on failure. */
+/**
+ * @brief Add an item to a given inventory. Letters are "sticky," in that
+if you drop an item, it should have the same letter when you
+pick it back up. If there is a collision, the letter is reassigned.
+Returns 1 if item was successfully added.
+Returns 0 on failure.
+ * 
+ * @param creature The creature whose inventory is being appended to.
+ * @param item The actor being added to the inventory.
+ * @return int Success.
+0 if unsuccessful.
+1 if successful.
+ */
 int add_to_invent(struct actor *creature, struct actor *item) {
     struct actor *cur = creature->invent;
     struct actor *prev = creature->invent;
@@ -56,7 +83,7 @@ int add_to_invent(struct actor *creature, struct actor *item) {
                 break;
             }
         }
-        if (!found_spot) return 1;
+        if (!found_spot) return 0;
     }
     /* Insert the item */
     if (prev != NULL) {
@@ -67,6 +94,11 @@ int add_to_invent(struct actor *creature, struct actor *item) {
     return 1;
 }
 
+/**
+ * @brief Set up the inventory menu and choose an item.
+ * 
+ * @return struct actor* The item chosen from the inventory menu.
+ */
 struct actor *win_pick_invent(void) {
     struct menu *selector;
     struct actor *cur = g.player->invent;
@@ -101,6 +133,13 @@ struct actor *win_pick_invent(void) {
     return cur;
 }
 
+/**
+ * @brief Display the item use menu.
+ * 
+ * @param item The item to be used.
+ * @return int The energy cost of the action performed with the
+ item.
+ */
 int win_use_item(struct actor *item) {
     struct menu *selector;
     int selected = -1;

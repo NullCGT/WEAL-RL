@@ -1,3 +1,14 @@
+/**
+ * @file message.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality necessary for ingame messages.
+ * @version 1.0
+ * @date 2022-05-27
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -9,14 +20,22 @@
 int log_string(const char *, int, va_list);
 void wrap_string(char *, int);
 
-/* Free an individual message. */
+/**
+ * @brief Free an individual message.
+ * 
+ * @param message The message to be freed.
+ */
 void free_msg(struct msg *message) {
     free(message->msg);
     free(message);
     return;
 }
 
-/* Free all messages in the linked list of messages. */
+/**
+ * @brief Free all messages in the linked list of messages.
+ * 
+ * @param cur_msg Head of the linked list to be freed.
+ */
 void free_message_list(struct msg *cur_msg) {
     struct msg *prev_msg = cur_msg;
     while (cur_msg != (struct msg *) 0) {
@@ -26,8 +45,13 @@ void free_message_list(struct msg *cur_msg) {
     }
 }
 
-/* Iterates through a string and inserts newlines in order
-   to wrap the text in an aesthetically pleasing manner. */
+/**
+ * @brief Iterates through a string and inserts newlines in order
+ to wrap the text in an aesthetically pleasing manner.
+ * 
+ * @param buf The string to be wrapped. Mutated by this function.
+ * @param max_width The width at which to wrap.
+ */
 void wrap_string(char *buf, int max_width) {
     int last_space = 0;
     int w = 0;
@@ -45,7 +69,12 @@ void wrap_string(char *buf, int max_width) {
     }
 }
 
-/* Unwraps the line breaks in a string. */
+/**
+ * @brief Replace the line breaks in a string with spaces.
+ * 
+ * @param buf The string to be unwrapped. Mutated by this function call.
+ * @return char* The unwrapped string.
+ */
 char *unwrap_string(char *buf) {
     int i =0;
     while (buf[i] != '\0') {
@@ -56,7 +85,14 @@ char *unwrap_string(char *buf) {
     return buf;
 }
 
-/* Outputs a string to the log. */
+/**
+ * @brief Output a string to the log.
+ * 
+ * @param format Format.
+ * @param attr Attributes to apply. Should be constrained to color.
+ * @param arg Arguments for the format.
+ * @return int Returns zero.
+ */
 int log_string(const char *format, int attr, va_list arg) {
     char *msgbuf = malloc(MAX_MSG_LEN * sizeof(char));
     int i = 0;
@@ -107,7 +143,13 @@ int log_string(const char *format, int attr, va_list arg) {
     return 0;
 }
 
-/* Output a message to the message log with standard formatting. */
+/**
+ * @brief Output a message to the log with standard formatting.
+ * 
+ * @param format The format.
+ * @param ... Formatting arguments.
+ * @return int The result of log_string.
+ */
 int logm(const char *format, ...) {
     int ret;
     va_list arg;
@@ -118,7 +160,13 @@ int logm(const char *format, ...) {
     return ret;
 }
 
-/* Output a message to the message log with a color attribute. */
+/**
+ * @brief Output a message to the log with a color attribute.
+ * 
+ * @param format The format.
+ * @param ... Formatting arguments.
+ * @return int The result of log_string.
+ */
 int logma(int attr, const char *format, ...) {
     int ret;
     va_list arg;
@@ -129,7 +177,13 @@ int logma(int attr, const char *format, ...) {
     return ret;
 }
 
-/* Return "a" or "an," depending on which is grammatically correct. */
+/**
+ * @brief Return "a" or "an", depending on which would be grammatically
+ correct when preceeding the string passed in.
+ * 
+ * @param str The string to consider.
+ * @return const char* "a" or "an"
+ */
 const char *an(const char *str) {
     if (str && vowel(str[0]))
         return "an";

@@ -1,3 +1,15 @@
+/**
+ * @file ai.c
+ * @author Kestrel (kestrelg@kestrelscry.com)
+ * @brief Functionality associated with AI, as well as the code for
+ taking a turn with a given actor.
+ * @version 1.0
+ * @date 2022-05-26
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <stdlib.h>
 
 #include "ai.h"
@@ -7,6 +19,11 @@
 #include "map.h"
 #include "random.h"
 
+/**
+ * @brief Initialize an AI struct.
+ * 
+ * @param actor The parent of the newly initialized ai struct.
+ */
 void init_ai(struct actor *actor) {
     struct ai *new_ai = (struct ai *) malloc(sizeof(struct ai));
     new_ai->parent = actor;
@@ -15,6 +32,12 @@ void init_ai(struct actor *actor) {
     actor->ai = new_ai;
 }
 
+/**
+ * @brief An actor takes a turn if able. If the actor is the player, then
+ pass control to the user. Otherwise, make use of ai functionality.
+ * 
+ * @param actor The actor who will be taking the turn.
+ */
 void take_turn(struct actor *actor) {
     int cost;
     int action = A_NONE;
@@ -70,8 +93,15 @@ void take_turn(struct actor *actor) {
     }
 }
 
-/* Randomly pick an attack from among available attacks. Eventually, implement
-   smart monsters favoring attacks that the target is vulnerable to. */
+/**
+ * @brief Randomly pick an attack from among available attacks. Eventually,
+ smart monsters will be able to favor attacks that their target is vulnerable
+ to.
+ * 
+ * @param aggressor The actor performing the attack.
+ * @param target The target of the attack.
+ * @return struct attack The chosen attack.
+ */
 struct attack choose_attack(struct actor *aggressor, struct actor *target) {
     int i, j;
     (void) target; /* TODO: Implement attack favoring. */
