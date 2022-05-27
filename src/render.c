@@ -61,8 +61,10 @@ void render_cursor(void) {
  */
 void render_map(void) {
     clear_map();
-    g.cx = min(max(0, g.player->x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
-    g.cy = min(max(0, g.player->y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
+    if (MAPW > term.mapwin_w)
+        g.cx = min(max(0, g.player->x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
+    if (MAPH > term.mapwin_h)
+        g.cy = min(max(0, g.player->y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
     for (int i = 0; i < term.mapwin_w; i++) {
         for (int j = 0; j < term.mapwin_h; j++) {
             if (i + g.cx < MAPW && j + g.cy < MAPH
