@@ -1,0 +1,31 @@
+FIVE MAIN STATS
+All five stats have a different focus, but provide a minor improvement
+to another aspect of the character.
+
+- STRENGTH
+    - High impact on combat damage.
+    - Minor impact on hit points.
+- CONSTITUTION
+    - High impact on hit points.
+    - Minor impact on dodging.
+- DEXTERITY
+    - High impact on stealthiness.
+    - High impact on dodging.
+    - Minor impact on healing skills.
+- INTELLIGENCE
+    - High impact on healing skills.
+    - Minor impact on magic.
+- DRIVE
+    - High impact on magic.
+    - Minor impact on combat.
+
+
+When leveling up, player can contribute a point to a statistic.
+
+
+EXPERIENCE GAIN
+- Encountering a type of enemy (diminishing returns).
+- Slaying an enemy (diminishing returns).
+- Identifying the characteristics of an enemy.
+- Healing someone.
+- Descending to a new level.

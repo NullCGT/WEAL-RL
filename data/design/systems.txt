@@ -1,0 +1,47 @@
+== KNOCKBACK ==
+- Actors can use certain effects in order to apply knockback.
+- Being knocked back into a wall results in losing one or more turns.
+    - Positioning becomes very important.
+- POSSIBLE ADDITION: When one actor collides with another, the stationary
+  actor gains an immediate bonus turn.
+
+== CHAIN TURN === 
+- Inspired by the Shin Megami Tensei series Press Turn system.
+- An attack that deals damage of a type that an enemy is weak against costs
+  half as much energy.
+  - Allows for great flexibility in terms of how one approaches battles, and
+    prompts thought about character builds.
+- An attack that deals damage of a type that an enemy resists costs twice
+  as much energy.
+  - Forces careful thought and improvisation during battles in order to avoid
+    getting combo'd. You cannot simply spam the same attacks over and over
+    again.
+- Potential Flaw: Degenerate strategies, such as hitting an enemy's weakness,
+  then immediately backing up, forcing them to approach again.
+    - This is potentially limited by space, and the aforementioned danger of
+      being backed up against walls.
+    - Potentially mitigated by cost of repeated spell use.
+- Potential Flaw: Penalizes new players, since they may be unfamiliar with
+  enemy resists. Veteran players will be essentially playing a different
+  game than new players.
+    - Potential Solution: Slightly randomize enemy resists on every run. Would
+      create flavor issues, unfortunately.
+    - Potential Solution: Give players access to all information about every
+      enemy. Would destroy mood and discovery aspects.
+    - Potential Solution: No solution. Give most enemies a static set of weaknesses
+      and resistances.
+- Potential Flaw: May encourage players to go as wide as possible, rather than
+  going deep. Why make extremely powerful spells of certain elements if you can
+  cover every single one?
+    - Potential solution: Allow players to go wide on some level, but going wide requires
+      sacrificing other options.
+    - Potential solution: Using a spell of a certain element will make you weak to that
+      element for a number of turns. Thus, spamming spells of many different elements
+      results in increased risk. ****
+    - Potential solution: Consumables that allow for dealing elemental damage.
+- Potential Flaw: May encourage hoarding.
+    - Potential Solution: Non-persistent levels.
+
+== LIGHT AND SOUND ==
+- Enemies react to light and sound using dijkstra maps.
+- Certain attacks can manipulate light and sound.

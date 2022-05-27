@@ -1,0 +1,90 @@
+Things we want out of the combat system:
+- Wide array of effects other than just damage.
+- Allows for a variety of builds and player expression.
+- Simple enough that it is not a barrier to entry, but
+  complex enough that is dynamic.
+
+Things we do NOT want in our system:
+- Combat should not be the best solution to every given
+  problem.
+- Combat should not boil down to simply pressing the
+  direction of an enemy over and over again.
+- Combat should not be a copy of the d20 system. That
+  system is overdone.
+
+
+== SYSTEM ONE: FIGHTING GAME ==
+- Two HP bars: Health and Recoverable Health.
+- Damage can be applied to health or recoverable health.
+- Recoverable health regenerates over time.
+- If health is greater than recoverable health, it falls
+  over time until the two are equal.
+
+Pros:
+- Easy to implement. Required stats are as follows:
+    - Health
+    - Recoverable Health
+- Relatively easy to understand.
+- Allows for potentially interesting situations, such
+  as enemies that only attack non-recoverable health.
+- Could combine nicely with the medkit system: Player can
+  expend a medkit in order to recover their recoverable
+  health.
+- More forgiving than a total lack of healing.
+- Allows for combat with large swings that is still
+  relatively forgiving.
+- Different builds could alter meter mechanics in different
+  ways.
+- Allows for HP-to-One attacks.
+
+Cons:
+- Still encourages waiting around for one's health to
+  refill.
+- Damage to health might feel bad for players, and
+  encourage them to quit playing.
+- Fighting or exploring at very low health might be
+  difficult.
+- Could lead to fighting feeling very "tanky." Perhaps
+  a small amount of damage could always be applied to
+  health?
+
+Potential Mitigations:
+- Health can be increased, but only by descending to a
+  depth that has not yet been visited.
+  - Descending to an unvisited depth increases recoverable
+    health to the maximum, and regular health increases by
+    a decent amount as well.
+- Allow recoverable health to increase above regular health.
+  It could act similar to barrier points from Arcturus.
+
+== SYSTEM TWO: NO HEALTH REGEN ==
+- Straight hit points with no health regeneration.
+
+Pros:
+- Avoids the need for a clock, because health itself becomes
+  the clock.
+- The more you want to grind, the harder the game becomes.
+  Simultaneously, moving too quickly will also result in a
+  loss, since you will miss out on good items.
+- Combat is quick, as opposed to grindy.
+- Combat is greatly simplified.
+
+Cons:
+- Getting hit in any way has a permanent impact.
+- May lead to exceedingly careful gameplay.
+- Will potentially trigger the OCD of players like me.
+- Incredibly unforgiving.
+- New players may attempt to descend too deep too quickly and
+  die because of it.
+- Combat is, by nature, very quick.
+- Combat is greatly simplified.
+
+Potential Mitigations:
+- Restore health when descending to a level that has not been
+  visited before.
+
+
+== SYSTEM THREE: NO *NATURAL* HEALTH REGEN ==
+- Straight hit points with no natural health regen.
+- Many ways to restore hit points the normal way.
+- HP is fully restored upon entering an area that has not been visited.
