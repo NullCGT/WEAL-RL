@@ -9,6 +9,7 @@
 #include "message.h"
 #include "action.h"
 #include "map.h"
+#include "invent.h"
 
 void setup_gui(void);
 void refresh_gui(void);
@@ -348,6 +349,9 @@ int handle_keys(void) {
         case 'x':
             ret = A_EXPLORE;
             break;
+        case 'i':
+            ret = A_INVENT;
+            break;
         case 'S':
             ret = A_SAVE;
             break;
@@ -383,4 +387,109 @@ int handle_keys(void) {
     if (shift && is_movement(ret))
         f.mode_run = f.mode_map;
     return ret;
+}
+
+void menu_destroy(struct ncselector *selector) {
+    ncselector_destroy(selector, 0);
+}
+
+struct ncselector *menu_new(int x, int y, int rows, int cols) {
+    struct ncplane *selector_plane;
+    struct ncselector *selector;
+    struct ncplane_options plane_opts = {
+        .y = x,
+        .x = y,
+        .rows = rows,
+        .cols = cols,
+        .userptr = NULL,
+        .name = "Menu Plane",
+        .resizecb = NULL,
+        .flags = 0
+    };
+    struct ncselector_options select_options = {
+        .title = NULL,
+        .secondary = NULL,
+        .footer = NULL,
+        .items = NULL,
+        .defidx = 0,
+        .maxdisplay = min(term.h, 26),
+        .opchannels = 0,
+        .descchannels = 0,
+        .titlechannels = 0,
+        .footchannels = 0,
+        .boxchannels = 0,
+        .flags = 0
+    };
+    selector_plane = ncplane_create(nstd, &plane_opts);
+    selector = ncselector_create(selector_plane, &select_options);
+    f.mode_map = 0;
+
+    return selector;
+}
+
+void menu_add_item(struct ncselector *selector, const char *choice, const char *text) {
+    #if 0
+    struct ncselector_item *new_item = malloc(sizeof(struct ncselector_item));
+    new_item->option = choice;
+    new_item->desc = text;
+    #endif
+    struct ncselector_item new_item = { choice, text };
+    ncselector_additem(selector, &new_item);
+}
+
+/* Returns char selected from menu, or -1 if an invalid selection was made. */
+unsigned int menu_do_choice(struct ncselector *selector, int can_quit) {
+    struct ncinput input;
+
+    while (1) {
+        notcurses_get(nc, NULL, &input);
+        ncselector_offer_input(selector, &input);
+        if (input.id == NCKEY_ESC && can_quit) {
+            return -1;
+        } else if (input.id == NCKEY_ENTER && input.evtype != NCTYPE_RELEASE) {
+            return ncselector_selected(selector)[0];
+        } else if (input.id >= 'a' && input.id <= 'z' && input.evtype != NCTYPE_RELEASE) {
+            return input.id;
+        }
+    }
+}
+
+struct actor *win_pick_invent(void) {
+    struct ncselector *selector;
+    struct actor *cur = g.player->invent;
+    int selected = -1;
+
+    if (cur == NULL) {
+        logm("I am not carrying anything.");
+        return NULL;
+    }
+
+    selector = menu_new(1, 1, term.w - 2, term.h - 2);
+    while (cur != NULL) {
+        /* To resolve valgrind issues here: Allocate memory for each of these.
+           Notcurses frees the memory of item members when a window is destroyed. */
+        //menu_add_item(selector, &cur->item->letter, actor_name(cur, 0));
+        menu_add_item(selector, "a", "fart");
+        cur = cur->next;
+    }
+    notcurses_render(nc);
+    while (1) {
+        selected = menu_do_choice(selector, 1);
+        cur = g.player->invent;
+        if (selected == -1) {
+            cur = NULL;
+            break;
+        }
+        while (cur != NULL) {
+            if (cur->item->letter == selected) {
+                menu_destroy(selector);
+                f.mode_map = 1;
+                return cur;
+            }
+            cur = cur->next;
+        }
+    }
+    menu_destroy(selector);
+    f.mode_map = 1;
+    return cur;
 }

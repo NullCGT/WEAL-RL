@@ -52,6 +52,7 @@ struct actor *remove_actor(struct actor *actor) {
         if (cur == actor) {
             if (prev != NULL) prev->next = cur->next;
             else prev = NULL;
+            actor->next = NULL;
             return actor;
         }
         prev = cur;

@@ -31,7 +31,9 @@ static const char *permcreaturenames[] = {
 };
 
 static const char *permitemnames[] = {
-    "longsword"
+    "longsword",
+    "shortsword",
+    "dagger"
 };
 
 void init_permcreature(struct actor *actor, int cindex) {

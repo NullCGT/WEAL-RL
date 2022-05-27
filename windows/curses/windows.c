@@ -10,12 +10,12 @@
 #include "message.h"
 #include "action.h"
 #include "map.h"
+#include "invent.h"
+#include "menu.h"
 
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
-WINDOW* create_win(int, int, int, int);
-void cleanup_win(WINDOW *);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 int handle_mouse(void);
 
@@ -130,26 +130,6 @@ void cleanup_win(WINDOW *win) {
     werase(win);
     wrefresh(win);
     delwin(win);
-    return;
-}
-
-void create_popup_win(const char *title, const char *msg) {
-    WINDOW* new_win;
-    int w = term.mapwin_w / 2;
-    int h = term.mapwin_h / 2;
-    
-    new_win = newwin(h, w, h /2, w / 2);
-    box(new_win, 0, 0);
-    wattron(new_win, COLOR_PAIR(GREEN));
-    mvwprintw(new_win, 0, 1, title);
-    mvwprintw(new_win, h - 1, 1, "[Press back to dismiss.]");
-    wattroff(new_win, COLOR_PAIR(GREEN));
-    mvwprintw(new_win, 1, 1, msg);
-    wrefresh(new_win);
-    while (getch() != 'x');
-    cleanup_win(new_win);
-    f.update_map = 1;
-    f.update_msg = 1;
     return;
 }
 
@@ -457,6 +437,8 @@ int handle_keys(void) {
             return A_PICK_UP;
         case ':':
             return A_LOOK_DOWN;
+        case 'i':
+            return A_INVENT;
         case 'x':
             return A_EXPLORE;
         case '?':

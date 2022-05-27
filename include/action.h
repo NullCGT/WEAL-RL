@@ -32,6 +32,7 @@ enum actionnum {
     A_PICK_UP,
     A_LOOK_DOWN,
     A_EXPLORE,
+    A_INVENT,
     A_FULLSCREEN,
     A_HELP,
     A_SAVE,

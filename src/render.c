@@ -73,7 +73,7 @@ void render_all_npcs(void) {
             else if (!cur->item)
                 map_put_actor(cur->x - g.cx, cur->y - g.cy, cur, cur->color);
             /* TODO: Handle visibility and runmode in ai.c */
-            if (cur != g.player) {
+            if (cur != g.player && cur->ai) {
                 f.mode_explore = 0;
                 stop_running();
             }

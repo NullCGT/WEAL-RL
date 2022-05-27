@@ -6,9 +6,10 @@
 #include "windows.h"
 
 int write_dumplog(const char *, int);
-void dump_killer(FILE *fp);
+void dump_killer(FILE *);
 void dump_levmap(FILE *);
 void dump_messages(FILE *);
+void dump_inventory(FILE *);
 
 void end_game(int winner) {
     if (!write_dumplog("dumplog.txt", winner)) {
@@ -39,14 +40,25 @@ int write_dumplog(const char *fname, int winner) {
 
     dump_levmap(fp);
     dump_messages(fp);
+    dump_inventory(fp);
     fclose(fp);
     return 0;
 }
 
 void dump_killer(FILE *fp) {
+    struct actor *cur = g.killer->invent;
+
     fputs("\n== Killer Statistics ==\n", fp);
     fprintf(fp, "Name: %s\n", actor_name(g.killer, NAME_CAP));
     fprintf(fp, "HP: (%d/%d)\n", g.killer->hp, g.killer->hpmax);
+
+    if (cur != NULL) {
+        fprintf(fp, "Possessions:\n");
+    }
+    while (cur != NULL) {
+        fprintf(fp, " %s\n", actor_name(cur, NAME_CAP | NAME_A));
+        cur = cur->next;
+    }
 }
 
 void dump_levmap(FILE *fp) {
@@ -55,6 +67,8 @@ void dump_levmap(FILE *fp) {
         for (int x = 0; x < MAPW; x++) {
             if (g.levmap[x][y].actor)
                 fputc(g.levmap[x][y].actor->chr, fp);
+            else if (g.levmap[x][y].item_actor)
+                fputc(g.levmap[x][y].item_actor->chr, fp);
             else
                 fputc(g.levmap[x][y].pt->chr, fp);
         }
@@ -69,4 +83,19 @@ void dump_messages(FILE *fp) {
         fprintf(fp, "%d | %s\n", cur_msg->turn, cur_msg->msg);
         cur_msg = cur_msg->prev;
     }
+}
+
+void dump_inventory(FILE *fp) {
+    struct actor *cur = g.player->invent;
+
+    fputs("\n== Inventory ==\n", fp);
+    if (!cur) {
+        fprintf(fp, "A bit of dust.");
+        return;
+    }
+    while (cur != NULL) {
+        fprintf(fp, "%s\n", actor_name(cur, NAME_CAP | NAME_A));
+        cur = cur->next;
+    }
+
 }

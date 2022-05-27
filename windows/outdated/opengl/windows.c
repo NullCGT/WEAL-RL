@@ -241,7 +241,7 @@ int handle_keys(void) {
         ret = A_OPEN;
     } else if (keycode == TK_C) {
         ret = A_CLOSE;
-    } else if (keycode == TK_SEMICOLON) {
+    } else if (keycode == TK_SEMICOLON && !shift) {
         return A_LOOK;
     } else if ((keycode == TK_PERIOD) && shift) {
         ret = A_DESCEND;
@@ -255,6 +255,8 @@ int handle_keys(void) {
         ret = A_FULLSCREEN;
     } else if (keycode == TK_X) {
         ret = A_EXPLORE;
+    } else if (keycode == TK_I) {
+        ret = A_INVENT;
     } else if ((keycode == TK_SLASH) && shift) {
         ret = A_HELP;
     } else if ((keycode == TK_SEMICOLON) && shift) {
@@ -273,4 +275,8 @@ int handle_keys(void) {
         f.mode_run = f.mode_map;
     }
     return ret;
+}
+
+struct actor *win_pick_invent(void) {
+    return 0;
 }

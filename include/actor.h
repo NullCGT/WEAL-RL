@@ -95,7 +95,13 @@ void free_actor_list(struct actor *);
 
 #define PERMITEMS \
     ACTOR(LONGSWORD,    '/', 0x2000, WHITE, 10, 5, \
-            ATKS(ATK(1, 6, 0, DM_CUT), NO_ATK, NO_ATK, NO_ATK), \
+            ATKS(ATK(1, 8, 0, DM_CUT), NO_ATK, NO_ATK, NO_ATK), \
+            DM_BLDG, DM_CUT | DM_STAB), \
+    ACTOR(SHORTSWORD,   '/', 0x2000, WHITE, 8, 3, \
+            ATKS(ATK(1, 6, 0, DM_STAB), NO_ATK, NO_ATK, NO_ATK), \
+            DM_BLDG, DM_CUT | DM_STAB), \
+    ACTOR(DAGGER,       '/', 0x2000, WHITE, 4, 2, \
+            ATKS(ATK(1, 4, 0, DM_STAB), NO_ATK, NO_ATK, NO_ATK), \
             DM_BLDG, DM_CUT | DM_STAB)
 
 enum permcreaturenum {

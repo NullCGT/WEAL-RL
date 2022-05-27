@@ -11,6 +11,7 @@
 #include "gameover.h"
 #include "save.h"
 #include "combat.h"
+#include "invent.h"
 
 int is_player(struct actor *);
 int autoexplore(void);
@@ -93,10 +94,15 @@ int pick_up(struct actor *creature) {
         logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
             g.levmap[creature->x][creature->y].pt->name);
         return 0;
+    }
+    /* Remove the actor. If we cannot put it in the inventory, put it back. */
+    remove_actor(item);
+    if (add_to_invent(creature, item)) {
+        logm("I pick up %s [%c].", actor_name(item, NAME_THE), item->item->letter);
+        return 50;
     } else {
-        logm("I pick up %s.", actor_name(item, NAME_THE));
-        remove_actor(item);
-        creature->invent = item;
+        push_actor(item, item->x, item->y);
+        logm("My bag is too full.");
         return 50;
     }
 }
@@ -326,6 +332,9 @@ int execute_action(struct actor *actor, int actnum) {
             break;
         case A_PICK_UP:
             ret = pick_up(g.player);
+            break;
+        case A_INVENT:
+            ret = display_invent();
             break;
         case A_FULLSCREEN:
             draw_msg_window(term.h, 1);
