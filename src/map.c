@@ -114,6 +114,10 @@ int change_depth(int change) {
     return 50;
 }
 
+static struct coord cardinal_dirs[] = {
+    { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 }
+};
+
 /**
  * @brief Create the level's heatmap. An extremely expensive function that should
  be called as little as possible.
@@ -150,27 +154,26 @@ void create_heatmap(void) {
         changed = 0;
         for (y = 0; y < MAPH; y++) {
             for (x = 0; x < MAPW; x++) {
-                for (x1 = x - 1; x1 <= x + 1; x1++) {
-                    if (x1 < 0 || x1 >= MAPW) continue;
-                    for (y1 = y - 1; y1 <= y + 1; y1++) {
-                        if (y1 < 0 || y1 >= MAPH) continue;
-                        if (x1 == 0 && y1 == 0) continue;
-                        /* Heatmap updates */
-                        if (g.levmap[x1][y1].player_heat > g.levmap[x][y].player_heat + 1
-                            && g.levmap[x1][y1].player_heat != IMPASSABLE) {
-                            g.levmap[x1][y1].player_heat = g.levmap[x][y].player_heat + 1;
-                            changed = 1;
-                        }
-                        if (f.mode_explore && g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1
-                            && g.levmap[x1][y1].explore_heat != IMPASSABLE) {
-                            g.levmap[x1][y1].explore_heat = g.levmap[x][y].explore_heat + 1;
-                            changed = 1;
-                        }
-                        if (f.mode_run && g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1
-                            && g.levmap[x1][y1].goal_heat != IMPASSABLE) {
-                            g.levmap[x1][y1].goal_heat = g.levmap[x][y].goal_heat + 1;
-                            changed = 1;
-                        }
+                for (int i = 0; i < 4; i++) {
+                    struct coord dir = cardinal_dirs[i];
+                    x1 = x + dir.x;
+                    y1 = y + dir.y;
+                    if (!in_bounds(x1, y1)) continue;
+                    /* Heatmap updates */
+                    if (g.levmap[x1][y1].player_heat > g.levmap[x][y].player_heat + 1
+                        && g.levmap[x1][y1].player_heat != IMPASSABLE) {
+                        g.levmap[x1][y1].player_heat = g.levmap[x][y].player_heat + 1;
+                        changed = 1;
+                    }
+                    if (f.mode_explore && g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1
+                        && g.levmap[x1][y1].explore_heat != IMPASSABLE) {
+                        g.levmap[x1][y1].explore_heat = g.levmap[x][y].explore_heat + 1;
+                        changed = 1;
+                    }
+                    if (f.mode_run && g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1
+                        && g.levmap[x1][y1].goal_heat != IMPASSABLE) {
+                        g.levmap[x1][y1].goal_heat = g.levmap[x][y].goal_heat + 1;
+                        changed = 1;
                     }
                 }
             }
