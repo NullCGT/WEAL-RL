@@ -43,6 +43,14 @@ struct name *init_permname(struct actor *actor, const char *permname) {
     return actor->name;
 }
 
+/**
+ * @brief Spawn a creature at a location. Wrapper for spawn_actor.
+ * 
+ * @param name The name of the creature to spawn.
+ * @param x The x coordinate to spawn at.
+ * @param y THe y coordinate to spawn at.
+ * @return struct actor* A pointer to the creature spawned.
+ */
 struct actor *spawn_creature(const char *name, int x, int y) {
     struct actor *actor;
     char buf[128];
@@ -51,6 +59,14 @@ struct actor *spawn_creature(const char *name, int x, int y) {
     return actor;
 }
 
+/**
+ * @brief Spawn an item at a location. Wrapper for spawn_actor.
+ * 
+ * @param name The name of the item to spawn.
+ * @param x The x coordinate to spawn at.
+ * @param y THe y coordinate to spawn at.
+ * @return struct actor* A pointer to the item spawned.
+ */
 struct actor *spawn_item(const char *name, int x, int y) {
     struct actor *actor;
     char buf[128];
@@ -59,6 +75,15 @@ struct actor *spawn_item(const char *name, int x, int y) {
     return actor;
 }
 
+/**
+ * @brief Spawn an actor at a location. If an invalid
+ location is passed in, then choose a random one.
+ * 
+ * @param name The filename of the actor's JSON definition.
+ * @param x The x coordinate to spawn at.
+ * @param y THe y coordinate to spawn at.
+ * @return struct actor* A pointer to the actor spawned.
+ */
 struct actor *spawn_actor(const char *name, int x, int y) {
     struct actor *cur_actor = g.player;
     struct actor *prev_actor = cur_actor;
