@@ -5,22 +5,28 @@
 
 #define MAX_ATTK 4
 
-#define DM_FIRE 0x00000001 /* Fire */
-#define DM_ELEC 0x00000002 /* Electricity */
-#define DM_AIR  0x00000004 /* Air */
-#define DM_ICE  0x00000008 /* Ice */
-#define DM_POIS 0x00000010 /* Poison */
-#define DM_STAB 0x00000020 /* Pierce */
-#define DM_CUT  0x00000040 /* Slash */
-#define DM_BLDG 0x00000080 /* Bludgeon */
-#define DM_HOLY 0x00000100 /* Holy */
-#define DM_DARK 0x00000200 /* Dark */
+#define DM_FIRE 0x0001 /* Fire */
+#define DM_ELEC 0x0002 /* Electricity */
+#define DM_AIR  0x0004 /* Air */
+#define DM_COLD 0x0008 /* Ice */
+#define DM_POIS 0x0010 /* Poison */
+#define DM_STAB 0x0020 /* Pierce */
+#define DM_CUT  0x0040 /* Slash */
+#define DM_BLDG 0x0080 /* Bludgeon */
+#define DM_HOLY 0x0100 /* Holy */
+#define DM_DARK 0x0200 /* Dark */
+
+struct damage {
+    const char *str;
+    unsigned short val; 
+};
+
+#define MAX_DTYPE 10
 
 struct attack {
     unsigned char dam_n;
     unsigned char dam_d;
     unsigned char kb;
-    unsigned char timeout;
     /* bitfields */
     unsigned short dtype;
 };
@@ -70,55 +76,8 @@ void free_actor_list(struct actor *);
 #define NAME_A        0x04
 #define NAME_MY       0x08
 
-#define ATKS(a1, a2, a3, a4) \
-    {a1, a2, a3, a4}
-
-#define ATK(dam_n, dam_d, kb, dtype) \
-    {dam_n, dam_d, kb, 0, dtype}
-
-#define NO_ATK \
-    {0, 0, 0, 0, 0}
-
 #define is_noatk(x) \
     (!(x.dam_n || x.dam_d))
-
-#define ACTOR(id, chr, tile, color, hpmax, weight, attacks, weakness, resist) \
-    M_##id
-
-#define PERMCREATURES \
-    ACTOR(HUMAN,     '@', 0x2000, WHITE, 100, 100, \
-            ATKS(ATK(1, 6, 0, DM_BLDG), NO_ATK, NO_ATK, NO_ATK), \
-            0, 0), \
-    ACTOR(ZOMBIE, 'Z', 0x2001, GREEN,      6, 60, \
-            ATKS(ATK(1, 6, 0, DM_BLDG), ATK(1, 3, 0, DM_STAB), NO_ATK, NO_ATK), \
-            DM_FIRE | DM_HOLY, DM_POIS)
-
-#define PERMITEMS \
-    ACTOR(LONGSWORD,    '/', 0x2000, WHITE, 10, 5, \
-            ATKS(ATK(1, 8, 0, DM_CUT), NO_ATK, NO_ATK, NO_ATK), \
-            DM_BLDG, DM_CUT | DM_STAB), \
-    ACTOR(SHORTSWORD,   '/', 0x2000, WHITE, 8, 3, \
-            ATKS(ATK(1, 6, 0, DM_STAB), NO_ATK, NO_ATK, NO_ATK), \
-            DM_BLDG, DM_CUT | DM_STAB), \
-    ACTOR(DAGGER,       '/', 0x2000, WHITE, 4, 2, \
-            ATKS(ATK(1, 4, 0, DM_STAB), NO_ATK, NO_ATK, NO_ATK), \
-            DM_BLDG, DM_CUT | DM_STAB)
-
-enum permcreaturenum {
-    PERMCREATURES,
-    M_MAX
-};
-
-enum permitems {
-    PERMITEMS,
-    I_MAX,
-};
-
-#undef ACTOR
-
-#define ACTOR(id, chr, tile, color, hpmax, weight, attacks, weakness, resist) \
-    { chr, tile, color, -1, -1, 0, hpmax, hpmax, weight, M_##id, attacks, NULL, NULL, NULL, NULL, NULL, weakness, resist, 0, 0 }
-
 
 extern struct actor permcreatures[];
 extern struct actor permitems[];

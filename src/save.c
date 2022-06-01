@@ -19,6 +19,7 @@
 #include "ai.h"
 #include "invent.h"
 #include "actor.h"
+#include "windows.h"
 
 void save_game(const char *);
 void save_actor(FILE *, struct actor *);
@@ -30,6 +31,7 @@ struct actor *load_actor(FILE *, struct actor *);
  */
 void save_exit(void) {
     save_game("save.bin");
+    cleanup_screen();
     exit(0);
 }
 

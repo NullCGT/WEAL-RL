@@ -40,7 +40,6 @@ void new_game(void);
  * 
  */
 void handle_exit(void) {
-    cleanup_screen();
     printf("Freeing message list...\n");
     free_message_list(g.msg_list);
     printf("Freeing actor list...\n");
@@ -79,10 +78,10 @@ void handle_sigwinch(int sig) {
  * @param sig Signal.
  */
 void handle_sigsegv(int sig) {
+    void *array[16];
+    int size = backtrace(array, 16);
     (void) sig;
-    void *array[10];
-    size_t size;
-    size = backtrace(array, 10);
+    cleanup_screen();
     fprintf(stderr, "Error: signal %d:\n", sig);
     backtrace_symbols_fd(array, size, STDERR_FILENO);
     exit(1);
@@ -98,7 +97,7 @@ void new_game(void) {
     logma(CYAN, "Icicles creep down the concrete crenelations high above, and the wind howls past barbed wire before cutting straight through my jacket.");
     /* Spawn player */
     if (g.player == NULL) {
-        g.player = spawn_creature(M_HUMAN, 0, 0);
+        g.player = spawn_creature("human", 0, 0);
         strcpy(g.player->name->given_name, "Player");
         g.player->unique = 1;
     }
@@ -107,9 +106,6 @@ void new_game(void) {
     c = rand_open_coord();
     /* Put player in a random spot */
     push_actor(g.player, c.x, c.y);
-    spawn_item(M_LONGSWORD, g.player->x + 1, g.player->y);
-    spawn_item(M_SHORTSWORD, g.player->x, g.player->y + 1);
-    spawn_item(M_DAGGER, g.player->x - 1, g.player->y);
 }
 
 /**
@@ -152,6 +148,7 @@ int main(void) {
                 cur_actor = g.player;
         }
     }
+    cleanup_screen();
     exit(0);
     return 0;
 }

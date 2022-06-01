@@ -23,13 +23,14 @@
  * @brief Initialize an AI struct.
  * 
  * @param actor The parent of the newly initialized ai struct.
+ * @return A pointer to the newly-created ai struct.
  */
-void init_ai(struct actor *actor) {
+struct ai *init_ai(struct actor *actor) {
     struct ai *new_ai = (struct ai *) malloc(sizeof(struct ai));
+    *new_ai = (struct ai) { 0 };
     new_ai->parent = actor;
-    new_ai->seektime = 0;
-    new_ai->faction = 0;
     actor->ai = new_ai;
+    return actor->ai;
 }
 
 /**
@@ -88,8 +89,9 @@ void take_turn(struct actor *actor) {
         cost = execute_action(actor, action);
         actor->energy -= cost;
         actor_sanity_checks(actor);
-        if (f.update_fov && actor == g.player)
+        if (f.update_fov && actor == g.player) {
             create_heatmap(); /* VERY EXPENSIVE. */
+        }
     }
 }
 

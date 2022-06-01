@@ -2,7 +2,8 @@
 #define CREATURE_H
 
 /* Function prototypes */
-struct actor *spawn_creature(int, int, int);
-struct actor *spawn_item(int, int, int);
+struct name *init_permname(struct actor *, const char *);
+struct actor *spawn_creature(const char *name, int x, int y);
+struct actor *spawn_item(const char *name, int x, int y);
 
 #endif

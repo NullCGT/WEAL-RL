@@ -99,9 +99,6 @@ void actor_sanity_checks(struct actor *actor) {
         logma(MAGENTA, "Sanity check fail: Actor claims to be at (%d, %d), but is not there.",
               actor->x, actor->y);
     }
-    if (actor->cindex < 0) {
-        logma(MAGENTA, "Sanity check fail: Actor with bad cindex %d.", actor->cindex);
-    }
 }
 
 /**
@@ -159,13 +156,13 @@ char *actor_name(struct actor *actor, unsigned flags) {
     else actname = actor->name->real_name;
 
     if ((flags & NAME_THE) && !actor->unique) {
-        sprintf(namebuf[nbi], "the %s", actname);
+        snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "the %s", actname);
     } else if ((flags & NAME_MY) && !actor->unique) {
-        sprintf(namebuf[nbi], "my %s", actname);
+        snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "my %s", actname);
     } else if ((flags & NAME_A) && !actor->unique) {
-        sprintf(namebuf[nbi], "%s %s", !vowel(namebuf[nbi][0]) ? "a" : "an", actname);
+        snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "%s %s", !vowel(namebuf[nbi][0]) ? "a" : "an", actname);
     } else {
-        sprintf(namebuf[nbi], "%s", actname);
+        snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "%s", actname);
     }
 
     if (flags & NAME_CAP) {

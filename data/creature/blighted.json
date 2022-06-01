@@ -1,0 +1,28 @@
+{
+    "name": "blighted",
+    "chr": "Z",
+    "tile": 0,
+    "color": "green",
+    "hp": 6,
+    "weight": 125,
+    "attacks": [
+        {
+            "dice": 1,
+            "sides": 6,
+            "knockback": 0,
+            "types": ["bash"]
+        },
+        {
+            "dice": 1,
+            "sides": 3,
+            "knockback": 0,
+            "types": ["pierce"]
+        }
+    ],
+    "ai" :{
+        "seektime": 2
+    },
+    "weak": ["holy", "fire"],
+    "resist": ["poison"],
+    "description": "This humanoid died long ago, yet its limbs still twitch, as if controlled by an unskilled puppeteer. Exposure has beaten its skin into a rubbery mass from which the occasional bone protrudes. The fact that this creature was once human is betrayed only by its eyes, which remain fixed upon the heavens."
+}

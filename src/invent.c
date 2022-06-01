@@ -25,13 +25,15 @@ int win_use_item(struct actor *);
  * @brief Allocate memory for the item component of a given actor
  * 
  * @param actor The parent of the new item component.
+ * @return A pointer to the newly-created item struct.
  */
-void init_item(struct actor *actor) {
+struct item *init_item(struct actor *actor) {
     struct item *new_item = (struct item *) malloc(sizeof(struct item));
     new_item->parent = actor;
     new_item->letter = 'a';
     new_item->quan = 1;
     actor->item = new_item;
+    return actor->item;
 }
 
 /**

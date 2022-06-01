@@ -25,12 +25,14 @@ struct permtile permtiles[] = {
  * 
  * @param intile The tile to be initialized. Mutated by this function.
  * @param tindex The index of the permtile to initialize the tile as.
+ * @return A pointer to the modified tile.
  */
-void init_tile(struct tile *intile, int tindex) {
+struct tile *init_tile(struct tile *intile, int tindex) {
     intile->color = permtiles[tindex].color;
     intile->pt = &permtiles[tindex];
     intile->actor = NULL;
     intile->item_actor = NULL;
+    return intile;
 }
 
 /**

@@ -74,13 +74,13 @@ void display_menu(struct menu *menu) {
 
     werase(menu->win);
     wattron(menu->win, A_UNDERLINE);
-    sprintf(itembuf, "%s\n\n", menu->title);
+    snprintf(itembuf, sizeof(itembuf), "%s\n\n", menu->title);
     waddstr(menu->win, itembuf);
     wattroff(menu->win, A_UNDERLINE);
     
     while (cur != NULL) {
         memset(itembuf, 0, 128);
-        sprintf(itembuf, " %c) %s\n", cur->index, cur->text);
+        snprintf(itembuf, sizeof(itembuf), " %c) %s\n", cur->index, cur->text);
         if (index == menu->selected)
             wattron(menu->win, A_REVERSE);
         waddstr(menu->win, itembuf);

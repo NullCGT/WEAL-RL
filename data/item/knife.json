@@ -1,0 +1,21 @@
+{
+    "name": "knife",
+    "chr": "/",
+    "tile": 0,
+    "color": "white",
+    "hp": 4,
+    "weight": 2,
+    "attacks": [
+        {
+            "dice": 1,
+            "sides": 4,
+            "knockback": 0,
+            "types": ["stab"]
+        }
+    ],
+    "item": {
+    },
+    "weak": ["bash"],
+    "resist": ["cut", "pierce"],
+    "description": "Cuts throats just as easily as sandwiches."
+}

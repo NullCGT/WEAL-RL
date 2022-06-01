@@ -38,19 +38,6 @@ struct curse_color {
 
 #define CHANGE_COLORS 0
 
-#if CHANGE_COLORS
-static struct curse_color colors[] = {
-    { 0, 0, 0 },          // Black
-    { 1000, 0, 0 },       // Red
-    { 0, 1000, 0 },        // Green
-    { 1000, 1000, 0 },    // Yellow
-    { 0, 0, 1000 },       // Blue
-    { 1000, 0, 1000 },    // Magenta
-    { 0, 1000, 1000 },    // Cyan
-    { 1000, 1000, 1000 }, // White
-};
-#endif
-
 WINDOW *map_win;
 WINDOW *msg_win;
 
@@ -99,6 +86,7 @@ void setup_screen(void) {
     if (h > 1 && w > 1) {
         setup_term_dimensions(h, w, 1, 1);
     } else if ((h > 1 && h < MIN_TERM_H) || (w > 1 && w < MIN_TERM_W)) {
+        cleanup_screen();
         printf("Terminal must be at least %dx%d.", MIN_TERM_W, MIN_TERM_H);
         exit(0);
     }
@@ -123,6 +111,7 @@ is only called if color is supported by the terminal.
 void setup_colors(void) {
     /* Set colors to desired shades if able. */
     #if CHANGE_COLORS
+    /* TODO: Alter this so that it pulls from the global w_colors array. */
     if (can_change_color()) {
         for (int i = COLOR_BLACK; i <= COLOR_WHITE; i++) {
             if (i >= COLORS) break;
@@ -241,33 +230,33 @@ void display_energy_win(void) {
     new_win = newwin(term.h, term.sb_w, 0, term.sb_x);
     box(new_win, 0, 0);
 
-    sprintf(buf, "Player Location: (%d, %d)", cur_npc->x, cur_npc->y);
+    snprintf(buf, sizeof(buf), "Player Location: (%d, %d)", cur_npc->x, cur_npc->y);
     mvwprintw(new_win, 1, 1, buf);
     memset(buf, 0, 128);
-    sprintf(buf, "Camera Origin: (%d, %d)", g.cx, g.cy);
+    snprintf(buf, sizeof(buf), "Camera Origin: (%d, %d)", g.cx, g.cy);
     mvwprintw(new_win, 2, 1, buf);
     memset(buf, 0, 128);
-    sprintf(buf, "HP: (%d/%d) EN: (%d/%d)", cur_npc->hp, cur_npc->hpmax, cur_npc->energy, 100);
+    snprintf(buf, sizeof(buf), "HP: (%d/%d) EN: (%d/%d)", cur_npc->hp, cur_npc->hpmax, cur_npc->energy, 100);
     mvwprintw(new_win, 3, 1, buf);
     memset(buf, 0, 128);
-    sprintf(buf, "Depth: %d meters", g.depth * 4);
+    snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
     mvwprintw(new_win, 4, 1, buf);
     memset(buf, 0, 128);
-    sprintf(buf, "Turn %d", g.turns);
+    snprintf(buf, sizeof(buf), "Turn %d", g.turns);
     mvwprintw(new_win, 5, 1, buf);
 
     memset(buf, 0, 128);
-    sprintf(buf, "Nearby: ");
+    snprintf(buf, sizeof(buf), "Nearby: ");
     mvwprintw(new_win, 7, 1, buf);
     while (cur_npc != NULL) {
         if (is_visible(cur_npc->x, cur_npc->y) && cur_npc != g.player) {
             memset(buf, 0, 128);
-            sprintf(buf, "%c ", cur_npc->chr);
+            snprintf(buf, sizeof(buf), "%c ", cur_npc->chr);
             wattron(new_win, COLOR_PAIR(cur_npc->color));
             mvwprintw(new_win, 8 + i, 1, buf);
             wattroff(new_win, COLOR_PAIR(cur_npc->color));
             memset(buf, 0, 128);
-            sprintf(buf, "%s (%d, %d)", actor_name(cur_npc, 0), cur_npc->x, cur_npc->y);
+            snprintf(buf, sizeof(buf), "%s (%d, %d)", actor_name(cur_npc, 0), cur_npc->x, cur_npc->y);
             mvwprintw(new_win, 8 + i, 3, buf);
             i++;
         }
@@ -407,7 +396,7 @@ int map_putch(int x, int y, int chr, int attr) {
  * @return int Result of map_putch().
  */
 int map_putch_truecolor(int x, int y, int chr, unsigned color) {
-    int final_color = color % COLOR_MAX;
+    int final_color = color % MAX_COLOR;
     return map_putch(x, y, chr, final_color);
 }
 

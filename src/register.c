@@ -65,3 +65,14 @@ void setup_term_dimensions(int h, int w, int height_mul, int width_mul) {
     term.sb_w = term.w - (term.mapwin_w * width_mul);
     term.sb_x = term.w - term.sb_w;
 }
+
+struct w_color w_colors[MAX_COLOR] = {
+    { "black",   BLACK, 0, 0, 0 }, 
+    { "red",     RED,   255, 0, 0 },
+    { "green",   GREEN, 0, 255, 0 },
+    { "yellow",  YELLOW, 255, 255, 0 },
+    { "blue",    BLUE, 0, 0, 255 },
+    { "magenta", MAGENTA, 255, 0, 255 },
+    { "cyan",    CYAN, 0, 255, 255 },
+    { "white",   WHITE, 255, 255, 255 }
+};

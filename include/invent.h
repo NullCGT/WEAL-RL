@@ -9,7 +9,7 @@ struct item {
     int letter;       /* Previous letter used if dropped */
 };
 
-void init_item(struct actor *);
+struct item *init_item(struct actor *);
 int display_invent(void);
 int add_to_invent(struct actor *, struct actor *);
 

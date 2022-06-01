@@ -33,6 +33,7 @@ void end_game(int winner) {
     if (!write_dumplog("dumplog.txt", winner)) {
         display_file_text("dumplog.txt");
     }
+    cleanup_screen();
     exit(0);
 }
 

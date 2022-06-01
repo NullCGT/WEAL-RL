@@ -1,6 +1,18 @@
+# Binaries
 weal
+
+# Generated files
 obj/
 *.o
 /makefile
+version.h
+
+# CMake artifacts
 build/
+
+# Settings
+.vscode/
+
+# Application artifacts
 dumplog.txt
+save.bin

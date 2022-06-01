@@ -1,0 +1,28 @@
+{
+    "name": "skeleton",
+    "chr": "Z",
+    "tile": 0,
+    "color": "red",
+    "hp": 6,
+    "weight": 18,
+    "attacks": [
+        {
+            "dice": 1,
+            "sides": 4,
+            "knockback": 0,
+            "types": ["cut"]
+        },
+        {
+            "dice": 1,
+            "sides": 3,
+            "knockback": 0,
+            "types": ["pierce"]
+        }
+    ],
+    "ai" :{
+        "seektime": 5
+    },
+    "weak": ["holy", "bash"],
+    "resist": ["poison", "cut", "pierce", "cold"],
+    "description": "Bones bleached white by the dying sun."
+}

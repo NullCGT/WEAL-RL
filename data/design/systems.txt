@@ -45,3 +45,9 @@
 == LIGHT AND SOUND ==
 - Enemies react to light and sound using dijkstra maps.
 - Certain attacks can manipulate light and sound.
+
+== GRABS ==
+- You can initiate a grab at the cost of 100 energy.
+- Grabbing a creature will set its momentum to zero.
+- While grabbing an enemy, all of their attacks automatically hit you.
+- You can throw an enemy who is below a certain weight threshold.

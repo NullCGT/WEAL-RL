@@ -179,9 +179,8 @@ void make_level(void) {
     init_tile(&g.levmap[c.x][c.y], T_STAIR_DOWN);
     /* Populate level */
     for (int i = 0; i < 3; i++) {
-        spawn_creature(M_ZOMBIE, -1, -1);
+        spawn_creature("skeleton", -1, -1);
     }
-
 
     f.update_map = 1;
     f.update_fov = 1;
