@@ -1,0 +1,57 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 1
+    },
+    "configurePresets": [
+        {
+            "name": "dev",
+            "displayName": "Debug Config [Linux]",
+            "description": "Build with debug flags enabled on Linux.",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_FLAGS": "-Wall -Werror -Wextra -Wshadow -Wunused-parameter -fno-common -pedantic -lm -g -rdynamic",
+                "CMAKE_C_COMPILER": "gcc"
+            }
+        },
+        {
+            "name": "dev-windows",
+            "displayName": "Debug Config [Windows]",
+            "description": "Build with debug flags enabled on Windows.",
+            "binaryDir": "${sourceDir}/build",
+            "toolchainFile": "${sourceDir}/toolchain/win64.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_FLAGS": "-Wall -Werror -Wextra -Wshadow -Wunused-parameter -fno-common -pedantic -lm -g",
+                "CMAKE_C_COMPILER": "gcc"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release Config [Linux]",
+            "description": "Build for a versioned release on Linux.",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE":"Release",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "OFF",
+                "CMAKE_C_FLAGS": "-O3",
+                "CMAKE_C_COMPILER": "gcc"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        }
+    ]
+}
