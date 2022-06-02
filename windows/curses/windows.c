@@ -221,6 +221,7 @@ void display_file_text(const char *fname) {
  * @brief Display the energy window.
  * 
  */
+/* TODO: This leaks memory because it keeps allocating windows without deleting them. Do not use this in its current iteration. */
 void display_energy_win(void) {
     WINDOW* new_win;
     char buf[128];

@@ -13,6 +13,7 @@
 #include "map.h"
 #include "register.h"
 #include "message.h"
+#include "render.h"
 
 void cast_light(int, int,
                 double, double,
@@ -128,6 +129,7 @@ void clear_fov(void) {
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
             g.levmap[x][y].visible = 0;
+            mark_refresh(x, y);
         }
     }
 }

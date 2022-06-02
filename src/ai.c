@@ -90,7 +90,7 @@ void take_turn(struct actor *actor) {
         actor->energy -= cost;
         actor_sanity_checks(actor);
         if (f.update_fov && actor == g.player) {
-            create_heatmap(); /* VERY EXPENSIVE. */
+            do_heatmaps(); /* VERY EXPENSIVE. */
         }
     }
 }

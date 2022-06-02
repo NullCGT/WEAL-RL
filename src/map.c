@@ -9,6 +9,7 @@
  * 
  */
 
+#include <stdlib.h>
 #include "map.h"
 #include"mapgen.h"
 #include "register.h"
@@ -118,14 +119,91 @@ static struct coord cardinal_dirs[] = {
     { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 }
 };
 
+
+
+struct p_node {
+    int heat;
+    int x;
+    int y;
+};
+
+void pq_push(struct p_node arr[], int *last, int heat, int x, int y) {
+    /* TODO: Potentially insert at beginning rather than end? */
+    arr[*last + 1].heat = heat;
+    arr[*last + 1].x = x;
+    arr[*last + 1].y = y;
+    (*last)++;
+}
+
+void pq_swap(struct p_node *a, struct p_node *b) {
+    struct p_node temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+struct p_node pq_pop(struct p_node arr[], int *last) {
+    struct p_node ret = { 0 };
+    int lowest = IMPASSABLE; /* Assuming no negative numbers. */
+    int j = 0;
+    for (int i = 0; i <= *last; i++) {
+        if (arr[i].heat < lowest) {
+            lowest = arr[i].heat;
+            j = i;
+        }
+    }
+    pq_swap(&arr[j], &ret);
+    pq_swap(&arr[j], &arr[*last]);
+    (*last)--;
+    return ret;
+}
+
 /**
- * @brief Create the level's heatmap. An extremely expensive function that should
- be called as little as possible.
+ * @brief Create a heatmap.
+ * 
+ * @param accessor The function used to access the heat variable.
+ */
+void create_heatmap(int* (* accessor) (int, int)) {
+    struct p_node cur;
+    int nx, ny;
+    int *n_heat;
+    unsigned char visited[MAPW][MAPH] = { 0 };
+    struct p_node heap[MAPH * MAPW + 1] = { 0 };
+    int last = -1;
+
+    /* Populate heap */
+    for (int y = 0; y < MAPH; y++) {
+        for (int x = 0; x < MAPW; x++) {
+            int val = *(accessor(x, y));
+            if (val < MAX_HEAT)
+                pq_push(heap, &last, val, x, y);
+        }
+    }
+
+    /* Dijkstra */
+    while (last >= 0) {
+        cur = pq_pop(heap, &last);
+        for (int i = 0; i < 4; i++) {
+            /* Loop through neighbors of cur */
+            nx = cur.x + cardinal_dirs[i].x;
+            ny = cur.y + cardinal_dirs[i].y;
+            if (!in_bounds(nx, ny) || visited[nx][ny]) continue;
+            n_heat = accessor(nx, ny);
+            visited[nx][ny] = 1;
+            if (*n_heat == IMPASSABLE) continue;
+            if (cur.heat + 1 < *n_heat) {
+                *n_heat = cur.heat + 1;
+                pq_push(heap, &last, *n_heat, nx, ny);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Create all necessary heatmaps for the next round.
  * 
  */
-void create_heatmap(void) {
-    int y, x, y1, x1;
-    int changed = 1;
+void do_heatmaps(void) {
+    int y, x;
     /* Setup */
     for (y = 0; y < MAPH; y++) {
         for (x = 0; x < MAPW; x++) {
@@ -141,42 +219,21 @@ void create_heatmap(void) {
                 g.levmap[x][y].goal_heat = !is_explored(x, y) ? IMPASSABLE : MAX_HEAT;
             }
 
-            if (g.player->x == x && g.player->y == y)
+            /* TODO: Create toggles so we only touch the explore and goal maps when necessary */
+            if (g.player->x == x && g.player->y == y) {
                 g.levmap[x][y].player_heat = 0;
-            if (!g.levmap[x][y].explored)
+            }
+            if (!g.levmap[x][y].explored && f.mode_explore) {
                 g.levmap[x][y].explore_heat = 0;
-            if (g.goal_x == x && g.goal_y == y)
+            }
+            if (g.goal_x == x && g.goal_y == y && f.mode_run) {
                 g.levmap[x][y].goal_heat = 0;
-        }
-    }
-    /* Iterate until nothing has been changed */
-    while (changed) {
-        changed = 0;
-        for (y = 0; y < MAPH; y++) {
-            for (x = 0; x < MAPW; x++) {
-                for (int i = 0; i < 4; i++) {
-                    struct coord dir = cardinal_dirs[i];
-                    x1 = x + dir.x;
-                    y1 = y + dir.y;
-                    if (!in_bounds(x1, y1)) continue;
-                    /* Heatmap updates */
-                    if (g.levmap[x1][y1].player_heat > g.levmap[x][y].player_heat + 1
-                        && g.levmap[x1][y1].player_heat != IMPASSABLE) {
-                        g.levmap[x1][y1].player_heat = g.levmap[x][y].player_heat + 1;
-                        changed = 1;
-                    }
-                    if (f.mode_explore && g.levmap[x1][y1].explore_heat > g.levmap[x][y].explore_heat + 1
-                        && g.levmap[x1][y1].explore_heat != IMPASSABLE) {
-                        g.levmap[x1][y1].explore_heat = g.levmap[x][y].explore_heat + 1;
-                        changed = 1;
-                    }
-                    if (f.mode_run && g.levmap[x1][y1].goal_heat > g.levmap[x][y].goal_heat + 1
-                        && g.levmap[x1][y1].goal_heat != IMPASSABLE) {
-                        g.levmap[x1][y1].goal_heat = g.levmap[x][y].goal_heat + 1;
-                        changed = 1;
-                    }
-                }
             }
         }
     }
+    create_heatmap(get_playerh);
+    if (f.mode_run)
+        create_heatmap(get_goalh);
+    if (f.mode_explore)
+        create_heatmap(get_exploreh);
 }

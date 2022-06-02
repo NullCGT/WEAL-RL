@@ -34,10 +34,14 @@ struct tile {
     unsigned int visible : 1;
     unsigned int lit : 1;
     unsigned int explored : 1;
+    unsigned int refresh : 1;
     /* 4 free bits */
 };
 
 /* Function prototypes */
+int *get_playerh(int, int);
+int *get_exploreh(int, int);
+int *get_goalh(int, int);
 struct tile *init_tile(struct tile *, int);
 int open_door(struct actor *, int, int);
 int close_door(struct actor *, int, int);

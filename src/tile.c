@@ -14,11 +14,24 @@
 #include "map.h"
 #include "message.h"
 #include "windows.h"
+#include "render.h"
 
 
 struct permtile permtiles[] = {
     PERMTILES
 };
+
+int *get_playerh(int x, int y) {
+    return &g.levmap[x][y].player_heat;
+}
+
+int *get_exploreh(int x, int y) {
+    return &g.levmap[x][y].explore_heat;
+}
+
+int *get_goalh(int x, int y) {
+    return &g.levmap[x][y].goal_heat;
+}
 
 /**
  * @brief Initialize the tile struct.
@@ -32,6 +45,7 @@ struct tile *init_tile(struct tile *intile, int tindex) {
     intile->pt = &permtiles[tindex];
     intile->actor = NULL;
     intile->item_actor = NULL;
+    intile->refresh = 1;
     return intile;
 }
 
@@ -52,11 +66,9 @@ int open_door(struct actor *actor, int x, int y) {
         return 0;
     }
 
-    init_tile(intile, T_DOOR_OPEN);
+    init_tile(intile, T_DOOR_OPEN); // init tile handles the refresh mark.
     if (is_visible(x, y)) {
-        map_put_tile(x - g.cx, y - g.cy, x, y, intile->color);
         f.update_fov = 1;
-        f.update_map = 1;
     }
 
     if (actor != g.player && is_visible(actor->x, actor->y)) {

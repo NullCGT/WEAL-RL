@@ -25,6 +25,7 @@
 #include "gameover.h"
 #include "spawn.h"
 #include "ai.h"
+#include "render.h"
 
 /**
  * @brief Pushes an actor to a new location and updates the levmap
@@ -35,6 +36,7 @@
  * @param dy The y coordinate the actor is to be pushed to.
  */
 void push_actor(struct actor *actor, int dx, int dy) {
+    mark_refresh(actor->x, actor->y);
     if (actor->item) {
         g.levmap[actor->x][actor->y].item_actor = NULL;
         actor->x = dx;
@@ -46,14 +48,7 @@ void push_actor(struct actor *actor, int dx, int dy) {
         actor->y = dy;
         g.levmap[actor->x][actor->y].actor = actor;
     }
-    /* TODO: WHY do we have rendering code here???/ */
-    if (is_visible(actor->x, actor->y)) {
-        if (g.levmap[actor->x][actor->y].item_actor)
-            map_put_actor(actor->x - g.cx, actor->y - g.cy, actor, actor->color);
-        else
-            map_put_tile(actor->x - g.cx, actor->y - g.cy, actor->x, actor->y, 
-                        g.levmap[actor->x][actor->y].pt->color);
-    }
+    mark_refresh(actor->x, actor->y);
 }
 
 /**
@@ -66,6 +61,7 @@ void push_actor(struct actor *actor, int dx, int dy) {
 struct actor *remove_actor(struct actor *actor) {
     struct actor *cur = g.player;
     struct actor *prev = NULL;
+    mark_refresh(actor->x, actor->y);
     if (actor->item)
         g.levmap[actor->x][actor->y].item_actor = NULL;
     else
@@ -79,10 +75,6 @@ struct actor *remove_actor(struct actor *actor) {
         }
         prev = cur;
         cur = cur->next;
-        /* TODO: WHY do we have rendering code here???/ */
-        if (is_visible(actor->x, actor->y))
-            map_put_tile(actor->x - g.cx, actor->y - g.cy, actor->x, actor->y, 
-                        g.levmap[actor->x][actor->y].pt->color);
     }
     logma(MAGENTA, "Attempting to remove actor that is not there?");
     return actor;

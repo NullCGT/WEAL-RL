@@ -19,6 +19,7 @@
 #include "message.h"
 #include "action.h"
 
+int update_camera(void);
 void put_heatmap(int, int);
 void render_cursor(void);
 
@@ -35,14 +36,14 @@ void render_all(void) {
         clear_fov();
         calculate_fov(g.player->x, g.player->y, 7);
     }
-    if (f.update_map) {
+    if (1) {
         render_map();
     }
     render_all_actors();
     if (f.mode_look) {
         render_cursor();
     }
-    display_energy_win();
+    //display_energy_win();
     refresh_map();
 }
 
@@ -55,20 +56,60 @@ void render_cursor(void) {
 }
 
 /**
+ * @brief Update the camera's location.
+ * 
+ * @return int 
+ Return 1 if the camera's location changed.
+ Return 0 if the camera's location has remained static.
+ */
+int update_camera(void) {
+    int px = g.cx;
+    int py = g.cy;
+
+    if (MAPW > term.mapwin_w)
+        g.cx = min(max(0, g.player->x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
+    if (MAPH > term.mapwin_h)
+        g.cy = min(max(0, g.player->y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
+    
+    if (px == g.cx && py == g.cy)
+        return 0;
+    return 1;
+}
+
+/**
+ * @brief Re-render a single cell.
+ * 
+ * @param x The x coordinate of the cell.
+ * @param y The y coordinate of a cell.
+ */
+void refresh_cell(int x, int y) {
+    if (is_visible(x, y)) {
+        if (g.levmap[x][y].item_actor)
+            map_put_actor(x - g.cx, y - g.cy, g.levmap[x][y].item_actor, g.levmap[x][y].item_actor->color);
+        else if (g.levmap[x][y].actor)
+            map_put_actor(x - g.cx, y - g.cy, g.levmap[x][y].actor, g.levmap[x][y].actor->color);
+        else
+            map_put_tile(x - g.cx, y - g.cy, x, y, g.levmap[x][y].pt->color);
+    }
+}
+
+void mark_refresh(int x, int y) {
+    g.levmap[x][y].refresh = 1;
+}
+
+/**
  * @brief Render the map, tile by tile.
  Loops over the entirety of the map, and works in O(n) time.
  * 
  */
 void render_map(void) {
-    clear_map();
-    if (MAPW > term.mapwin_w)
-        g.cx = min(max(0, g.player->x - (term.mapwin_w  / 2)), abs(MAPW - term.mapwin_w));
-    if (MAPH > term.mapwin_h)
-        g.cy = min(max(0, g.player->y - (term.mapwin_h / 2)), abs(MAPH - term.mapwin_h));
+    int refresh_all;
+
+    refresh_all = update_camera();
     for (int i = 0; i < term.mapwin_w; i++) {
         for (int j = 0; j < term.mapwin_h; j++) {
-            if (i + g.cx < MAPW && j + g.cy < MAPH
-                && i + g.cx >= 0 && j + g.cy >= 0) {
+            if (in_bounds(i + g.cx, j + g.cy)
+                && (needs_refresh(i + g.cx, j + g.cy) || refresh_all)) {
                 if (is_explored(i + g.cx, j + g.cy)) {
                     if (g.display_heat)
                         put_heatmap(i, j);
@@ -78,8 +119,8 @@ void render_map(void) {
                 } else {
                     map_putch(i, j, ' ', WHITE);
                 }
-            } else
-                map_putch(i, j, ' ', WHITE);  
+                g.levmap[i + g.cx][j + g.cy].refresh = 0;
+            }
         }
     }
     f.update_map = 0;

@@ -57,9 +57,6 @@ int move_mon(struct actor* mon, int x, int y) {
     int nx = mon->x + x;
     int ny = mon->y + y;
     int ret = 0;
-    
-    /* TEMP */
-    f.update_map = 1;
 
     /* Immediately exit if out of bounds */
     if (!in_bounds(nx, ny)) {
@@ -84,6 +81,9 @@ int move_mon(struct actor* mon, int x, int y) {
             return ret;
         }
     }
+    /* Resting costs zero movement */
+    if (!x && !y)
+        return 100;
     /* Handle blocked movement */
     if (is_blocked(nx, ny)) {
         if (is_player(mon)) {
@@ -223,7 +223,7 @@ int autoexplore(void) {
     /* Regenerate the heatmap if exploration is just beginning. */
     if (!f.mode_explore) {
         f.mode_explore = 1;
-        create_heatmap();
+        do_heatmaps();
     }
     // Do things
     for (int x = -1; x <= 1; x++) {

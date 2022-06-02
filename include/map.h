@@ -16,7 +16,7 @@ struct coord rand_open_coord(void);
 void magic_mapping(void);
 int climb(int);
 int change_depth(int);
-void create_heatmap(void);
+void do_heatmaps(void);
 
 /* MACROS */
 
@@ -35,6 +35,8 @@ void create_heatmap(void);
     (g.levmap[x][y].explored)
 #define is_lit(x, y) \
     (g.levmap[x][y].lit)
+#define needs_refresh(x, y) \
+    (g.levmap[x][y].refresh)
 
 /* lookup */
 #define MON_AT(x, y) \

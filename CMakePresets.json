@@ -14,7 +14,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_C_FLAGS": "-Wall -Werror -Wextra -Wshadow -Wunused-parameter -fno-common -pedantic -lm -g -rdynamic",
+                "CMAKE_C_FLAGS": "-Wall -Werror -Wextra -Wshadow -Wunused-parameter -fno-common -pedantic -lm -g -pg -rdynamic",
                 "CMAKE_C_COMPILER": "gcc"
             }
         },
