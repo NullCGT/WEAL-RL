@@ -17,7 +17,7 @@
 #include "windows.h"
 
 int write_dumplog(const char *, int);
-void dump_killer(FILE *);
+void dump_target(FILE *);
 void dump_levmap(FILE *);
 void dump_messages(FILE *);
 void dump_inventory(FILE *);
@@ -57,15 +57,15 @@ int write_dumplog(const char *fname, int winner) {
     fputs("== Final Statics ==\n", fp);
     if (winner) {
         fprintf(fp, "I won on turn %d.\n", g.turns);
-    } else if (g.killer) {
-        fprintf(fp, "I was killed by %s on turn %d.\n", actor_name(g.killer, NAME_A), g.turns);
+    } else if (g.target) {
+        fprintf(fp, "I was killed by %s on turn %d.\n", actor_name(g.target, NAME_A), g.turns);
     } else {
         fprintf(fp, "I quit on turn %d.\n", g.turns);
     }
     fprintf(fp, "I had %d health, with a maximum of %d.\n", g.player->hp, g.player->hpmax);
 
-    if (g.killer) {
-        dump_killer(fp);
+    if (g.target) {
+        dump_target(fp);
     }
 
     dump_levmap(fp);
@@ -80,12 +80,12 @@ int write_dumplog(const char *fname, int winner) {
  * 
  * @param fp The dumplog file.
  */
-void dump_killer(FILE *fp) {
-    struct actor *cur = g.killer->invent;
+void dump_target(FILE *fp) {
+    struct actor *cur = g.target->invent;
 
-    fputs("\n== Killer Statistics ==\n", fp);
-    fprintf(fp, "Name: %s\n", actor_name(g.killer, NAME_CAP));
-    fprintf(fp, "HP: (%d/%d)\n", g.killer->hp, g.killer->hpmax);
+    fputs("\n== target Statistics ==\n", fp);
+    fprintf(fp, "Name: %s\n", actor_name(g.target, NAME_CAP));
+    fprintf(fp, "HP: (%d/%d)\n", g.target->hp, g.target->hpmax);
 
     if (cur != NULL) {
         fprintf(fp, "Possessions:\n");

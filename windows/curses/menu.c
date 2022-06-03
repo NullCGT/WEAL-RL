@@ -82,9 +82,9 @@ void display_menu(struct menu *menu) {
         memset(itembuf, 0, 128);
         snprintf(itembuf, sizeof(itembuf), " %c) %s\n", cur->index, cur->text);
         if (index == menu->selected)
-            wattron(menu->win, A_REVERSE);
+            wattron(menu->win, A_STANDOUT);
         waddstr(menu->win, itembuf);
-        wattroff(menu->win, A_REVERSE);
+        wattroff(menu->win, A_STANDOUT);
         cur = cur->next;
         index++;
     }

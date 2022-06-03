@@ -129,7 +129,7 @@ void mod_attributes(struct actor *actor) {
     if (!actor)
         return;
     actor->weight += rndmx(actor->weight + g.depth);
-    actor->hpmax += rndmx(g.depth);
+    actor->hpmax += rndmx(1 + g.depth);
     actor->hp = actor->hpmax;
 }
 
@@ -141,5 +141,5 @@ void mod_attributes(struct actor *actor) {
 void mod_ai(struct ai *ai) {
     if (!ai)
         return;
-    ai->seektime += rndmx(3);
+    ai->seekdef += rndmx(3);
 }

@@ -2,7 +2,7 @@
     "name": "human",
     "chr": "@",
     "tile": 0,
-    "color": "white",
+    "color": "bright white",
     "hp": 100,
     "weight": 100,
     "attacks": [

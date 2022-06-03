@@ -16,11 +16,11 @@
             "dice": 1,
             "sides": 3,
             "knockback": 0,
-            "types": ["pierce"]
+            "types": ["stab"]
         }
     ],
     "ai" :{
-        "seektime": 2
+        "seekdef": 2
     },
     "weak": ["holy", "fire"],
     "resist": ["poison"],

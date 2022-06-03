@@ -196,7 +196,8 @@ int look_at(int x, int y) {
         return 0;
     } else if (is_visible(x, y)) {
         if (MON_AT(x, y)) {
-            logm("That is %s", actor_name(MON_AT(x, y), NAME_A));
+            g.target = MON_AT(x, y);
+            logm("That is %s.", actor_name(MON_AT(x, y), NAME_A));
         } else if (ITEM_AT(x, y)) {
             logm("That is %s.", actor_name(ITEM_AT(x, y), NAME_A));
         } else {
@@ -282,7 +283,7 @@ int travel(void) {
             }
         }
     }
-    if (lx == IMPASSABLE || ly == IMPASSABLE) {
+    if (lx >= MAX_HEAT || ly == MAX_HEAT) {
         stop_running();
         return A_NONE;
     }

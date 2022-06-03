@@ -4,9 +4,9 @@
 struct ai {
     struct actor *parent;
     /* Stats */
-    int max_seek;
+    int seekdef;
     /* Mutable values */
-    int seektime;
+    int seekcur;
     /* Various bitfields */
     unsigned long faction;
 };
@@ -14,5 +14,6 @@ struct ai {
 struct ai *init_ai(struct actor *);
 void take_turn(struct actor *);
 struct attack choose_attack(struct actor *, struct actor *);
+int is_aware(struct actor *, struct actor *); 
 
 #endif

@@ -23,10 +23,15 @@
 #include "map.h"
 #include "invent.h"
 #include "menu.h"
+#include "ai.h"
 
+void wcolor_on(WINDOW *, unsigned char);
+void wcolor_off(WINDOW *, unsigned char);
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
+void display_stats(WINDOW *, int *, struct actor *);
+void print_dtypes(WINDOW *, int, int, short);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 int handle_mouse(void);
 
@@ -40,8 +45,21 @@ struct curse_color {
 
 WINDOW *map_win;
 WINDOW *msg_win;
+WINDOW *sb_win;
 
 /* SCREEN FUNCTIONS */
+
+void wcolor_on(WINDOW *win, unsigned char color) {
+    wattron(win, COLOR_PAIR(color));
+    if (color >= BRIGHT_COLOR)
+        wattron(win, A_BOLD);
+}
+
+void wcolor_off(WINDOW *win, unsigned char color) {
+    wattroff(win, COLOR_PAIR(color));
+    if (color >= BRIGHT_COLOR)
+        wattroff(win, A_BOLD);
+}
 
 /**
  * @brief Perform the first-time setup for the game's GUI.
@@ -50,6 +68,7 @@ WINDOW *msg_win;
 void setup_gui(void) {
     map_win = create_win(term.mapwin_h, term.mapwin_w, term.mapwin_y, 0);
     msg_win = create_win(term.msg_h, term.msg_w, 0, 0);
+    sb_win = create_win(term.h, term.sb_w, 0, term.sb_x);
     f.update_map = 1;
     draw_msg_window(term.msg_h, 0);
     wrefresh(map_win);
@@ -121,8 +140,11 @@ void setup_colors(void) {
     }
     #endif
     /* Initialize color pairs */
-    for (int i = COLOR_BLACK; i <= COLOR_WHITE; i++) {
-        init_pair(i, i, COLOR_BLACK);
+    for (int i = COLOR_BLACK; i < MAX_COLOR; i++) {
+        if (i < BRIGHT_COLOR)
+            init_pair(i, i, COLOR_BLACK);
+        else
+            init_pair(i, i - BRIGHT_COLOR, COLOR_BLACK);
     }
     return;
 }
@@ -223,48 +245,119 @@ void display_file_text(const char *fname) {
  */
 /* TODO: This leaks memory because it keeps allocating windows without deleting them. Do not use this in its current iteration. */
 void display_energy_win(void) {
-    WINDOW* new_win;
     char buf[128];
     struct actor *cur_npc = g.player;
-    int i = 0;
+    int j = 1;
 
-    new_win = newwin(term.h, term.sb_w, 0, term.sb_x);
-    box(new_win, 0, 0);
+    werase(sb_win);
+    box(sb_win, 0, 0);
 
-    snprintf(buf, sizeof(buf), "Player Location: (%d, %d)", cur_npc->x, cur_npc->y);
-    mvwprintw(new_win, 1, 1, buf);
-    memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "Camera Origin: (%d, %d)", g.cx, g.cy);
-    mvwprintw(new_win, 2, 1, buf);
-    memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "HP: (%d/%d) EN: (%d/%d)", cur_npc->hp, cur_npc->hpmax, cur_npc->energy, 100);
-    mvwprintw(new_win, 3, 1, buf);
+    display_stats(sb_win, &j, cur_npc);
+
     memset(buf, 0, 128);
     snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
-    mvwprintw(new_win, 4, 1, buf);
-    memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "Turn %d", g.turns);
-    mvwprintw(new_win, 5, 1, buf);
+    mvwprintw(sb_win, j++, 1, buf);
 
     memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "Nearby: ");
-    mvwprintw(new_win, 7, 1, buf);
+    snprintf(buf, sizeof(buf), "Turn: %d", g.turns);
+    mvwprintw(sb_win, j++, 1, buf);
+    j++;
+
+    if (g.target != NULL) {
+        display_stats(sb_win, &j, g.target);
+        j++;
+    }
+
+    wattron(sb_win, A_STANDOUT);
+    memset(buf, 0, 128);
+    snprintf(buf, sizeof(buf), "Nearby");
+    mvwprintw(sb_win, j++, 1, buf);
+    wattroff(sb_win, A_STANDOUT);
     while (cur_npc != NULL) {
         if (is_visible(cur_npc->x, cur_npc->y) && cur_npc != g.player) {
             memset(buf, 0, 128);
-            snprintf(buf, sizeof(buf), "%c ", cur_npc->chr);
-            wattron(new_win, COLOR_PAIR(cur_npc->color));
-            mvwprintw(new_win, 8 + i, 1, buf);
-            wattroff(new_win, COLOR_PAIR(cur_npc->color));
+            snprintf(buf, sizeof(buf), "%c", cur_npc->chr);
+            wcolor_on(sb_win, cur_npc->color);
+            mvwprintw(sb_win, j, 1, buf);
+            wcolor_off(sb_win, cur_npc->color);
+            
+            if (is_aware(cur_npc, g.player)) {
+                wcolor_on(sb_win, BRIGHT_YELLOW);
+                mvwprintw(sb_win, j, 2, "!");
+                wcolor_off(sb_win, BRIGHT_YELLOW);
+            }
+
             memset(buf, 0, 128);
             snprintf(buf, sizeof(buf), "%s (%d, %d)", actor_name(cur_npc, 0), cur_npc->x, cur_npc->y);
-            mvwprintw(new_win, 8 + i, 3, buf);
-            i++;
+            mvwprintw(sb_win, j++, 4, buf);
         }
         cur_npc = cur_npc->next;
     }
 
-    wrefresh(new_win);
+    wrefresh(sb_win);
+}
+
+void display_stats(WINDOW *win, int *i, struct actor *actor) {
+    char buf[128];
+
+    memset(buf, 0, 128);
+    wattron(win, A_STANDOUT);
+    if (actor == g.player)
+        snprintf(buf, sizeof(buf), "%s", actor_name(actor, NAME_CAP));
+    else
+        snprintf(buf, sizeof(buf), "%s (target)", actor_name(actor, NAME_CAP));
+    mvwprintw(win, *i, 1, buf);
+    *i+= 1;
+    wattroff(win, A_STANDOUT);
+
+    memset(buf, 0, 128);
+    snprintf(buf, sizeof(buf), "HP: %d/%d", actor->hp, actor->hpmax);
+    wcolor_on(win, RED);
+    mvwprintw(win, *i, 1, buf);
+    *i += 1;
+    wcolor_off(win, RED);
+
+    memset(buf, 0, 128);
+    snprintf(buf, sizeof(buf), "EN: %d/%d", actor->energy, 100);
+    wcolor_on(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
+    mvwprintw(win, *i, 1, buf);
+    *i += 1;
+    wcolor_off(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
+
+    if (actor != g.player) {
+        if (is_aware(actor, g.player)) {
+            wcolor_on(win, BRIGHT_YELLOW);
+            mvwprintw(win, *i, 1, "Tracking");
+            wcolor_off(win, BRIGHT_YELLOW);
+        } else {
+            mvwprintw(win, *i, 1, "Unaware");
+        }
+        *i += 1;
+    }
+
+    mvwprintw(win, *i, 1, "Weak: ");
+    print_dtypes(win, *i, 8, actor->weak);
+    *i += 1;
+    mvwprintw(win, *i, 1, "Res: ");
+    print_dtypes(win, *i, 8, actor->resist);
+    *i += 1;
+}
+
+void print_dtypes(WINDOW *win, int y, int x, short dtypes) {
+    char buf[16]; /* For a more verbose form later. */
+
+    for (int i = 0; i < MAX_DTYPE; i++) {
+        if (dtypes & dtypes_arr[i].val) {
+            memset(buf, 0, 16);
+            wcolor_on(win, dtypes_arr[i].color);
+            snprintf(buf, sizeof(buf), "%c", dtypes_arr[i].str[0] - 32);
+            mvwprintw(win, y, x, buf);
+            wcolor_off(win, dtypes_arr[i].color);
+        } else {
+            mvwprintw(win, y, x, "_");
+        }
+        x++;
+    }
 }
 
 /**
@@ -279,7 +372,7 @@ void display_energy_win(void) {
  * @param full color when full.
  * @param empty color when empty.
  */
-void render_bar(WINDOW* win, int cur, int max, int x, int y,
+void render_bar(WINDOW *win, int cur, int max, int x, int y,
                 int width, int full, int empty) {
     int pips = (int) ((width - 2) * cur / max);
     for (int i = 0; i < width; i++) {
@@ -324,9 +417,9 @@ void draw_msg_window(int h, int full) {
             i++;
             continue;
         }
-        wattron(win, COLOR_PAIR(cur_msg->attr));
+        wcolor_on(win, cur_msg->attr);
         waddstr(win, cur_msg->msg);
-        wattroff(win, COLOR_PAIR(cur_msg->attr));
+        wcolor_off(win, cur_msg->attr);
         waddch(win, '\n');
         cur_msg = cur_msg->next;
         i++;
@@ -380,9 +473,9 @@ int map_put_actor(int x, int y, struct actor *actor, int attr) {
  */
 int map_putch(int x, int y, int chr, int attr) {
     int ret;
-    wattron(map_win, COLOR_PAIR(attr));
+    wcolor_on(map_win, attr);
     ret = mvwaddch(map_win, y, x, chr); 
-    wattroff(map_win, COLOR_PAIR(attr));
+    wcolor_off(map_win, attr);
     return ret;
 }
 

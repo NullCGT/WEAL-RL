@@ -27,6 +27,19 @@
 #include "ai.h"
 #include "render.h"
 
+struct damage dtypes_arr[MAX_DTYPE] = {
+    { "fire",       RED,             0x0001 },
+    { "lightning",  BRIGHT_CYAN,     0x0002 },
+    { "wind",       CYAN,            0x0004 },
+    { "ice",        BLUE,            0x0008 },
+    { "poison",     BRIGHT_GREEN,    0x0010 },
+    { "stab",       WHITE,           0x0020 },
+    { "cut",        BRIGHT_WHITE,    0x0040 },
+    { "bash",       DARK_GRAY,       0x0080 },
+    { "holy",       BRIGHT_YELLOW,   0x0100 },
+    { "unholy",     MAGENTA,         0x0200 } 
+};
+
 /**
  * @brief Pushes an actor to a new location and updates the levmap
  accordingly.
@@ -62,6 +75,8 @@ struct actor *remove_actor(struct actor *actor) {
     struct actor *cur = g.player;
     struct actor *prev = NULL;
     mark_refresh(actor->x, actor->y);
+    if (actor == g.target)
+        g.target = NULL;
     if (actor->item)
         g.levmap[actor->x][actor->y].item_actor = NULL;
     else
@@ -157,8 +172,12 @@ char *actor_name(struct actor *actor, unsigned flags) {
         snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "%s", actname);
     }
 
-    if (flags & NAME_CAP) {
+    if ((flags & NAME_CAP) && namebuf[nbi][0] > 'Z') {
         namebuf[nbi][0] = namebuf[nbi][0] - 32;
     }
     return namebuf[nbi];
+}
+
+int in_danger(struct actor *actor) {
+    return actor->hpmax / actor->hp >= 2;
 }

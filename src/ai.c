@@ -18,6 +18,10 @@
 #include "render.h"
 #include "map.h"
 #include "random.h"
+#include "message.h"
+
+void make_aware(struct actor *, struct actor *);
+int check_stealth(struct actor *, struct actor *);
 
 /**
  * @brief Initialize an AI struct.
@@ -61,6 +65,13 @@ void take_turn(struct actor *actor) {
             /* Player input */
             action = get_action();
         } else {
+            /* Stealth and Visibility */
+            if (!is_visible(actor->x, actor->y)) {
+                if (actor->ai->seekcur)
+                    actor->ai->seekcur--;
+            }
+            if (!is_aware(actor, g.player))
+                check_stealth(actor, g.player);
             /* AI Decision-Making */
             int lx, ly = -99;
             int lowest = MAX_HEAT;
@@ -114,4 +125,35 @@ struct attack choose_attack(struct actor *aggressor, struct actor *target) {
     if (i == 1) return aggressor->attacks[0];
     j = rndmx(i);
     return aggressor->attacks[j];
+}
+
+int is_aware(struct actor *aggressor, struct actor *target) {
+    if (!aggressor->ai)
+        return 0;
+    else if (target == g.player)
+        return aggressor->ai->seekcur;
+    else
+        return 1;
+}
+
+#define MAX_SPOT_MSG 2
+static const char *spot_msgs[MAX_SPOT_MSG] = { "spots", "notices" };
+
+void make_aware(struct actor *aggressor, struct actor *target) {
+    if (aggressor == g.player && is_visible(aggressor->x, aggressor->y)) {
+        logm("You notice %s.", actor_name(target, NAME_A));
+    }
+    if (aggressor->ai) {
+        logm("%s %s you%s", actor_name(aggressor, NAME_A | NAME_CAP),
+            spot_msgs[rndmx(MAX_SPOT_MSG)],
+            in_danger(g.player) ? "!" : "." );
+        aggressor->ai->seekcur = aggressor->ai->seekdef;
+    }
+}
+
+int check_stealth(struct actor *aggressor, struct actor *target) {
+    (void) aggressor;
+    if (is_visible(target->x, target->y) && is_visible(aggressor->x, aggressor->y))
+        make_aware(aggressor, target);
+    return 0;
 }

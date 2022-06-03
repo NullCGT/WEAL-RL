@@ -10,7 +10,7 @@
 #define DM_AIR  0x0004 /* Air */
 #define DM_COLD 0x0008 /* Ice */
 #define DM_POIS 0x0010 /* Poison */
-#define DM_STAB 0x0020 /* Pierce */
+#define DM_STAB 0x0020 /* stab */
 #define DM_CUT  0x0040 /* Slash */
 #define DM_BLDG 0x0080 /* Bludgeon */
 #define DM_HOLY 0x0100 /* Holy */
@@ -18,6 +18,7 @@
 
 struct damage {
     const char *str;
+    unsigned char color;
     unsigned short val; 
 };
 
@@ -69,6 +70,7 @@ void actor_sanity_checks(struct actor *);
 char *actor_name(struct actor *, unsigned);
 void free_actor(struct actor *);
 void free_actor_list(struct actor *);
+int in_danger(struct actor *);
 
 /* Naming bitmasks */
 #define NAME_CAP      0x01
@@ -79,8 +81,7 @@ void free_actor_list(struct actor *);
 #define is_noatk(x) \
     (!(x.dam_n || x.dam_d))
 
-extern struct actor permcreatures[];
-extern struct actor permitems[];
+extern struct damage dtypes_arr[];
 
 
 

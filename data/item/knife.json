@@ -16,6 +16,6 @@
     "item": {
     },
     "weak": ["bash"],
-    "resist": ["cut", "pierce"],
+    "resist": ["cut", "stab"],
     "description": "Cuts throats just as easily as sandwiches."
 }

@@ -37,19 +37,21 @@ int do_attack(struct actor *aggressor, struct actor *target) {
         color = (target == g.player) ? RED : GREEN;
     /* Feedback */
     if (aggressor == g.player) {
-        logma(color, "I thump %s for %d damage%s", actor_name(target, NAME_THE), damage,
+        g.target = target;
+        logma(color, "I hit %s for %d damage%s", actor_name(target, NAME_THE), damage,
                 (bonus > 0) ? "! Vulnerable!" : (bonus < 0) ? ". Weak..." : ".");
     } else if (target == g.player) {
-        logma(color, "%s thumps me for %d damage%s", actor_name(aggressor, NAME_THE | NAME_CAP), damage,
+        if (!g.target) g.target = aggressor;
+        logma(color, "%s hits me for %d damage%s", actor_name(aggressor, NAME_THE | NAME_CAP), damage,
                 (bonus > 0) ? "! Vulnerable!" : (bonus < 0) ? ". Weak..." : ".");
     } else {
-        logm("%s thumps %s%s", actor_name(aggressor, NAME_THE | NAME_CAP), actor_name(target, NAME_THE),
+        logm("%s hits %s%s", actor_name(aggressor, NAME_THE | NAME_CAP), actor_name(target, NAME_THE),
                 (bonus > 0) ? "!" : (bonus < 0) ? "..." : ".");
     }
     /* Apply damage */
     target->hp -= damage;
     if (target == g.player && target->hp <= 0) {
-        g.killer = aggressor;
+        g.target = aggressor;
         logm("It's all over...");
         end_game(0);
     } else if (target != g.player && target->hp <= 0) {

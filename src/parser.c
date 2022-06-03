@@ -22,19 +22,6 @@
 #include "register.h"
 #include "invent.h"
 
-static struct damage dtypes[MAX_DTYPE] = {
-    { "fire",   0x0001 },
-    { "shock",  0x0002 },
-    { "wind",   0x0004 },
-    { "ice",    0x0008 },
-    { "poison", 0x0010 },
-    { "pierce", 0x0020 },
-    { "cut",    0x0040 },
-    { "bash",   0x0080 },
-    { "holy",   0x0100 },
-    { "unholy", 0x0200 } 
-};
-
 void remove_whitespace(unsigned char *);
 struct cJSON* json_from_file(const char *);
 struct ai *ai_from_json(struct ai *, cJSON *);
@@ -154,8 +141,8 @@ struct actor *actor_from_file(const char *fname) {
  */
 struct ai *ai_from_json(struct ai *ai, cJSON *ai_json) {
     cJSON* field = NULL;
-    field = cJSON_GetObjectItemCaseSensitive(ai_json, "seektime");
-    ai->seektime = field->valueint;
+    field = cJSON_GetObjectItemCaseSensitive(ai_json, "seekdef");
+    ai->seekdef = field->valueint;
     return ai;
 }
 
@@ -224,8 +211,8 @@ void dtypes_from_json(unsigned short *field, cJSON *types_json) {
 
     cJSON_ArrayForEach(damage_json, types_json) {
         for (int j = 0; j < MAX_DTYPE; j++) {
-            if (!strcmp(dtypes[j].str, damage_json->valuestring)) {
-                *field |= dtypes[j].val;
+            if (!strcmp(dtypes_arr[j].str, damage_json->valuestring)) {
+                *field |= dtypes_arr[j].val;
             }
         }
     }

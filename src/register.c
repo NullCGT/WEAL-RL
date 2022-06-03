@@ -16,7 +16,7 @@
 struct global g = {
     .levmap = {{ {0} }},
     .player = NULL,
-    .killer = NULL,
+    .target = NULL,
     .msg_list = NULL,
     .msg_last = NULL,
     .turns = 0,
@@ -74,5 +74,13 @@ struct w_color w_colors[MAX_COLOR] = {
     { "blue",    BLUE, 0, 0, 255 },
     { "magenta", MAGENTA, 255, 0, 255 },
     { "cyan",    CYAN, 0, 255, 255 },
-    { "white",   WHITE, 255, 255, 255 }
+    { "white",   WHITE, 255, 255, 255 },
+    { "dark gray",      DARK_GRAY, 0, 0, 0 },
+    { "bright red",     BRIGHT_RED,   255, 0, 0 },
+    { "bright green",   BRIGHT_GREEN,  0, 255, 0 },
+    { "bright yellow",  BRIGHT_YELLOW,        255, 255, 0 },
+    { "bright blue",    BRIGHT_BLUE,   0, 0, 255 },
+    { "bright magenta", BRIGHT_MAGENTA, 255, 0, 255 },
+    { "bright cyan",    BRIGHT_CYAN, 0, 255, 255 },
+    { "bright white",   BRIGHT_WHITE, 255, 255, 255 }
 };
