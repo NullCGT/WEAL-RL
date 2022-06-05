@@ -127,7 +127,7 @@ int main(void) {
 
     // Set up the screen
     setup_screen();
-
+    title_screen();
     fp = fopen("save.bin", "r");
     if (fp) {
         fclose(fp);

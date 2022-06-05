@@ -111,7 +111,7 @@ struct actor *win_pick_invent(void) {
         return NULL;
     }
 
-    selector = menu_new("Inventory");
+    selector = menu_new("Inventory", 0, 0, term.w, term.h);
     while (cur != NULL) {
         menu_add_item(selector, cur->item->letter, actor_name(cur, 0));
         cur = cur->next;
@@ -146,7 +146,7 @@ int win_use_item(struct actor *item) {
     struct menu *selector;
     int selected = -1;
 
-    selector = menu_new(actor_name(item, NAME_A | NAME_CAP));
+    selector = menu_new(actor_name(item, NAME_A | NAME_CAP), 0, 0, term.w, term.h);
     menu_add_item(selector, 'd', "drop");
     menu_add_item(selector, 'w', "wield");
     menu_add_item(selector, 'p', "put on");

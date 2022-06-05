@@ -23,13 +23,13 @@
  * @param title The title of the new menu.
  * @return struct menu* The menu that has been created.
  */
-struct menu *menu_new(const char *title) {
+struct menu *menu_new(const char *title, int x, int y, int w, int h) {
     struct menu *new_menu = malloc(sizeof(struct menu));
     new_menu->title = title;
     new_menu->max = 0;
     new_menu->selected = 0;
     new_menu->items = NULL;
-    new_menu->win = create_win(term.h, term.w, 0, 0);
+    new_menu->win = create_win(h, w, y, x);
     werase(new_menu->win);
     f.mode_map = 0;
     wrefresh(new_menu->win);
@@ -73,10 +73,12 @@ void display_menu(struct menu *menu) {
     int index = 0;
 
     werase(menu->win);
-    wattron(menu->win, A_UNDERLINE);
-    snprintf(itembuf, sizeof(itembuf), "%s\n\n", menu->title);
-    waddstr(menu->win, itembuf);
-    wattroff(menu->win, A_UNDERLINE);
+    if (menu->title) {
+        wattron(menu->win, A_UNDERLINE);
+        snprintf(itembuf, sizeof(itembuf), "%s\n\n", menu->title);
+        waddstr(menu->win, itembuf);
+        wattroff(menu->win, A_UNDERLINE);
+    }
     
     while (cur != NULL) {
         memset(itembuf, 0, 128);
@@ -101,6 +103,8 @@ exited from and nothing is chosen. The caller must handle a response of -1.
  */
 signed char menu_do_choice(struct menu *menu, int can_quit) {
     struct menu_item *cur_item = menu->items;
+    int x, y;
+    MEVENT event;
 
     while (1) {
         display_menu(menu);
@@ -120,6 +124,23 @@ signed char menu_do_choice(struct menu *menu, int can_quit) {
             return cur_item->index;
         } else if (input >= 'a' && input <= 'z') {
             return input;
+        } else if (input == KEY_MOUSE) {
+            if (getmouse(&event) != OK)
+                continue;
+            getbegyx(menu->win, y, x);
+            x = event.x - x;
+            y = event.y - y - 2;
+            if (y < 0 || y >= menu->max)
+                continue;
+            else
+                menu->selected = y;
+            if (event.bstate & BUTTON1_CLICKED) {
+                (void) x;
+                for (int i = 0; i < menu->selected; i++) {
+                    cur_item = cur_item->next;
+                }
+                return cur_item->index;
+            }
         }
     }
 }

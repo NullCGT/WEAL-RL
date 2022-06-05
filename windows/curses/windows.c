@@ -24,6 +24,7 @@
 #include "invent.h"
 #include "menu.h"
 #include "ai.h"
+#include "version.h"
 
 void wcolor_on(WINDOW *, unsigned char);
 void wcolor_off(WINDOW *, unsigned char);
@@ -59,6 +60,49 @@ void wcolor_off(WINDOW *win, unsigned char color) {
     wattroff(win, COLOR_PAIR(color));
     if (color >= BRIGHT_COLOR)
         wattroff(win, A_BOLD);
+}
+
+void title_screen(void) {
+    WINDOW *background;
+    struct menu *selector;
+    char buf[64];
+    int selected = -1;
+
+    background = newwin(term.h, term.w, 0, 0);
+    box(background, 0, 0);
+    wrefresh(background);
+
+    snprintf(buf, sizeof(buf), "WEAL v%d.%d.%d-%s", 
+             VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, RELEASE_TYPE);
+    selector = menu_new(buf, term.w / 2 - 10, 1, 24, 7);
+    menu_add_item(selector, 'p', "Play");
+    menu_add_item(selector, 'd', "View Last Character");
+    menu_add_item(selector, 'r', "Records");
+    menu_add_item(selector, 'h', "Help");
+    menu_add_item(selector, 'q', "Quit");
+
+    while (1) {
+        selected = menu_do_choice(selector, 0);
+        switch (selected) {
+            case 'p':
+                menu_destroy(selector);
+                cleanup_win(background);
+                return;
+            case 'd':
+                display_file_text("dumplog.txt");
+                break;
+            case 'r':
+                continue;
+            case 'h':
+                display_file_text("data/text/help.txt");
+                break;
+            case 'q':
+                menu_destroy(selector);
+                cleanup_win(background);
+                cleanup_screen();
+                exit(0);
+        }
+    }
 }
 
 /**
@@ -117,7 +161,7 @@ void setup_screen(void) {
     noecho();
     raw();
     keypad(stdscr, TRUE);
-    mousemask(ALL_MOUSE_EVENTS, NULL);
+    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     refresh();
     setup_gui();
 }
@@ -220,8 +264,9 @@ void display_file_text(const char *fname) {
         action = handle_keys();
         switch (action) {
             case A_QUIT:
-            case A_HELP:
-                cleanup_win(new_win);
+                werase(new_win);
+                prefresh(new_win, j, 0, 0, 0, term.h - 1, term.w - 1);
+                delwin(new_win);
                 f.update_map = 1;
                 f.update_msg = 1;
                 f.mode_map = 1;
@@ -651,7 +696,6 @@ int handle_keys(void) {
             return A_HELP;
         case 'S':
             return A_SAVE;
-        case 'Q':
         case 27:
             return A_QUIT;
         default:

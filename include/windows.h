@@ -3,6 +3,7 @@
 
 #include <curses.h>
 
+void title_screen(void);
 WINDOW* create_win(int, int, int, int);
 void cleanup_win(WINDOW *);
 void setup_screen(void);

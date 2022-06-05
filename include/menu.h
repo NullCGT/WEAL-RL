@@ -17,7 +17,7 @@ struct menu {
     int selected;
 };
 
-struct menu *menu_new(const char *);
+struct menu *menu_new(const char *, int, int, int, int);
 void menu_add_item(struct menu *, unsigned char, const char *);
 void display_menu(struct menu *);
 signed char menu_do_choice(struct menu *, int);
