@@ -181,6 +181,9 @@ void make_level(void) {
     for (int i = 0; i < 3; i++) {
         spawn_creature("skeleton", -1, -1);
     }
+    for (int i = 0; i < 10; i++) {
+        spawn_item("knife", -1, -1);
+    }
 
     f.update_map = 1;
     f.update_fov = 1;

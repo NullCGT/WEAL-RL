@@ -4,7 +4,7 @@
 #include <curses.h>
 
 struct menu_item {
-    const char *text;
+    char text[64];
     unsigned char index;
     struct menu_item *next;
 };

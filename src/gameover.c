@@ -56,21 +56,21 @@ int write_dumplog(const char *fname, int winner) {
     }
     fputs("== Final Statics ==\n", fp);
     if (winner) {
-        fprintf(fp, "I won on turn %d.\n", g.turns);
+        fprintf(fp, "You won on turn %d.\n", g.turns);
     } else if (g.target) {
-        fprintf(fp, "I was killed by %s on turn %d.\n", actor_name(g.target, NAME_A), g.turns);
+        fprintf(fp, "You were killed by %s on turn %d.\n", actor_name(g.target, NAME_A), g.turns);
     } else {
-        fprintf(fp, "I quit on turn %d.\n", g.turns);
+        fprintf(fp, "You quit on turn %d.\n", g.turns);
     }
-    fprintf(fp, "I had %d health, with a maximum of %d.\n", g.player->hp, g.player->hpmax);
+    fprintf(fp, "You had %d health, with a maximum of %d.\n", g.player->hp, g.player->hpmax);
 
     if (g.target) {
         dump_target(fp);
     }
 
-    dump_levmap(fp);
     dump_messages(fp);
     dump_inventory(fp);
+    dump_levmap(fp);
     fclose(fp);
     return 0;
 }
@@ -140,11 +140,11 @@ void dump_inventory(FILE *fp) {
 
     fputs("\n== Inventory ==\n", fp);
     if (!cur) {
-        fprintf(fp, "A bit of dust.");
+        fprintf(fp, "A bit of dust.\n");
         return;
     }
     while (cur != NULL) {
-        fprintf(fp, "%s\n", actor_name(cur, NAME_CAP | NAME_A));
+        fprintf(fp, "%s\n", actor_name(cur, NAME_CAP | NAME_A | NAME_EQ));
         cur = cur->next;
     }
 

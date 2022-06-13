@@ -25,6 +25,7 @@
 void remove_whitespace(unsigned char *);
 struct cJSON* json_from_file(const char *);
 struct ai *ai_from_json(struct ai *, cJSON *);
+struct item *item_from_json(struct item *, cJSON *);
 struct actor *actor_primitives_from_json(struct actor *, cJSON *);
 struct actor *attacks_from_json(struct actor *, cJSON *);
 void dtypes_from_json(unsigned short *, cJSON *);
@@ -124,6 +125,11 @@ struct actor *actor_from_file(const char *fname) {
     field = cJSON_GetObjectItemCaseSensitive(actor_json, "item");
     if (field) {
         init_item(actor);
+        item_from_json(actor->item, field);
+    }
+    field = cJSON_GetObjectItemCaseSensitive(actor_json, "equip");
+    if (field) {
+        init_equip(actor);
     }
 
     
@@ -144,6 +150,19 @@ struct ai *ai_from_json(struct ai *ai, cJSON *ai_json) {
     field = cJSON_GetObjectItemCaseSensitive(ai_json, "seekdef");
     ai->seekdef = field->valueint;
     return ai;
+}
+
+struct item *item_from_json(struct item *item, cJSON *item_json) {
+    cJSON* field = NULL;
+    field = cJSON_GetObjectItemCaseSensitive(item_json, "pref_slot");
+    if (field) {
+        for (int i = 0; i < MAX_SLOTS; i++) {
+            if (!strcmp(field->valuestring, slot_types[i].slot_name)) {
+                item->pref_slot = slot_types[i].id;
+            }
+        }
+    }
+    return item;
 }
 
 /**
@@ -189,6 +208,8 @@ struct actor *attacks_from_json(struct actor *actor, cJSON *attacks_json) {
         actor->attacks[i].dam_d = field->valueint;
         field = cJSON_GetObjectItemCaseSensitive(attack_json, "knockback");
         actor->attacks[i].kb = field->valueint;
+        field = cJSON_GetObjectItemCaseSensitive(attack_json, "accuracy");
+        actor->attacks[i].accuracy = field->valueint;
         field = cJSON_GetObjectItemCaseSensitive(attack_json, "types");
         dtypes_from_json(&(actor->attacks[i].dtype), field);
         i++;

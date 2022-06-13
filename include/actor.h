@@ -28,6 +28,7 @@ struct attack {
     unsigned char dam_n;
     unsigned char dam_d;
     unsigned char kb;
+    unsigned char accuracy;
     /* bitfields */
     unsigned short dtype;
 };
@@ -45,8 +46,8 @@ struct actor {
     int energy;
     int hp, hpmax;
     int weight;
-    /* Index into creature list */
-    int cindex;
+    signed char temp_evasion;
+    signed char temp_accuracy;
     /* Attack list */
     struct attack attacks[MAX_ATTK];
     /* Components */
@@ -55,12 +56,13 @@ struct actor {
     struct ai *ai;
     struct actor *invent;
     struct item *item;
+    struct equip *equip;
     /* bitfields */
     unsigned short weak;
     unsigned short resist;
     unsigned int unique : 1;
     unsigned int saved : 1; /* Infinite file write loop prevention. */
-    /* 7 free bits */
+    /* 6 free bits */
 };
 
 /* Function prototypes */
@@ -77,6 +79,7 @@ int in_danger(struct actor *);
 #define NAME_THE      0x02
 #define NAME_A        0x04
 #define NAME_MY       0x08
+#define NAME_EQ       0x10
 
 #define is_noatk(x) \
     (!(x.dam_n || x.dam_d))

@@ -3,15 +3,17 @@
     "chr": "@",
     "tile": 0,
     "color": "bright white",
-    "hp": 100,
+    "hp": 20,
     "weight": 100,
     "attacks": [
         {
             "dice": 1,
             "sides": 6,
             "knockback": 0,
+            "accuracy": 80,
             "types": ["bash"]
         }
     ],
+    "equip" : {},
     "description": "One of billions."
 }

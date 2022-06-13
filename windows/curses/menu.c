@@ -49,8 +49,8 @@ void menu_add_item(struct menu *menu, unsigned char index, const char *text) {
 
     struct menu_item *new_item = malloc(sizeof(struct menu_item));
     new_item->index = index;
-    new_item->text = text;
     new_item->next = NULL;
+    strcpy(new_item->text, text);
 
     while (cur != NULL) {
         prev = cur;

@@ -24,6 +24,7 @@ enum actionnum {
     A_SOUTHEAST,
     /* End movement actions */
     A_REST,
+    A_CYCLE,
     A_OPEN,
     A_CLOSE,
     A_LOOK,

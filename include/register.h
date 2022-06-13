@@ -24,8 +24,10 @@ typedef struct global {
     struct tile levmap[MAPW][MAPH];
     struct actor *player; /* Assume player is first NPC */
     struct actor *target;
+    struct actor *active_attacker;
     struct msg *msg_list;
     struct msg *msg_last;
+    unsigned char active_attack_index;
     int turns;
     int depth;
     int cx, cy; /* Camera location */

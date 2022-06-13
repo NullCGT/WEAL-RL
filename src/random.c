@@ -52,7 +52,7 @@ int rndmx(int x) {
  */
 int rndrng(int x, int y) {
     if (y <= x) return x;
-    return (x + (rand() % (y - x)));
+    return (x + (rand() % abs(y - x)));
 }
 
 /**

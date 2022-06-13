@@ -54,6 +54,7 @@ Key     Function        Explanation
  ,      Get             Pick up an item.
  ;      Look            Look at a character on the screen.
  ?      Help            View this manual.
+ Tab    Cycle           Cycle attacks.
 
              |= ADVANCED KEYBINDS =|
 

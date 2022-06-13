@@ -20,6 +20,19 @@
 
 struct actor *win_pick_invent(void);
 int win_use_item(struct actor *);
+int win_extequip_item(struct actor *);
+int equip_item(struct actor *, struct actor *, int);
+int takeoff_item(struct actor *, struct actor *);
+
+struct slot_type slot_types[MAX_SLOTS] = {
+    { SLOT_HEAD,  0x0001,  "head",    "(on head)",  "put on",  "take off" },
+    { SLOT_BACK,  0x0002,  "back",    "(on back)",  "put on",  "shrug off" },
+    { SLOT_TORSO, 0x0004,  "torso",   "(on torso)", "don",     "take off" },
+    { SLOT_LEGS,  0x0008,  "legs",    "(on legs)",  "put on",  "take off" },
+    { SLOT_WEP,   0x0010,  "weapon",  "(wielded)",  "wield",   "stop wielding" },
+    { SLOT_OFF,   0x0020,  "offhand", "(offhand)",  "equip",   "stop using" },
+    { SLOT_FEET,  0x0040,  "feet",    "(on feet)",  "pull on", "take off" }
+};
 
 /**
  * @brief Allocate memory for the item component of a given actor
@@ -29,11 +42,27 @@ int win_use_item(struct actor *);
  */
 struct item *init_item(struct actor *actor) {
     struct item *new_item = (struct item *) malloc(sizeof(struct item));
+    *new_item = (struct item) { 0 };
     new_item->parent = actor;
     new_item->letter = 'a';
     new_item->quan = 1;
+    new_item->slot = NO_SLOT;
     actor->item = new_item;
     return actor->item;
+}
+
+/**
+ * @brief Allocate memory for the equip component of a given actor
+ * 
+ * @param actor The parent of the new equip component.
+ * @return A pointer to the newly-created equip struct.
+ */
+struct equip *init_equip(struct actor *actor) {
+    struct equip *new_equip = (struct equip *) malloc(sizeof(struct equip));
+    *new_equip = (struct equip) { 0 };
+    new_equip->parent = actor;
+    actor->equip = new_equip;
+    return new_equip;
 }
 
 /**
@@ -107,13 +136,13 @@ struct actor *win_pick_invent(void) {
     int selected = -1;
 
     if (cur == NULL) {
-        logm("I am not carrying anything.");
+        logm("You are not carrying anything.");
         return NULL;
     }
 
     selector = menu_new("Inventory", 0, 0, term.w, term.h);
     while (cur != NULL) {
-        menu_add_item(selector, cur->item->letter, actor_name(cur, 0));
+        menu_add_item(selector, cur->item->letter, actor_name(cur, NAME_EQ));
         cur = cur->next;
     }
     while (1) {
@@ -145,11 +174,14 @@ struct actor *win_pick_invent(void) {
 int win_use_item(struct actor *item) {
     struct menu *selector;
     int selected = -1;
+    int equipped = is_equipped(item);
 
     selector = menu_new(actor_name(item, NAME_A | NAME_CAP), 0, 0, term.w, term.h);
     menu_add_item(selector, 'd', "drop");
-    menu_add_item(selector, 'w', "wield");
-    menu_add_item(selector, 'p', "put on");
+    menu_add_item(selector, 'w', is_weapon(item) ? "wield" : "wear");
+    if (equipped)
+        menu_add_item(selector, 'r', "remove");
+    menu_add_item(selector, 'e', "extended equip");
 
     while (1) {
         selected = menu_do_choice(selector, 1);
@@ -159,13 +191,20 @@ int win_use_item(struct actor *item) {
                 menu_destroy(selector);
                 return 0;
             case 'w':
-                logm("Wielding %s!", actor_name(item, NAME_THE));
                 menu_destroy(selector);
-                return 0;
-            case 'p':
-                logm("Putting on %s!", actor_name(item, NAME_THE));
-                menu_destroy(selector);
-                return 0;
+                return equip_item(g.player, item, item->item->pref_slot);
+            case 'r':
+                if (equipped) {
+                    menu_destroy(selector);
+                    return takeoff_item(g.player, item);
+                } else {
+                    break;
+                }
+            case 'e':
+                selected = win_extequip_item(item);
+                if (selected != -1)
+                    menu_destroy(selector);
+                return selected;
             case -1:
                 menu_destroy(selector);
                 return 0;
@@ -174,3 +213,100 @@ int win_use_item(struct actor *item) {
     menu_destroy(selector);
     return 0;
 }
+
+int win_extequip_item(struct actor *item) {
+    struct menu *selector;
+    int selected = -1;
+    int letter = 'a';
+
+    selector = menu_new("Which slot?", 0, 0, term.w, term.h);
+
+    for (int i = 0; i < MAX_SLOTS; i++) {
+        menu_add_item(selector, letter++, slot_types[i].slot_name);
+    }
+    while (1) {
+        selected = menu_do_choice(selector, 1);
+        if (selected >= 'a' && selected <= 'z') {
+            menu_destroy(selector);
+            return equip_item(g.player, item, selected - 'a');
+        } else if (selected == -1) {
+            menu_destroy(selector);
+            return -1;
+        }
+    }
+}
+
+int equip_item(struct actor *actor, struct actor *item, int inslot) {
+    if (!actor->equip) {
+        logm("You lack the ability to equip items%s", 
+             in_danger(actor) ? "!" : ".");
+        return 0;
+    }
+    if (actor->equip->slots[inslot] == item) {
+        logm("You are already %s %s!", 
+             is_weapon(item) ? "wielding" : "wearing", actor_name(item, NAME_THE));
+        return 0;
+    }
+    if (!(slot_types[inslot].field & item->item->poss_slot)) {
+        /* TODO: Vary this message based on intelligence score. */
+        logm("You cannot equip %s on your %s%s",
+             actor_name(item, NAME_THE), slot_types[inslot].slot_name,
+             in_danger(actor) ? "!" : ".");
+        return 0;
+    }
+
+    if (actor->equip->slots[inslot]) {
+        takeoff_item(actor, actor->equip->slots[inslot]);
+    }
+    if (is_equipped(item)) {
+        takeoff_item(actor, actor->equip->slots[item->item->slot]);
+    }
+    actor->equip->slots[inslot] = item;
+    item->item->slot = inslot;
+
+    if (is_weapon(item) && item != g.active_attacker
+        && (inslot == SLOT_WEP || inslot == SLOT_OFF)){
+        g.active_attacker = item;
+        g.active_attack_index = (inslot == SLOT_WEP ? MAX_ATTK : (MAX_ATTK * 2));
+    }
+
+    if (actor == g.player)
+        logm("You %s %s.", in_danger(actor) ? "whip out" : slot_types[item->item->slot].on_msg, 
+                           actor_name(item, NAME_A));
+    else //TODO: Grammar, pluralize
+        logm("%s equips %s.", actor_name(actor, NAME_THE), 
+                              actor_name(item, NAME_A));
+    return 100;
+}
+
+int takeoff_item(struct actor *actor, struct actor *item) {
+    if (!actor->equip) {
+        logm("You lack the ability to remove items.");
+        return 0;
+    }
+    if (item->item->slot == -1) {
+        if (actor == g.player) {
+            logm("Already done.");
+        }
+        return 0;
+    }
+    if (actor == g.player)
+        logm("You %s%s your %s.", in_danger(actor) ? "hastily " : "", 
+             slot_types[item->item->slot].off_msg, actor_name(item, 0));
+    actor->equip->slots[item->item->slot] = NULL;
+    item->item->slot = NO_SLOT;
+    if (actor == g.player) {
+        g.active_attack_index = 0;
+        g.active_attacker = g.player;
+    }
+    return 100;
+}
+#if 0
+struct coord nearest_empty_space(int x, int y) {
+    for (int x0 = x - 1; x0 < x + 1; x++) {
+        for (int y0 = y - 1; y0 < y + 1; y++) {
+            
+        }
+    }
+}
+#endif

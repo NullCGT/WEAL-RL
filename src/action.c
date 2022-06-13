@@ -61,7 +61,7 @@ int move_mon(struct actor* mon, int x, int y) {
     /* Immediately exit if out of bounds */
     if (!in_bounds(nx, ny)) {
         if (is_player(mon)) {
-            logm("I'm not leaving until I find Kate.");
+            logm("You know in your heart that your quest lies here, not in the wilds beyond.");
             stop_running();
             return 0;
         } else {
@@ -110,11 +110,11 @@ int move_mon(struct actor* mon, int x, int y) {
  */
 int look_down() {
     if (ITEM_AT(g.player->x, g.player->y)) {
-        logm("I glance down. There is %s resting on the %s here.", 
+        logm("You glance down. There is %s resting on the %s here.", 
             actor_name(ITEM_AT(g.player->x, g.player->y), NAME_A),
             g.levmap[g.player->x][g.player->y].pt->name);
     } else {
-        logm("I glance down. I am standing on %s.", g.levmap[g.player->x][g.player->y].pt->name);
+        logm("You glance down. You are standing on %s.", g.levmap[g.player->x][g.player->y].pt->name);
     }
     return 0;
 }
@@ -131,14 +131,14 @@ int look_down() {
 int pick_up(struct actor *creature) {
     struct actor *item = ITEM_AT(creature->x, creature->y);
     if (!item) {
-        logm("I brush the %s beneath me with my fingers. There is nothing there to pick up.",
+        logm("You brush the %s beneath you with your fingers. There is nothing there to pick up.",
             g.levmap[creature->x][creature->y].pt->name);
         return 0;
     }
     /* Remove the actor. If we cannot put it in the inventory, put it back. */
     remove_actor(item);
     if (add_to_invent(creature, item)) {
-        logm("I pick up %s [%c].", actor_name(item, NAME_THE), item->item->letter);
+        logm("You pick up %s [%c].", actor_name(item, NAME_THE), item->item->letter);
         return 50;
     } else {
         push_actor(item, item->x, item->y);
@@ -160,7 +160,7 @@ int lookmode(void) {
     f.mode_look = 1;
     g.cursor_x = g.player->x;
     g.cursor_y = g.player->y;
-    logm("What should I examine?");
+    logm("What do you want to examine?");
     while (1) {
         f.update_map= 1;
         render_all();
@@ -206,7 +206,7 @@ int look_at(int x, int y) {
     } else if (is_explored(x, y)) {
         logm("That is %s %s.", an(g.levmap[x][y].pt->name), g.levmap[x][y].pt->name);
     } else {
-        logm("I haven't explored that area.");
+        logm("You haven't explored that area.");
     }
     return 0;
 }
@@ -245,12 +245,12 @@ int autoexplore(void) {
     }
     if (lowest < MAX_HEAT) {
         if (!f.mode_explore) {
-            logma(YELLOW, "I begin cautiously exploring the area.");
+            logma(YELLOW, "You begin cautiously exploring the area.");
             f.mode_explore = 1;
         }
         return dir_to_action(lx, ly);
     } else {
-        logm("I don't think there's anywhere else I can explore from here.");
+        logm("You don't think there's anywhere else you can explore from here.");
         f.mode_explore = 0;
         return A_NONE;
     }
@@ -411,6 +411,9 @@ int execute_action(struct actor *actor, int actnum) {
         case A_REST:
             ret = move_mon(actor, 0, 0);
             break;
+        case A_CYCLE:
+            ret = cycle_active_attack();
+            break;
         case A_OPEN:
             ret = directional_action("open", open_door);
             break;
@@ -445,7 +448,7 @@ int execute_action(struct actor *actor, int actnum) {
             save_exit();
             break;
         case A_QUIT:
-            logm("I give up...");
+            logm("The quest has become too much. You surrender yourself to fate...");
             end_game(0);
             break;
         case A_DEBUG_MAGICMAP:

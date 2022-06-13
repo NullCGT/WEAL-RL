@@ -27,6 +27,7 @@
 struct actor *spawn_actor(const char *name, int x, int y);
 void mod_attributes(struct actor *);
 void mod_ai(struct ai *);
+void mod_slots(struct item *);
 
 /**
  * @brief Initialize the name struct of an actor.
@@ -70,7 +71,7 @@ struct actor *spawn_creature(const char *name, int x, int y) {
 struct actor *spawn_item(const char *name, int x, int y) {
     struct actor *actor;
     char buf[128];
-    snprintf(buf, sizeof(buf), "data/creature/%s.json", name);
+    snprintf(buf, sizeof(buf), "data/item/%s.json", name);
     actor = spawn_actor(buf, x, y);
     return actor;
 }
@@ -94,6 +95,7 @@ struct actor *spawn_actor(const char *name, int x, int y) {
 
     mod_attributes(actor);
     mod_ai(actor->ai);
+    mod_slots(actor->item);
 
     /* Add the creature the list of actors. */
     while (cur_actor != NULL) {
@@ -131,6 +133,11 @@ void mod_attributes(struct actor *actor) {
     actor->weight += rndmx(actor->weight + g.depth);
     actor->hpmax += rndmx(1 + g.depth);
     actor->hp = actor->hpmax;
+    for (int i = 0; i < MAX_ATTK; i++) {
+        if (is_noatk(actor->attacks[i])) continue;
+        actor->attacks[i].accuracy += rndrng(-4, 5);
+        actor->attacks[i].dam_d += rndrng(-1, 2);
+    }
 }
 
 /**
@@ -142,4 +149,27 @@ void mod_ai(struct ai *ai) {
     if (!ai)
         return;
     ai->seekdef += rndmx(3);
+}
+
+/**
+ * @brief Set up the item's preferred slots based on its type.
+ * 
+ * @param item The item to be mutated.
+ */
+void mod_slots(struct item *item) {
+    if (!item)
+        return;
+    /* The preferred slot is always possible, as are hand slots. */
+    item->poss_slot |= slot_types[item->pref_slot].field;
+    item->poss_slot |= slot_types[SLOT_WEP].field;
+    item->poss_slot |= slot_types[SLOT_OFF].field;
+    /* All shields can be worn on the back for minor protection. */
+    if (is_shield(item->parent) || is_weapon(item->parent))
+        item->poss_slot |= slot_types[SLOT_BACK].field;
+    /* Pants can be hats, if you try hard enough. */
+    if (is_pants(item->parent))
+        item->poss_slot |= slot_types[SLOT_HEAD].field;
+    /* And the shirt off your back... */
+    if (is_shirt(item->parent))
+        item->poss_slot |= slot_types[SLOT_BACK].field;
 }

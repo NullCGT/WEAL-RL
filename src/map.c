@@ -60,7 +60,7 @@ void magic_mapping(void) {
             g.levmap[x][y].explored = 1;
         }
     }
-    logma(MAGENTA, "I punch in the debug function that lets me see the entire map.");
+    logma(MAGENTA, "You punch in the debug function that lets me see the entire map.");
     f.update_map = 1;
 }
 
@@ -73,20 +73,20 @@ void magic_mapping(void) {
  */
 int climb(int change) {
     if (g.depth + change < 0) {
-        logm("I look up. It's too cloudy to make out any stars.");
+        logm("You look up. It's too cloudy to make out any stars.");
         return 0;
     }
     if (change == 1) {
         if (TILE_AT(g.player->x, g.player->y) == T_STAIR_DOWN) {
-            logm("I descend deeper into the complex.");
+            logm("You descend deeper into the complex.");
             return change_depth(change);
         } else {
-            logm("I need to find a staircase in order to descend.");
+            logm("You need to find a staircase in order to descend.");
             return 0;
         }
     } else if (change == -1) {
         if (TILE_AT(g.player->x, g.player->y) == T_STAIR_UP) {
-            logm("I ascend to an unfamiliar level.");
+            logm("You ascend to an unfamiliar level.");
             return change_depth(change);
         } else {
             logm("Unless I'm supposed to literally climb the walls, I need to find some stairs.");

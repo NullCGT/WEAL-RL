@@ -122,6 +122,8 @@ void free_actor(struct actor *actor) {
         free(actor->ai);
     if (actor->item)
         free(actor->item);
+    if (actor->equip)
+        free(actor->equip);
     free(actor);
 }
 
@@ -171,7 +173,12 @@ char *actor_name(struct actor *actor, unsigned flags) {
     } else {
         snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "%s", actname);
     }
-
+    /* Equip Status */
+    if ((flags & NAME_EQ) && actor->item && actor->item->slot >= 0) {
+        snprintf(namebuf[nbi] + strlen(namebuf[nbi]), sizeof(namebuf[nbi]), " %s", 
+                 slot_types[actor->item->slot].slot_desc);
+    }
+    /* Capitalization */
     if ((flags & NAME_CAP) && namebuf[nbi][0] > 'Z') {
         namebuf[nbi][0] = namebuf[nbi][0] - 32;
     }

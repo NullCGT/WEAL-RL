@@ -8,12 +8,14 @@
     "attacks": [
         {
             "dice": 1,
-            "sides": 4,
+            "sides": 8,
             "knockback": 0,
+            "accuracy": 70,
             "types": ["stab"]
         }
     ],
     "item": {
+        "pref_slot": "weapon"
     },
     "weak": ["bash"],
     "resist": ["cut", "stab"],

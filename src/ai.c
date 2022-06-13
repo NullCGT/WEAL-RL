@@ -19,9 +19,11 @@
 #include "map.h"
 #include "random.h"
 #include "message.h"
+#include "combat.h"
 
 void make_aware(struct actor *, struct actor *);
 int check_stealth(struct actor *, struct actor *);
+void increment_regular_values(struct actor *);
 
 /**
  * @brief Initialize an AI struct.
@@ -54,10 +56,7 @@ void take_turn(struct actor *actor) {
     actor->energy += 100;
     if (actor->energy > 0 && actor->energy < 100)
         actor->energy = 100;
-    /* Increment turn counter */
-    if (actor == g.player) {
-        g.turns++;
-    }
+    increment_regular_values(actor);
 
     while (actor->energy > 0) {
         if (actor == g.player) {
@@ -118,6 +117,9 @@ void take_turn(struct actor *actor) {
 struct attack choose_attack(struct actor *aggressor, struct actor *target) {
     int i, j;
     (void) target; /* TODO: Implement attack favoring. */
+    if (aggressor == g.player) {
+        return *(get_active_attack());
+    }
     for (i = 0; i < MAX_ATTK; i++) {
         if (is_noatk(aggressor->attacks[i]))
             break;
@@ -148,6 +150,7 @@ void make_aware(struct actor *aggressor, struct actor *target) {
             spot_msgs[rndmx(MAX_SPOT_MSG)],
             in_danger(g.player) ? "!" : "." );
         aggressor->ai->seekcur = aggressor->ai->seekdef;
+        if (!g.target) g.target = aggressor;
     }
 }
 
@@ -156,4 +159,23 @@ int check_stealth(struct actor *aggressor, struct actor *target) {
     if (is_visible(target->x, target->y) && is_visible(aggressor->x, aggressor->y))
         make_aware(aggressor, target);
     return 0;
+}
+
+/**
+ * @brief Increment and decrement the values that shift every turn an actor takes.
+ * 
+ * @param actor The actor whose values are to be altered.
+ */
+void increment_regular_values(struct actor *actor) {
+    /* Increment turn counter */
+    if (actor == g.player) {
+        g.turns++;
+    }
+    /* Temporary evasion and accuracy slowly return to zero.  */
+    if (actor->temp_accuracy != 0) {
+        actor->temp_accuracy < 0 ? actor->temp_accuracy++ : actor->temp_accuracy--;
+    }
+    if (actor->temp_evasion != 0) {
+        actor->temp_evasion < 0 ? actor->temp_evasion++ : actor->temp_evasion--;
+    }
 }

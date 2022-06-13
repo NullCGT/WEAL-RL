@@ -25,6 +25,8 @@
 #include "menu.h"
 #include "ai.h"
 #include "version.h"
+#include "save.h"
+#include "combat.h"
 
 void wcolor_on(WINDOW *, unsigned char);
 void wcolor_off(WINDOW *, unsigned char);
@@ -75,7 +77,12 @@ void title_screen(void) {
     snprintf(buf, sizeof(buf), "WEAL v%d.%d.%d-%s", 
              VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, RELEASE_TYPE);
     selector = menu_new(buf, term.w / 2 - 10, 1, 24, 7);
-    menu_add_item(selector, 'p', "Play");
+
+    if (file_exists("save.bin")) {
+        menu_add_item(selector, 'p', "Continue");
+    } else {
+        menu_add_item(selector, 'p', "Play");
+    }
     menu_add_item(selector, 'd', "View Last Character");
     menu_add_item(selector, 'r', "Records");
     menu_add_item(selector, 'h', "Help");
@@ -292,12 +299,19 @@ void display_file_text(const char *fname) {
 void display_energy_win(void) {
     char buf[128];
     struct actor *cur_npc = g.player;
+    struct attack *cur_attack = get_active_attack();
     int j = 1;
 
     werase(sb_win);
     box(sb_win, 0, 0);
 
     display_stats(sb_win, &j, cur_npc);
+
+    memset(buf, 0, 128);
+    snprintf(buf, sizeof(buf), "%s [%d%%%%](%dd%d)", 
+             g.active_attacker == g.player ? "Unarmed" : actor_name(g.active_attacker, NAME_CAP), 
+             cur_attack->accuracy, cur_attack->dam_n, cur_attack->dam_d);
+    mvwprintw(sb_win, j++, 1, buf);
 
     memset(buf, 0, 128);
     snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
@@ -363,7 +377,7 @@ void display_stats(WINDOW *win, int *i, struct actor *actor) {
     wcolor_off(win, RED);
 
     memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "EN: %d/%d", actor->energy, 100);
+    snprintf(buf, sizeof(buf), "TP: %d%%%%", actor->energy);
     wcolor_on(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
     mvwprintw(win, *i, 1, buf);
     *i += 1;
@@ -504,7 +518,13 @@ int map_put_tile(int x, int y, int mx, int my, int attr) {
  * @return int result of map_putch.
  */
 int map_put_actor(int x, int y, struct actor *actor, int attr) {
-    return map_putch(x, y, actor->chr, attr);
+    int ret;
+    if (actor == g.target)
+        wattron(map_win, A_UNDERLINE);
+    ret = map_putch(x, y, actor->chr, attr);
+    if (actor == g.target)
+        wattroff(map_win, A_UNDERLINE);
+    return ret;
 }
 
 /**
@@ -670,6 +690,9 @@ int handle_keys(void) {
         case '.':
         case '5':
             return A_REST;
+        case KEY_STAB:
+        case '\t':
+            return A_CYCLE;
         case 'o':
             return A_OPEN;
         case 'c':

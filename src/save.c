@@ -24,6 +24,7 @@
 void save_game(const char *);
 void save_actor(FILE *, struct actor *);
 struct actor *load_actor(FILE *, struct actor *);
+void load_active_attacker(void);
 
 /**
  * @brief Save the game and immediately exit.
@@ -33,6 +34,20 @@ void save_exit(void) {
     save_game("save.bin");
     cleanup_screen();
     exit(0);
+}
+
+/**
+ * @brief Check if a file exists
+ * 
+ * @param fname The filename of the file.
+ * @return int Return 1 if the file exists, otherwise return 0.
+ */
+int file_exists(const char *fname) {
+    FILE *fp;
+    fp = fopen(fname, "r");
+    if (!fp) return 0;
+    fclose(fp);
+    return 1;
 }
 
 /**
@@ -110,9 +125,13 @@ void save_actor(FILE *fp, struct actor *actor) {
     if (actor->ai) {
         fwrite(actor->ai, sizeof(struct ai), 1, fp);
     }
+    if (actor->equip) {
+        fwrite(actor->equip, sizeof(struct equip), 1, fp);
+    }
     if (actor->invent) {
+        cur_item = actor->invent;
         while (cur_item != NULL) {
-            cur_item = actor->invent->next;
+            cur_item = cur_item->next;
             item_count++;
         }
         fwrite(&item_count, sizeof(int), 1, fp);
@@ -173,6 +192,10 @@ void load_game(const char *fname) {
         cur_actor = cur_actor->next;
     }
     fclose(fp);
+    /* Post-load pointer cleanup */
+    g.target = NULL;
+    load_active_attacker();
+
 }
 
 /**
@@ -199,6 +222,11 @@ struct actor *load_actor(FILE *fp, struct actor *actor) {
         fread(actor->ai, sizeof(struct ai), 1, fp);
         actor->ai->parent = actor;
     }
+    if (actor->equip) {
+        actor->equip = (struct equip *) malloc(sizeof(struct equip));
+        fread(actor->equip, sizeof(struct equip), 1, fp);
+        actor->equip->parent = actor;
+    }
     if (actor->invent) {
         fread(&item_count, sizeof(int), 1, fp);
         cur_item = actor->invent;
@@ -206,6 +234,9 @@ struct actor *load_actor(FILE *fp, struct actor *actor) {
         for (int i = 0; i < item_count; i++) {
             cur_item = load_actor(fp, cur_item);
             *addr = cur_item;
+            if (cur_item->item->slot >= 0) {
+                actor->equip->slots[cur_item->item->slot] = cur_item;
+            }
             addr = &((*addr)->next);
             cur_item->next = NULL;
             cur_item = cur_item->next;
@@ -218,4 +249,10 @@ struct actor *load_actor(FILE *fp, struct actor *actor) {
     }
     actor->saved = 0;
     return actor;
+}
+
+void load_active_attacker(void) {
+    if (g.active_attack_index < MAX_ATTK) g.active_attacker = g.player;
+    else if (g.active_attack_index < MAX_ATTK * 2) g.active_attacker = EWEP(g.player);
+    else g.active_attacker = EOFF(g.player);
 }

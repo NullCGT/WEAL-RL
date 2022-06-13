@@ -93,13 +93,14 @@ void handle_sigsegv(int sig) {
  */
 void new_game(void) {
     struct coord c;
-    logma(CYAN, "I've arrived at Fort Tarn."); 
-    logma(CYAN, "Icicles creep down the concrete crenelations high above, and the wind howls past barbed wire before cutting straight through my jacket.");
+    logma(CYAN, "The air cools as you step into the shadow of the Tower.");
+    logma(CYAN, "Ivy creeps down the crystaline crenalations, and birds nest upon battlements high above.");
     /* Spawn player */
     if (g.player == NULL) {
         g.player = spawn_creature("human", 0, 0);
         strcpy(g.player->name->given_name, "Player");
         g.player->unique = 1;
+        g.active_attacker = g.player;
     }
     /* Make level */
     make_level();
@@ -115,7 +116,6 @@ void new_game(void) {
  */
 int main(void) {
     struct actor *cur_actor;
-    FILE *fp;
 
     /* handle exits and resizes */
     atexit(handle_exit);
@@ -128,11 +128,9 @@ int main(void) {
     // Set up the screen
     setup_screen();
     title_screen();
-    fp = fopen("save.bin", "r");
-    if (fp) {
-        fclose(fp);
+    if (file_exists("save.bin")) {
         load_game("save.bin");
-        logma(CYAN, "Welcome back. You ready for this?");
+        logma(CYAN, "Your reverie ends, and you open your eyes. Welcome back.");
     } else {
         new_game();
     }
