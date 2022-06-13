@@ -58,8 +58,10 @@ typedef struct terminal {
     int mapwin_y;
     int msg_w;
     int msg_h;
+    int msg_y;
     int sb_w;
     int sb_x;
+    int sb_h;
     char *saved_locale;
 } terminal;
 

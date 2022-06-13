@@ -73,6 +73,7 @@ char *actor_name(struct actor *, unsigned);
 void free_actor(struct actor *);
 void free_actor_list(struct actor *);
 int in_danger(struct actor *);
+const char *describe_health(struct actor *);
 
 /* Naming bitmasks */
 #define NAME_CAP      0x01

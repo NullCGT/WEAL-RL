@@ -185,6 +185,41 @@ char *actor_name(struct actor *actor, unsigned flags) {
     return namebuf[nbi];
 }
 
+/**
+ * @brief Determine if an actor is "in danger."
+ * 
+ * @param actor The actor whose danger needs to be determined.
+ * @return int Return 1 if in danger, 0 otherwise.
+ */
 int in_danger(struct actor *actor) {
     return actor->hpmax / actor->hp >= 2;
+}
+
+#define MAX_HEALTH_COND 4
+static const char *health_conditions[MAX_HEALTH_COND] = { "Near Death", "Bloodied", "Lightly Wounded", "Fine"};
+
+/**
+ * @brief Describe the health of an actor by way of a string.
+ * 
+ * @param actor The actor to describe the health of.
+ * @return const char* A short description of the actor's health.
+ */
+const char *describe_health(struct actor *actor) {
+    int index = 0;
+    int fraction;
+
+    if (actor->hp == actor->hpmax)
+        return "Perfect";
+    if (actor->hp > actor->hpmax)
+        return "Beyond Perfect";
+    if (actor->hp <= 0)
+        return "In Death's Hands";
+
+    fraction = actor->hpmax / MAX_HEALTH_COND;
+
+    while (((index + 1) * fraction) < actor->hp) {
+        index++;
+    }
+
+    return health_conditions[min(MAX_HEALTH_COND - 1, index)];
 }

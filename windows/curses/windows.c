@@ -34,7 +34,7 @@ void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
 void display_stats(WINDOW *, int *, struct actor *);
-void print_dtypes(WINDOW *, int, int, short);
+void print_dtypes(WINDOW *, int, int, short, unsigned char);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 int handle_mouse(void);
 
@@ -118,8 +118,8 @@ void title_screen(void) {
  */
 void setup_gui(void) {
     map_win = create_win(term.mapwin_h, term.mapwin_w, term.mapwin_y, 0);
-    msg_win = create_win(term.msg_h, term.msg_w, 0, 0);
-    sb_win = create_win(term.h, term.sb_w, 0, term.sb_x);
+    msg_win = create_win(term.msg_h, term.msg_w, term.msg_y, 0);
+    sb_win = create_win(term.sb_h, term.sb_w, 0, term.sb_x);
     f.update_map = 1;
     draw_msg_window(term.msg_h, 0);
     wrefresh(map_win);
@@ -303,7 +303,7 @@ void display_energy_win(void) {
     int j = 1;
 
     werase(sb_win);
-    box(sb_win, 0, 0);
+    //box(sb_win, 0, 0);
 
     display_stats(sb_win, &j, cur_npc);
 
@@ -311,7 +311,8 @@ void display_energy_win(void) {
     snprintf(buf, sizeof(buf), "%s [%d%%%%](%dd%d)", 
              g.active_attacker == g.player ? "Unarmed" : actor_name(g.active_attacker, NAME_CAP), 
              cur_attack->accuracy, cur_attack->dam_n, cur_attack->dam_d);
-    mvwprintw(sb_win, j++, 1, buf);
+    mvwprintw(sb_win, j, 1, buf);
+    print_dtypes(sb_win, j++, 1 + strlen(buf), cur_attack->dtype, 0);
 
     memset(buf, 0, 128);
     snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
@@ -358,6 +359,10 @@ void display_energy_win(void) {
 
 void display_stats(WINDOW *win, int *i, struct actor *actor) {
     char buf[128];
+    int max_x, max_y;
+
+    getmaxyx(win, max_y, max_x);
+    (void) max_y;
 
     memset(buf, 0, 128);
     wattron(win, A_STANDOUT);
@@ -370,18 +375,37 @@ void display_stats(WINDOW *win, int *i, struct actor *actor) {
     wattroff(win, A_STANDOUT);
 
     memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "HP: %d/%d", actor->hp, actor->hpmax);
+    if (actor == g.player)
+        snprintf(buf, sizeof(buf), "HP: %d/%d", actor->hp, actor->hpmax);
+    else
+        snprintf(buf, sizeof(buf), "%s", describe_health(actor));
     wcolor_on(win, RED);
     mvwprintw(win, *i, 1, buf);
+    if (actor == g.player)
+        render_bar(win, actor->hp, actor->hpmax, 15, *i,
+                    max_x - 17, '+', ' ');
     *i += 1;
     wcolor_off(win, RED);
 
-    memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "TP: %d%%%%", actor->energy);
-    wcolor_on(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
-    mvwprintw(win, *i, 1, buf);
-    *i += 1;
-    wcolor_off(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
+    if (actor == g.player) {
+        memset(buf, 0, 128);
+        snprintf(buf, sizeof(buf), "MP: %d/%d", actor->hp, actor->hpmax);
+        wcolor_on(win, BLUE);
+        mvwprintw(win, *i, 1, buf);
+        render_bar(win, actor->hp, actor->hpmax, 15, *i,
+                    max_x - 17, '+', ' ') ;
+        *i += 1;
+        wcolor_off(win, BLUE);
+
+        memset(buf, 0, 128);
+        snprintf(buf, sizeof(buf), "EN: %d/%d", actor->energy, 100);
+        wcolor_on(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
+        render_bar(win, actor->energy, 100, 15, *i,
+                    max_x - 17, '+', ' ') ;
+        mvwprintw(win, *i, 1, buf);
+        *i += 1;
+        wcolor_off(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
+    }
 
     if (actor != g.player) {
         if (is_aware(actor, g.player)) {
@@ -394,15 +418,15 @@ void display_stats(WINDOW *win, int *i, struct actor *actor) {
         *i += 1;
     }
 
-    mvwprintw(win, *i, 1, "Weak: ");
-    print_dtypes(win, *i, 8, actor->weak);
+    mvwprintw(win, *i, 1, "Weak:");
+    print_dtypes(win, *i, 9, actor->weak, 1);
     *i += 1;
-    mvwprintw(win, *i, 1, "Res: ");
-    print_dtypes(win, *i, 8, actor->resist);
+    mvwprintw(win, *i, 1, "Resist:");
+    print_dtypes(win, *i, 9, actor->resist, 1);
     *i += 1;
 }
 
-void print_dtypes(WINDOW *win, int y, int x, short dtypes) {
+void print_dtypes(WINDOW *win, int y, int x, short dtypes, unsigned char blanks) {
     char buf[16]; /* For a more verbose form later. */
 
     for (int i = 0; i < MAX_DTYPE; i++) {
@@ -412,10 +436,10 @@ void print_dtypes(WINDOW *win, int y, int x, short dtypes) {
             snprintf(buf, sizeof(buf), "%c", dtypes_arr[i].str[0] - 32);
             mvwprintw(win, y, x, buf);
             wcolor_off(win, dtypes_arr[i].color);
-        } else {
+        } else if (blanks) {
             mvwprintw(win, y, x, "_");
+            x++;
         }
-        x++;
     }
 }
 
@@ -428,19 +452,15 @@ void print_dtypes(WINDOW *win, int y, int x, short dtypes) {
  * @param x x coordinate.
  * @param y y coordinate.
  * @param width width.
- * @param full color when full.
- * @param empty color when empty.
+ * @param full character when full.
+ * @param empty character when empty.
  */
 void render_bar(WINDOW *win, int cur, int max, int x, int y,
                 int width, int full, int empty) {
-    int pips = (int) ((width - 2) * cur / max);
+    int pips = (int) (width * cur / max);
     for (int i = 0; i < width; i++) {
-        if (!i) {
-            mvwaddch(win, y, x + i, '[');
-        } else if (i <= pips) {
+        if (i <= pips) {
             mvwaddch(win, y, x + i, full);
-        } else if (i == width - 1) {
-            mvwaddch(win, y, x + i, ']');
         } else {
             mvwaddch(win, y, x + i, empty);
         }
@@ -471,7 +491,7 @@ void draw_msg_window(int h, int full) {
     while (cur_msg != NULL) {
         getyx(win, y, x);
         (void) x;
-        if (y > h - 2) {
+        if (y > h - 1) {
             cur_msg = cur_msg->next;
             i++;
             continue;
