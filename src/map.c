@@ -98,18 +98,28 @@ int climb(int change) {
 }
 
 /**
- * @brief Change the player's depth.
+ * @brief Change the player's depth. If this results in a change in maximum depth,
+ * then update the player's score.
  * 
  * @param change The number of levels to shift.
  * @return int The cost in energy of climbing.
  */
 int change_depth(int change) {
     g.depth += change;
+    if (g.depth > g.max_depth) {
+        if (in_danger(g.player)) {
+            g.score += (1200 * (g.depth - g.max_depth));
+        } else {
+            g.score += (1000 * (g.depth - g.max_depth));
+        }
+        g.max_depth = g.depth;
+    }
     if (g.depth >= 25) {
         /* A winner is you. */
         end_game(1);
     }
     free_actor_list(g.player->next);
+    g.player->next = NULL;
     make_level();
     push_actor(g.player, g.player->x, g.player->y);
     return 50;

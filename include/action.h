@@ -3,13 +3,6 @@
 
 #define DEBUG_CUTOFF 100
 
-int move_mon(struct actor*, int, int);
-int look_at(int, int);
-void stop_running(void);
-int get_action(void);
-int dir_to_action(int, int);
-int execute_action(struct actor*, int);
-
 /* Order is important! */
 enum actionnum {
     A_NONE,
@@ -45,5 +38,12 @@ enum actionnum {
 #define is_movement(a) \
     (a > A_NONE && a < A_REST)
 
+/* Function Prototypes */
+int move_mon(struct actor*, int, int);
+int look_at(int, int);
+void stop_running(void);
+int get_action(void);
+int dir_to_action(int, int);
+int execute_action(struct actor*, int);
 
 #endif

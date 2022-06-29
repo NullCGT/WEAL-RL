@@ -5,6 +5,7 @@
     "color": "white",
     "hp": 4,
     "weight": 2,
+    "speed": 50,
     "attacks": [
         {
             "dice": 1,

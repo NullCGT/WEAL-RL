@@ -100,7 +100,7 @@ int do_attack(struct actor *aggressor, struct actor *target) {
 - Weak types > resist types = weak = 0
 - resist types == weak types = normal = 1
  */
-int weak_res(unsigned short dtype, unsigned short resist, unsigned short weak) {
+int weak_res(unsigned long dtype, unsigned long resist, unsigned long weak) {
     int blocks = __builtin_popcount(dtype & resist);
     int hits = __builtin_popcount(dtype & weak);
 

@@ -5,6 +5,7 @@
     "color": "bright white",
     "hp": 6,
     "weight": 18,
+    "speed": 100,
     "attacks": [
         {
             "dice": 1,
@@ -26,5 +27,6 @@
     },
     "weak": ["holy", "bash"],
     "resist": ["poison", "cut", "stab", "ice", "unholy"],
+    "tags": ["undead", "unholy"],
     "description": "Bones bleached white by the dying sun."
 }

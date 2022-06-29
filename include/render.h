@@ -1,6 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 
+/* Function Prototypes */
 void render_all(void);
 void refresh_cell(int, int);
 void mark_refresh(int, int);

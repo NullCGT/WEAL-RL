@@ -5,6 +5,7 @@
     "color": "bright white",
     "hp": 20,
     "weight": 100,
+    "speed": 100,
     "attacks": [
         {
             "dice": 1,
@@ -15,5 +16,6 @@
         }
     ],
     "equip" : {},
+    "tags" : ["humanoid"],
     "description": "One of billions."
 }

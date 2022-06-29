@@ -1,0 +1,46 @@
+== Scoring ==
+- We will include scoring simply because players love high score lists.
+- Scoring 
+
+
+== Score Calculation ==
++++ Maximum Depth
+    - We want to reward maximum depth above nearly all else.
+++  Identifeid Items
+    - Figuring out the game's secrets should be rewarded.
+++  Descent to New Levels when "In Danger"
+    - We want to reward "risky" play, so descending to a new level while
+      in danger should always result in a reward.
++ Kills
+    - Defeating a monster should result in an experience rewards.
+    - Defeating a monster while "in danger" should result in a larger experience
+      reward, because again, we want to reward risky behavior.
+    - Defeating the same type of monster repeatedly results in lower xp rewards.
+- Killing innocents / peacefuls
+    - Killing an innocent should penalize one's score a small amount, because we
+      do not want to reward that behavior.
+    - The penalty should not be overly large, otherwise we risk creating a
+      perverse incentive.
+    - New idea: What if we cut the player's score *in half* when they kill
+      an innocent? That way, it simply brings thier score closer to zero, rather
+      than raising or lowering their score.
+- Turns
+    - Every turn taken drops the player's score by a few points. This should help
+      reduce boring play during score maxouts.
+- Hitting an opponent's resistance.
+    - Hitting an opponent's resistance drops one's score by a small amount.
++ Hitting an opponent's weakness.
+    - Hitting an opponent's weakness improves one's score by a small amount.
++ Using a consumable item.
+    - We want players to be unafraid of using consumables, and (as usual) we want
+      to encourage risky play. Thus, using consumables should result in a small number
+      of points.
+
+== Ideas ==
+- Add a taunt button.
+    - When the player taunts, they are temporarily weak to everything, and lose a few
+      turns.
+    - Geting hit while taunting increases one's points.
+- Add a friendly little dude that appears to say hi to the player when they reach one
+  million points, or some sort of other arbitrary milestone. Reward exploring the
+  game! :D

@@ -81,9 +81,9 @@ int move_mon(struct actor* mon, int x, int y) {
             return ret;
         }
     }
-    /* Resting costs zero movement */
+    /* Resting costs movement */
     if (!x && !y)
-        return 100;
+        return mon->speed;
     /* Handle blocked movement */
     if (is_blocked(nx, ny)) {
         if (is_player(mon)) {
@@ -100,7 +100,7 @@ int move_mon(struct actor* mon, int x, int y) {
     if (is_player(mon)) {
         f.update_fov = 1;
     }
-    return 100;
+    return mon->speed;
 }
 
 /**
@@ -337,7 +337,8 @@ int get_action(void) {
     }
     /* If running, move towards the goal location if there is one. Otherwise, move 
        in the previously input direction. */
-    if (f.mode_run && in_bounds(g.goal_x, g.goal_y) && is_explored(g.goal_x, g.goal_y)) {
+    if (f.mode_run && in_bounds(g.goal_x, g.goal_y) && is_explored(g.goal_x, g.goal_y)
+        && g.levmap[g.player->x][g.player->y].goal_heat < MAX_HEAT) {
         return travel();
     } else if (f.mode_run) {
         return g.prev_action;
@@ -449,6 +450,7 @@ int execute_action(struct actor *actor, int actnum) {
             break;
         case A_QUIT:
             logm("The quest has become too much. You surrender yourself to fate...");
+            g.target = NULL;
             end_game(0);
             break;
         case A_DEBUG_MAGICMAP:

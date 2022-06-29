@@ -30,6 +30,8 @@ typedef struct global {
     unsigned char active_attack_index;
     int turns;
     int depth;
+    int max_depth;
+    int score;
     int cx, cy; /* Camera location */
     int cursor_x, cursor_y; /* In-game cursor location */
     int goal_x, goal_y; /* Traveling */
@@ -50,6 +52,16 @@ typedef struct bitflags {
     /* 1 free bit */
 } bitflags;
 
+typedef struct dungeon {
+    char filename[64];
+    char name[64];
+    unsigned char randomness;       /* Chance of disregarding encounter list to spawn a random creature. */
+    unsigned char wall_color;       /* Color of the dungeon walls. */
+    unsigned long forbidden_tags;   /* Actors with this tag cannot be randomly generated here. */
+    unsigned long preferred_tags;   /* Actors with this tag preferrentially generate here. */
+    unsigned long required_tags;   /* Actors that spawn randomly must have one of these tags. */
+} dungeon;
+
 typedef struct terminal {
     int h;
     int w;
@@ -67,6 +79,7 @@ typedef struct terminal {
 
 extern struct global g;
 extern struct bitflags f;
+extern struct dungeon dgn;
 extern struct terminal term;
 
 #endif

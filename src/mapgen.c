@@ -30,6 +30,8 @@ int in_region(struct rect, int, int);
 struct rect create_room(struct rect);
 void tunnel(struct rect, struct rect, int);
 void do_bsp(struct rect, int, int, int, int);
+void cellular_automata(struct rect, int, int);
+int deisolate(void);
 void init_map(void);
 void symmetrize(struct rect, struct rect, int);
 
@@ -136,6 +138,112 @@ void do_bsp(struct rect region, int min_w, int min_h, int horiz, int depth) {
     tunnel(sub1, sub2, horiz);
 }
 
+/**
+ * @brief Carve out a portion of the dungeon level using a cellular automata
+ algorithm.
+ * 
+ * @param region The region to perform cellular automata upon.
+ * @param filled An integer between 0 and 100. Used to determine what
+ percentage of the map should start filled.
+ * @param iterations How many iterations to run the algorithm.
+ */
+void cellular_automata(struct rect region, int filled, int iterations) {
+    int x, y, nx, ny;
+    int alive;
+    int width = region.x2 - region.x1;
+    int height = region.y2 - region.y1;
+    unsigned char cells[width][height];
+
+    /* Initialize cells. */
+    for (x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+            cells[x][y] = (rndmx(100) < filled);
+        }
+    }
+    /* Game of Life */
+    for (int i = 0; i < iterations; i++) {
+        for (x = 0; x < width; x++) {
+            for (y = 0; y < height; y++) {
+
+                alive = 0;
+                for (int x1 = -1; x1 <= 1; x1++) {
+                    nx = x + x1;
+                    if (nx < 0 || nx >= width) {
+                        alive += 3;
+                        continue;
+                    }
+                    for (int y1 = -1; y1 <= 1; y1++) {
+                        ny = y + y1;
+                        if (ny < 0 || ny >= height) {
+                            alive++;
+                        } else if (cells[nx][ny]) {
+                            alive++;
+                        }
+                    }
+                }
+                if (alive >= 5)
+                    cells[x][y] = 1;
+                else
+                    cells[x][y] = 0;
+            }
+        }
+    }
+
+    /* Transfer to grid */
+    for (x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+            if (!cells[x][y])
+                init_tile(&g.levmap[region.x1 + x][region.y1 + y], T_FLOOR);
+        }
+    }
+}
+
+/**
+ * @brief Combs the level map for isolated areas. Upon finding one, starts a
+ random walk, which finishes when the level is fully connected.
+ * 
+ * @return int Return 1 if changes were made to the level, otherwise return 0.
+ */
+int deisolate(void) {
+    int x, y;
+    int dx, dy;
+    /* Hacky hack */
+    for (x = 0; x < MAPW; x++) {
+        for (y = 0; y < MAPH; y++) {
+            if (!is_blocked(x, y)) {
+                break;
+            }
+        }
+        if (!is_blocked(x, y)) {
+            break;
+        }
+    }
+    g.player->x = x;
+    g.player->y = y;
+    do_heatmaps();
+    /* Loop over everything to see if there is somewhere the player cannot get. */
+    for (x = 0; x < MAPW; x++) {
+        for (y = 0; y < MAPH; y++) {
+            if (g.levmap[x][y].player_heat == MAX_HEAT) {
+                /* Hulk walk until we make a connection with an explorable area. */
+                do {
+                    dx = rndrng(-1, 2);
+                    dy = rndrng(-1, 2);
+                    if (x + dx < 1 || x + dx >= MAPW - 1)
+                        dx = dx * -1;
+                    if (y + dy < 1 || y + dy >= MAPH - 1)
+                        dy = dy * -1;
+                    x += dx;
+                    y += dy;
+                    init_tile(&g.levmap[x][y], T_FLOOR);
+                } while (g.levmap[x][y].player_heat >= MAX_HEAT);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /* Initialize the map by making sure everything is not visible and
    not explored. */
 void init_map(void) {
@@ -167,12 +275,16 @@ void symmetrize(struct rect region1, struct rect region2, int horiz) {
 /* Create the level. */
 void make_level(void) {
     struct coord c;
+    struct rect level_rect = { 1, 1, MAPW - 1, MAPH - 1 };
+    /* Temporary: Parse the dungeon. */
+    dungeon_from_file("data/dungeon/entrance.json");
     /* Draw the map */
-    struct rect level_rect = { 1, 1, MAPW / 2, MAPH - 1 };
-    struct rect level_rect2 = { MAPW / 2, 1, MAPW - 1, MAPH - 1};
     init_map();
-    do_bsp(level_rect, 8, 8, 1, 7);
-    symmetrize(level_rect, level_rect2, 1);
+    cellular_automata(level_rect, 45, 5);
+    while (deisolate()) {
+        //logm("Connecting an isolated area.");
+    };
+    
     c = rand_open_coord();
     init_tile(&g.levmap[c.x][c.y], T_STAIR_UP);
     c = rand_open_coord();

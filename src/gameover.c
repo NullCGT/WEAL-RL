@@ -62,7 +62,14 @@ int write_dumplog(const char *fname, int winner) {
     } else {
         fprintf(fp, "You quit on turn %d.\n", g.turns);
     }
+    fprintf(fp, "You scored %d points.\n", g.score);
     fprintf(fp, "You had %d health, with a maximum of %d.\n", g.player->hp, g.player->hpmax);
+    fprintf(fp, "You were on level %d of %s.\n", g.depth, dgn.name);
+    if (g.depth <= g.max_depth) {
+        fprintf(fp, "You were in the midst of your longest journey.\n");
+    } else {
+        fprintf(fp, "You had journeyed even further in the past, and had reached level %d.\n", g.max_depth);
+    }
 
     if (g.target) {
         dump_target(fp);
@@ -83,7 +90,7 @@ int write_dumplog(const char *fname, int winner) {
 void dump_target(FILE *fp) {
     struct actor *cur = g.target->invent;
 
-    fputs("\n== target Statistics ==\n", fp);
+    fputs("\n== Target Statistics ==\n", fp);
     fprintf(fp, "Name: %s\n", actor_name(g.target, NAME_CAP));
     fprintf(fp, "HP: (%d/%d)\n", g.target->hp, g.target->hpmax);
 
@@ -102,7 +109,7 @@ void dump_target(FILE *fp) {
  * @param fp The dumplog file.
  */
 void dump_levmap(FILE *fp) {
-    fputs("\n== Level Map ==\n", fp);
+    fprintf(fp, "\n== Level %d: %s ==\n", g.depth, dgn.name);
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
             if (g.levmap[x][y].actor)

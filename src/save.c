@@ -74,8 +74,10 @@ void save_game(const char *fname) {
     g.player->energy -= 100;
     g.turns -= 1;
 
-    /* Write the global strustart_menuct. */
+    /* Write the global struct. */
     fwrite(&g, sizeof(struct global), 1, fp);
+    /* Write the dungeon struct. */
+    fwrite(&dgn, sizeof(struct dungeon), 1, fp);
     /* Write level map */
     for (int x = 0; x < MAPW; x++) {
         for (int y = 0; y < MAPH; y++) {
@@ -166,6 +168,8 @@ void load_game(const char *fname) {
     }
     /* Read the global struct */
     fread(&g, sizeof(struct global), 1, fp);
+    /* Read the dungeon struct */
+    fread(&dgn, sizeof(struct dungeon), 1, fp);
     /* Clean up message pointers. We could save the message log fairly easily,
        but it would take up a lot of space, so we don't. */
     g.msg_list = NULL;

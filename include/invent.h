@@ -62,7 +62,7 @@ extern struct slot_type slot_types[MAX_SLOTS];
 
 #define is_equipped(actor) (actor->item && actor->item->slot != NO_SLOT)
 
-
+/* Function Prototypes */
 struct item *init_item(struct actor *);
 struct equip *init_equip(struct actor *);
 int display_invent(void);

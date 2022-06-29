@@ -10,14 +10,6 @@ struct coord {
     int x, y;
 };
 
-/* Function declarations */
-int make_visible(int, int);
-struct coord rand_open_coord(void);
-void magic_mapping(void);
-int climb(int);
-int change_depth(int);
-void do_heatmaps(void);
-
 /* MACROS */
 
 /* bounds */
@@ -45,5 +37,13 @@ void do_heatmaps(void);
     (g.levmap[x][y].item_actor)
 #define TILE_AT(x, y) \
     (g.levmap[x][y].pt->id)
+
+/* Function Prototypes */
+int make_visible(int, int);
+struct coord rand_open_coord(void);
+void magic_mapping(void);
+int climb(int);
+int change_depth(int);
+void do_heatmaps(void);
 
 #endif

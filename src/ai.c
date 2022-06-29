@@ -53,6 +53,7 @@ void take_turn(struct actor *actor) {
         return;
     
     /* Refill energy */
+    logm("%s", actor_name(actor, 0));
     actor->energy += 100;
     if (actor->energy > 0 && actor->energy < 100)
         actor->energy = 100;
@@ -170,6 +171,7 @@ void increment_regular_values(struct actor *actor) {
     /* Increment turn counter */
     if (actor == g.player) {
         g.turns++;
+        g.score--;
     }
     /* Temporary evasion and accuracy slowly return to zero.  */
     if (actor->temp_accuracy != 0) {

@@ -11,6 +11,7 @@ struct ai {
     unsigned long faction;
 };
 
+/* Function Prototypes */
 struct ai *init_ai(struct actor *);
 void take_turn(struct actor *);
 struct attack choose_attack(struct actor *, struct actor *);

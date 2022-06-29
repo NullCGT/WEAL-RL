@@ -42,4 +42,4 @@ cmake --preset=release
 cmake --build build
 ```
 
-Game binaries will be created in the build/bin folder.
+Game binaries and associated data will be created in the build/bin folder.

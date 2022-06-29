@@ -54,7 +54,7 @@ struct name *init_permname(struct actor *actor, const char *permname) {
  */
 struct actor *spawn_creature(const char *name, int x, int y) {
     struct actor *actor;
-    char buf[128];
+    char buf[64];
     snprintf(buf, sizeof(buf), "data/creature/%s.json", name);
     actor = spawn_actor(buf, x, y);
     return actor;
@@ -70,7 +70,7 @@ struct actor *spawn_creature(const char *name, int x, int y) {
  */
 struct actor *spawn_item(const char *name, int x, int y) {
     struct actor *actor;
-    char buf[128];
+    char buf[64];
     snprintf(buf, sizeof(buf), "data/item/%s.json", name);
     actor = spawn_actor(buf, x, y);
     return actor;
@@ -97,7 +97,7 @@ struct actor *spawn_actor(const char *name, int x, int y) {
     mod_ai(actor->ai);
     mod_slots(actor->item);
 
-    /* Add the creature the list of actors. */
+    /* Add the actor the list of actors. */
     while (cur_actor != NULL) {
         prev_actor = cur_actor;
         cur_actor = cur_actor->next;

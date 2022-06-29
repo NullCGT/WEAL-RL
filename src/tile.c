@@ -41,7 +41,11 @@ int *get_goalh(int x, int y) {
  * @return A pointer to the modified tile.
  */
 struct tile *init_tile(struct tile *intile, int tindex) {
-    intile->color = permtiles[tindex].color;
+    if (tindex == T_WALL) {
+        intile->color = dgn.wall_color;
+    } else {
+        intile->color = permtiles[tindex].color;
+    }
     intile->pt = &permtiles[tindex];
     intile->actor = NULL;
     intile->item_actor = NULL;

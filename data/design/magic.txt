@@ -1,0 +1,51 @@
+Gaining Words
+- The player gradually builds up a library of words of power.
+- The player has some influence over which words they gain, but it is largely
+  random.
+  - For example, player is offered a choice from a set of three every time they
+    learn a new word.
+- There are enough words that the player cannot learn all of them in a single game.
+
+Crafting a new spell
+- Players can use words to create new spells.
+- Creating spells can only happen at specific locations (?)
+- Spell creation requires several decisions
+  - Any number of standard effect words
+  - A single modifier word
+  - Power level
+  - The higher the power level, the greater the chance that the spell is created with unintended additional effects.
+
+
+STANDARD EFFECTS
+Accel
+- Gain extra energy immediately in exchange for losing turns in the future.
+Evasion Up
+- Boosts evasion
+Evasion Down
+- Damages evasion
+Accuracy Up
+- Boosts accuracy
+Accuracy Up
+- Damages accuracy
+Elemental
+- Typed damage
+- One for every damage type
+
+
+STANDARD MODIFIERS
+All
+- Affects all visible monsters.
+Other
+- Affects all visible monsters other than the caster.
+Target
+- Affects a specific visible target.
+Random
+- Affects a random visible target.
+Touch
+- Affects a target in touch range.
+Self
+- Affects self only.
+
+UNIQUE SPELLS
+Swap
+- Swap all status effects and temporary boosts with another target.

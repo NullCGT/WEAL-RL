@@ -3,6 +3,7 @@
 
 #include <curses.h>
 
+/* Function Prototypes */
 void title_screen(void);
 WINDOW* create_win(int, int, int, int);
 void cleanup_win(WINDOW *);

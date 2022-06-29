@@ -40,6 +40,22 @@ struct damage dtypes_arr[MAX_DTYPE] = {
     { "unholy",     MAGENTA,         0x0200 } 
 };
 
+struct tag tags_arr[MAX_TAGS] = {
+    { "undead",      0x00010000 },
+    { "construct",   0x00020000 },
+    { "angel",       0x00040000 },
+    { "demon",       0x00080000 },
+    { "animal",      0x00100000 },
+    { "humanoid",    0x00200000 },
+    { "abomination", 0x00400000 },
+    { "flying",      0x00800000 },
+    { "evil",        0x01000000 },
+    { "good",        0x02000000 },
+    { "law",         0x04000000 },
+    { "chaos",       0x08000000 },
+    { "neutral",     0x10000000 }
+};
+
 /**
  * @brief Pushes an actor to a new location and updates the levmap
  accordingly.

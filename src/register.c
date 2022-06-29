@@ -22,7 +22,9 @@ struct global g = {
     .msg_last = NULL,
     .active_attack_index = 0,
     .turns = 0,
-    .depth = 1,
+    .depth = 0,
+    .max_depth = 0,
+    .score = 0,
     .cx = 0,
     .cy = 0,
     .cursor_x = 0,
@@ -41,6 +43,16 @@ struct bitflags f = {
     .mode_run = 0,
     .mode_map = 1,
     .mode_look = 0,
+};
+
+struct dungeon dgn = {
+    .filename = { 0 },
+    .name = { 0 },
+    .randomness = 0,
+    .wall_color = YELLOW,
+    .forbidden_tags = 0,
+    .preferred_tags = 0,
+    .required_tags = 0
 };
 
 struct terminal term = {

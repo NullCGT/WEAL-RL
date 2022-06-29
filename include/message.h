@@ -9,14 +9,15 @@ struct msg {
     struct msg *prev;
 };
 
+#define MAX_MSG_LEN 256
+#define MAX_BACKSCROLL 25
+
+/* Function Prototypes */
 void free_msg(struct msg *);
 void free_message_list(struct msg *);
 char *unwrap_string(char *);
 int logm(const char *, ...);
 int logma(int, const char *, ...);
 const char *an(const char *);
-
-#define MAX_MSG_LEN 256
-#define MAX_BACKSCROLL 25
 
 #endif

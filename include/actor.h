@@ -19,10 +19,16 @@
 struct damage {
     const char *str;
     unsigned char color;
-    unsigned short val; 
+    unsigned long val; 
+};
+
+struct tag {
+    const char *str;
+    unsigned long val;
 };
 
 #define MAX_DTYPE 10
+#define MAX_TAGS 13
 
 struct attack {
     unsigned char dam_n;
@@ -30,7 +36,7 @@ struct attack {
     unsigned char kb;
     unsigned char accuracy;
     /* bitfields */
-    unsigned short dtype;
+    unsigned long dtype;
 };
 
 struct name {
@@ -46,6 +52,7 @@ struct actor {
     int energy;
     int hp, hpmax;
     int weight;
+    int speed; /* For creatures, denotes move speed. For items, attack speed. */
     signed char temp_evasion;
     signed char temp_accuracy;
     /* Attack list */
@@ -58,22 +65,14 @@ struct actor {
     struct item *item;
     struct equip *equip;
     /* bitfields */
-    unsigned short weak;
-    unsigned short resist;
+    unsigned long weak;
+    unsigned long resist;
+    unsigned long tags;
+    /* bitflags */
     unsigned int unique : 1;
     unsigned int saved : 1; /* Infinite file write loop prevention. */
     /* 6 free bits */
 };
-
-/* Function prototypes */
-void push_actor(struct actor *, int, int);
-struct actor *remove_actor(struct actor *);
-void actor_sanity_checks(struct actor *);
-char *actor_name(struct actor *, unsigned);
-void free_actor(struct actor *);
-void free_actor_list(struct actor *);
-int in_danger(struct actor *);
-const char *describe_health(struct actor *);
 
 /* Naming bitmasks */
 #define NAME_CAP      0x01
@@ -85,8 +84,18 @@ const char *describe_health(struct actor *);
 #define is_noatk(x) \
     (!(x.dam_n || x.dam_d))
 
-extern struct damage dtypes_arr[];
+/* Function Prototypes */
+void push_actor(struct actor *, int, int);
+struct actor *remove_actor(struct actor *);
+void actor_sanity_checks(struct actor *);
+char *actor_name(struct actor *, unsigned);
+void free_actor(struct actor *);
+void free_actor_list(struct actor *);
+int in_danger(struct actor *);
+const char *describe_health(struct actor *);
 
+extern struct damage dtypes_arr[];
+extern struct tag tags_arr[];
 
 
 #endif

@@ -28,7 +28,8 @@ struct ai *ai_from_json(struct ai *, cJSON *);
 struct item *item_from_json(struct item *, cJSON *);
 struct actor *actor_primitives_from_json(struct actor *, cJSON *);
 struct actor *attacks_from_json(struct actor *, cJSON *);
-void dtypes_from_json(unsigned short *, cJSON *);
+void dtypes_from_json(unsigned long *, cJSON *);
+void tags_from_json(unsigned long *, cJSON *);
 void color_from_json(unsigned char *, cJSON *);
 
 /**
@@ -115,6 +116,8 @@ struct actor *actor_from_file(const char *fname) {
     dtypes_from_json(&(actor->weak), field);
     field = cJSON_GetObjectItemCaseSensitive(actor_json, "resist");
     dtypes_from_json(&(actor->resist), field);
+    field = cJSON_GetObjectItemCaseSensitive(actor_json, "tags");
+    tags_from_json(&(actor->tags), field);
 
     /* Parse Components */
     field = cJSON_GetObjectItemCaseSensitive(actor_json, "ai");
@@ -136,6 +139,40 @@ struct actor *actor_from_file(const char *fname) {
     /* Free memory and return the actor. */
     cJSON_Delete(actor_json);
     return actor;
+}
+
+/**
+ * @brief Parses the dungeon struct from a file.
+ * 
+ * @param fname The name of the file.
+ */
+void dungeon_from_file(const char *fname) {
+    cJSON *dgn_json = NULL;
+    cJSON *field = NULL;
+    
+    /* Initialize Actor */
+    dgn_json = json_from_file(fname);
+    if (!dgn_json)
+        return;
+    memset(dgn.filename, 0, sizeof(dgn.filename));
+    snprintf(dgn.filename, sizeof(dgn.filename), fname);
+    
+    field = cJSON_GetObjectItemCaseSensitive(dgn_json, "name");
+    memset(dgn.name, 0, sizeof(dgn.name));
+    snprintf(dgn.name, sizeof(dgn.name), field->valuestring);
+
+    field = cJSON_GetObjectItemCaseSensitive(dgn_json, "randomness");
+    dgn.randomness = field->valueint;
+
+    field = cJSON_GetObjectItemCaseSensitive(dgn_json, "wall_color");
+    color_from_json(&(dgn.wall_color), field);
+
+    field = cJSON_GetObjectItemCaseSensitive(dgn_json, "forbidden_tags");
+    tags_from_json(&(dgn.forbidden_tags), field);
+    field = cJSON_GetObjectItemCaseSensitive(dgn_json, "required_tags");
+    tags_from_json(&(dgn.required_tags), field);
+    field = cJSON_GetObjectItemCaseSensitive(dgn_json, "preferred_tags");
+    tags_from_json(&(dgn.preferred_tags), field);
 }
 
 /**
@@ -185,6 +222,8 @@ struct actor *actor_primitives_from_json(struct actor *actor, cJSON *actor_json)
     actor->hpmax = actor->hp;
     field = cJSON_GetObjectItemCaseSensitive(actor_json, "weight");
     actor->weight = field->valueint;
+    field = cJSON_GetObjectItemCaseSensitive(actor_json, "speed");
+    actor->speed = field->valueint;
     return actor;
 }
 
@@ -227,7 +266,7 @@ struct actor *attacks_from_json(struct actor *actor, cJSON *attacks_json) {
  * @param field A pointer to the field to be modified.
  * @param types_json A pointer to the JSON.
  */
-void dtypes_from_json(unsigned short *field, cJSON *types_json) {
+void dtypes_from_json(unsigned long *field, cJSON *types_json) {
     cJSON* damage_json;
 
     cJSON_ArrayForEach(damage_json, types_json) {
@@ -238,6 +277,25 @@ void dtypes_from_json(unsigned short *field, cJSON *types_json) {
         }
     }
 }
+
+/**
+ * @brief Parse tags bitflags from JSON.
+ * 
+ * @param field A pointer to the field to be modified.
+ * @param types_json A pointer to the JSON.
+ */
+void tags_from_json(unsigned long *field, cJSON *types_json) {
+    cJSON* tags_json;
+
+    cJSON_ArrayForEach(tags_json, types_json) {
+        for (int j = 0; j < MAX_DTYPE; j++) {
+            if (!strcmp(tags_arr[j].str, tags_json->valuestring)) {
+                *field |= tags_arr[j].val;
+            }
+        }
+    }
+}
+
 
 /**
  * @brief Parse color information from JSON.

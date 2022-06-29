@@ -315,7 +315,10 @@ void display_energy_win(void) {
     print_dtypes(sb_win, j++, 1 + strlen(buf), cur_attack->dtype, 0);
 
     memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
+    if (g.depth)
+        snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
+    else
+        snprintf(buf, sizeof(buf), "Depth: Surface");
     mvwprintw(sb_win, j++, 1, buf);
 
     memset(buf, 0, 128);
@@ -615,11 +618,13 @@ int handle_mouse(void) {
     gx = x + g.cx;
     gy = y - g.cy - term.mapwin_y;
     
+    #if 0
     if (event.bstate & BUTTON1_CLICKED) {
         if (y <= term.msg_h - 1 && x <= term.msg_w) {
             return A_FULLSCREEN;
         }
     }
+    #endif
 
     if (f.mode_look) {
         g.cursor_x = gx;
