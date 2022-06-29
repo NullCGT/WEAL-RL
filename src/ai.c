@@ -47,7 +47,7 @@ struct ai *init_ai(struct actor *actor) {
  */
 void take_turn(struct actor *actor) {
     int cost;
-    int action = A_NONE;
+    struct action *action;
 
     if (actor != g.player && !actor->ai)
         return;

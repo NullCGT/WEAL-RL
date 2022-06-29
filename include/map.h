@@ -39,6 +39,7 @@ struct coord {
     (g.levmap[x][y].pt->id)
 
 /* Function Prototypes */
+struct coord get_direction(const char *);
 int make_visible(int, int);
 struct coord rand_open_coord(void);
 int magic_mapping(void);

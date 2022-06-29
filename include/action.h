@@ -1,12 +1,9 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#define DEBUG_CUTOFF 100
-
-/* Order is important! */
+/* Order is critical for A_REST and everything beforehand.  */
 enum actionnum {
     A_NONE,
-    /* Movement actions */
     A_WEST,
     A_EAST,
     A_NORTH,
@@ -15,8 +12,8 @@ enum actionnum {
     A_NORTHEAST,
     A_SOUTHWEST,
     A_SOUTHEAST,
-    /* End movement actions */
     A_REST,
+    /* End movement actions */
     A_CYCLE,
     A_OPEN,
     A_CLOSE,
@@ -31,7 +28,7 @@ enum actionnum {
     A_HELP,
     A_SAVE,
     A_QUIT,
-    A_MAGICMAP = DEBUG_CUTOFF,
+    A_MAGICMAP,
     A_HEAT
 };
 
@@ -57,10 +54,11 @@ struct action {
 
 /* Function Prototypes */
 int move_mon(struct actor*, int, int);
+struct coord action_to_dir(struct action *);
 int look_at(int, int);
 void stop_running(void);
-int get_action(void);
-int dir_to_action(int, int);
-int execute_action(struct actor*, int);
+struct action *get_action(void);
+struct action *dir_to_action(int, int);
+int execute_action(struct actor*, struct action*);
 
 #endif

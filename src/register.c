@@ -20,6 +20,7 @@ struct global g = {
     .active_attacker = NULL,
     .msg_list = NULL,
     .msg_last = NULL,
+    .prev_action = NULL,
     .active_attack_index = 0,
     .turns = 0,
     .depth = 0,
@@ -32,7 +33,6 @@ struct global g = {
     .goal_x = -1,
     .goal_y = -1,
     .display_heat = 0,
-    .prev_action = 0,
 };
 
 struct bitflags f = {

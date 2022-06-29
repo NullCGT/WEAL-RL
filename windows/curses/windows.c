@@ -249,7 +249,7 @@ void display_file_text(const char *fname) {
     WINDOW *new_win;
     int i =0;
     int j = 0;
-    int action = A_NONE;
+    int key = 0;
     char *line = NULL;
     size_t len = 0;
 
@@ -268,8 +268,8 @@ void display_file_text(const char *fname) {
     while (1) {
         prefresh(new_win, j, 0, 0, 0, term.h - 1, term.w - 1);
 
-        action = handle_keys();
-        switch (action) {
+        key = handle_keys();
+        switch (key) {
             case 27:
                 werase(new_win);
                 prefresh(new_win, j, 0, 0, 0, term.h - 1, term.w - 1);
@@ -611,7 +611,7 @@ int handle_mouse(void) {
     MEVENT event;
 
     if (getmouse(&event) != OK)
-        return A_NONE;
+        return 0;
     
     x = event.x;
     y = event.y;
@@ -639,14 +639,14 @@ int handle_mouse(void) {
         g.goal_x = gx;
         g.goal_y = gy;
         f.mode_run = 1;
-        return A_NONE;
+        return 0;
     }
     /* Right click to examine. */
     if (event.bstate & BUTTON3_CLICKED) {
         look_at(gx, gy);
     }
 
-    return A_NONE;
+    return 0;
 }
 
 /**

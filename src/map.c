@@ -16,8 +16,27 @@
 #include "message.h"
 #include "random.h"
 #include "gameover.h"
+#include "render.h"
+#include "action.h"
 
 int climb(int);
+
+/**
+ * @brief Ask the player to input a direction, and return a coordinate.
+ * 
+ * @param actstr A string with which to prompt the user.
+ * @return struct coord A coordinate representing the movement.
+ */
+struct coord get_direction(const char *actstr) {
+    struct coord c;
+    struct action *action;
+    
+    logma(GREEN, "What direction should I %s in?", actstr);
+    render_all(); /* TODO: Figure out why this needs render all. */
+    action = get_action();
+    c = action_to_dir(action);
+    return c;
+}
 
 /**
  * @brief Make a point on the map visible and explored.
@@ -111,7 +130,7 @@ int climb(int change) {
             logm("You ascend to an unfamiliar level.");
             return change_depth(change);
         } else {
-            logm("Unless I'm supposed to literally climb the walls, I need to find some stairs.");
+            logm("You can't climb the air! You need some stairs.");
             return 0;
         }
     }

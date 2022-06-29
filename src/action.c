@@ -25,14 +25,13 @@
 #include "combat.h"
 #include "invent.h"
 
+int do_nothing(void);
 int is_player(struct actor *);
 int autoexplore(void);
-int travel(void);
+struct action *travel(void);
 int look_down(void);
 int pick_up(struct actor *, int, int);
 int lookmode(void);
-int directional_action(const char *, int (* act)(struct actor *, int, int));
-struct coord action_to_dir(int);
 int display_help(void);
 
 #define ACTION_COUNT 25
@@ -47,10 +46,12 @@ int display_help(void);
    action versus a void action. If you are not careful, you risk corrupting
    the stack pointer. */
 /* The order of this array is largely agnostic, with the notable exception of
-   the movement keys. The movement keys must come first, and must be in the
-   correct dorder. Besides those, just try to keep things organized so that
-   the most common inputs appear early in the list. */
+   the movement keys. Doing nothing and movement keys must come first, and must
+   be in the correct dorder. Besides those, just try to keep things organized so
+   that the most common inputs appear early in the list, in order to keep the
+   number of function calls as low as possible.*/
 struct action actions[ACTION_COUNT] = {
+    VOID_ACT("none",       A_NONE,        -1,  -1,  do_nothing, 0, 0),
     MOV_ACT("west",        A_WEST,       'h',  '4'),
     MOV_ACT("east",        A_EAST,       'l',  '6'),
     MOV_ACT("north",       A_NORTH,      'k',  '8'),
@@ -68,15 +69,23 @@ struct action actions[ACTION_COUNT] = {
     VOID_ACT("ascend",     A_ASCEND,     '<',  -1,  ascend, 0, 0),
     VOID_ACT("descend",    A_DESCEND,    '>',  -1,  descend, 0, 0),
     VOID_ACT("look down",  A_LOOK_DOWN,  ':',  -1,  look_down, 0, 0),
-    VOID_ACT("explore",    A_EXPLORE,    'x',  -1,  NULL, 0, 0),
+    VOID_ACT("explore",    A_EXPLORE,    'x',  -1,  autoexplore, 0, 0),
     VOID_ACT("inventory",  A_INVENT,     'i',  -1,  display_invent, 0, 0),
     VOID_ACT("help",       A_HELP,       '?',  -1,  display_help, 0, 0),
     VOID_ACT("save",       A_SAVE,       'S',  -1,  save_exit, 0, 0),
     VOID_ACT("quit",       A_QUIT,       'Q',  -1,  do_quit, 0, 0),
     VOID_ACT("debugmap",   A_MAGICMAP,   '[',  -1,  magic_mapping, 1, 0),
     VOID_ACT("debugheat",  A_HEAT,       ']',  -1,  switch_viewmode, 1, 0),
-    VOID_ACT("none",       A_NONE,        -1,  -1,  NULL, 0, 0),
 };
+
+/**
+ * @brief Does nothing.
+ * 
+ * @return int Returns the cost of doing nothing. Hint: It's nothing.
+ */
+int do_nothing(void) {
+    return 0;
+}
 
 /**
  * @brief Determine if a given actor is the player
@@ -200,7 +209,7 @@ int pick_up(struct actor *creature, int x, int y) {
  * @return int The cost in energy. Should always return zero.
  */
 int lookmode(void) {
-    int act;
+    struct action *act;
     struct coord move_coord;
 
     f.mode_look = 1;
@@ -211,17 +220,16 @@ int lookmode(void) {
         f.update_map= 1;
         render_all();
         act = get_action();
-        if (is_movement(act)) {
+        if (act->movement) {
             move_coord = action_to_dir(act);
             g.cursor_x += move_coord.x;
             g.cursor_y += move_coord.y;
-        } else if (act == A_QUIT) {
+        } else if (act->index == A_LOOK) {
+            look_at(g.cursor_x, g.cursor_y);
             f.mode_look = 0;
             f.update_map = 1;
             render_all();
             return 0;
-        } else if (act == A_LOOK) {
-            look_at(g.cursor_x, g.cursor_y);
         }
     }
     return 0;
@@ -243,7 +251,10 @@ int look_at(int x, int y) {
     } else if (is_visible(x, y)) {
         if (MON_AT(x, y)) {
             g.target = MON_AT(x, y);
-            logm("That is %s.", actor_name(MON_AT(x, y), NAME_A));
+            if (MON_AT(x, y) == g.player)
+                logm("It's %s, otherwise known as you!", actor_name(MON_AT(x, y), NAME_A));
+            else
+                logm("That is %s.", actor_name(MON_AT(x, y), NAME_A));
         } else if (ITEM_AT(x, y)) {
             logm("That is %s.", actor_name(ITEM_AT(x, y), NAME_A));
         } else {
@@ -287,33 +298,33 @@ int autoexplore(void) {
     }
     if (lx == IMPASSABLE || ly == IMPASSABLE) {
         f.mode_explore = 0;
-        return A_NONE;
+        return 0;
     }
     if (lowest < MAX_HEAT) {
         if (!f.mode_explore) {
             logma(YELLOW, "You begin cautiously exploring the area.");
             f.mode_explore = 1;
         }
-        return dir_to_action(lx, ly);
+        return move_mon(g.player, lx, ly);
     } else {
         logm("You don't think there's anywhere else you can explore from here.");
         f.mode_explore = 0;
-        return A_NONE;
+        return 0;
     }
 }
 
 /**
  * @brief Calculates the next step when traveling to a specific location.
  * 
- * @return int The index of the action that the player will perform.
+ * @return struct action* A pointer to the action that the player will perform.
  */
-int travel(void) {
+struct action *travel(void) {
     int lx = IMPASSABLE;
     int ly = IMPASSABLE;
     int lowest = MAX_HEAT;
     if (g.goal_x == g.player->x && g.goal_y == g.player->y) {
         stop_running();
-        return A_NONE;
+        return &actions[A_NONE];
     }
 
     // Do things
@@ -331,7 +342,7 @@ int travel(void) {
     }
     if (lx >= MAX_HEAT || ly == MAX_HEAT) {
         stop_running();
-        return A_NONE;
+        return &actions[A_NONE];
     }
     return dir_to_action(lx, ly);
 }
@@ -357,40 +368,15 @@ int display_help(void) {
 }
 
 /**
- * @brief Prompt the user for a direction in which to perform an action.
- * 
- * @param actstr A string denoting the action that the player user is preparing to take.
- * @param act The function of the action that will be called.
- * @return int The energy cost of the action that was called.
- */
-int directional_action(const char *actstr, int (* act)(struct actor *, int, int)) {
-    int actnum;
-    struct coord c;
-    
-    logma(GREEN, "What direction should I %s in?", actstr);
-    render_all(); /* TODO: Figure out why this needs render all. */
-    while (1) {
-        actnum = get_action();
-        if (actnum == A_QUIT) {
-            logm("Scratch that.");
-            return 0;
-        } else if (is_movement(actnum))
-            break;
-    }
-    c = action_to_dir(actnum);
-    return act(g.player, g.player->x + c.x, g.player->y + c.y);
-}
-
-/**
  * @brief Determine the action that the player will be taking. Blocks input.
  * 
  * @return int The cost of the action to be taken.
  */
-int get_action(void) {
+struct action *get_action(void) {
     int i;
     /* If we are in runmode or are exploring, don't block input. */
     if (f.mode_explore) {
-        return autoexplore();
+        return &actions[A_EXPLORE];
     }
     /* If running, move towards the goal location if there is one. Otherwise, move 
        in the previously input direction. */
@@ -405,10 +391,10 @@ int get_action(void) {
     for (i = 0; i < ACTION_COUNT; i++) {
         if (actions[i].code == keycode
             || actions[i].alt_code == keycode) {
-                return actions[i].index;
+                return &actions[i];
             }
     }
-    return A_NONE;
+    return &actions[A_NONE];
 }
 
 static int dir_act_array[3][3] = {
@@ -430,33 +416,13 @@ static struct coord act_dir_array[] = {
 };
 
 /**
- * @brief Given a relative coordinate movement, return a direction.
+ * @brief Given a relative coordinate movement, return an action pointer.
  * 
- * @param x The x coordinate: Should fall between -1 and 1 inclusive.
+ * @param x The xcoordinate. Should fall between -1 and 1 inclusive.
  * @param y The y coordinate. Should fall between -1 and 1 inclusive.
- * @return int The index of the action to be called.
+ * @return struct action* A pointer to the action that will move in the given direction.
  */
-int dir_to_action(int x, int y) {
-    return dir_act_array[y + 1][x + 1];
-}
-
-/**
- * @brief Given a movement-based action, return the coordinates associated
- with that direction of movement.
- * 
- * @param actnum The index of the action.
- * @return struct coord Coordinate representing the direction of the action.
- */
-struct coord action_to_dir(int actnum) {
-    if (!is_movement(actnum)) {
-        return act_dir_array[0];
-    }
-    return act_dir_array[actnum];
-}
-
-#if 0
-
-struct action *dir_to_action(struct coord) {
+struct action *dir_to_action(int x, int y) {
     int index = dir_act_array[y + 1][x + 1];
     if (index >= A_REST)
         return &actions[A_REST];
@@ -466,100 +432,30 @@ struct action *dir_to_action(struct coord) {
 struct coord action_to_dir(struct action *action) {
     if (action->index >= A_REST)
         return act_dir_array[A_REST];
-    return act_dir_array[action.index];
+    return act_dir_array[action->index];
 }
-
-int execute_action(struct actor *actor, struct action *action) {
-    struct coord move_coord;
-    // if (actnum && actor == g.player) g.prev_action = actnum;
-    // Autoexploring
-    if (action.debug_only) {
-        logma(MAGENTA, "Warning: Performing a DEBUG action.");
-    }
-    if (action.movement) {
-        move_coord = action_to_dir(action);
-        return action.func.dir_act(g.player, move_coord.x, move_coord.y);
-    } else if (action.directed) {
-        return action.func.dir_act(g.player, g.player->x, g.player->y);
-    } else {
-        return action.func.void_act();
-    }
-    return 0;
-}
-#endif
 
 /**
- * @brief Executes an action and returns the cost in energy.
+ * @brief Direct an actor to execute an action.
  * 
- * @param actor The actor who will be performing the action.
- * @param actnum The index of the action to be performed.
- * @return int The cost in energy of the action.
+ * @param actor A pointer to the actor that will perform the action.
+ * @param action A pointer to the action to perform.
+ * @return int The cost of the actor in energy.
  */
-int execute_action(struct actor *actor, int actnum) {
-    int ret = 0;
+int execute_action(struct actor *actor, struct action *action) {
     struct coord move_coord;
-    if (actnum && actor == g.player) g.prev_action = actnum;
-    if (actnum == A_EXPLORE) {
-        actnum = autoexplore();
+    if (action->index != A_NONE && actor == g.player) g.prev_action = action;
+    // Autoexploring code goes here????
+    if (action->debug_only) {
+        logma(MAGENTA, "Warning: Performing a DEBUG action.");
     }
-    if (is_movement(actnum)) {
-        move_coord = action_to_dir(actnum);
-        return move_mon(actor, move_coord.x, move_coord.y);
+    if (action->movement) {
+        move_coord = action_to_dir(action);
+        return action->func.dir_act(actor, move_coord.x, move_coord.y);
+    } else if (action->directed) {
+        return action->func.dir_act(actor, actor->x, actor->y);
+    } else {
+        return action->func.void_act();
     }
-    switch(actnum) {
-        case A_REST:
-            ret = move_mon(actor, 0, 0);
-            break;
-        case A_CYCLE:
-            ret = cycle_active_attack();
-            break;
-        case A_OPEN:
-            ret = directional_action("open", open_door);
-            break;
-        case A_CLOSE:
-            ret = directional_action("close", close_door);
-            break;
-        case A_LOOK:
-            ret = lookmode();
-            break;
-        case A_ASCEND:
-            ret = ascend();
-            break;
-        case A_DESCEND:
-            ret = descend();
-            break;
-        case A_LOOK_DOWN:
-            ret = look_down();
-            break;
-        case A_PICK_UP:
-            ret = pick_up(g.player, g.player->x, g.player->y);
-            break;
-        case A_INVENT:
-            ret = display_invent();
-            break;
-        case A_FULLSCREEN:
-            draw_msg_window(term.h, 1);
-            break;
-        case A_HELP:
-            display_help();
-            break;
-        case A_SAVE:
-            save_exit();
-            break;
-        case A_QUIT:
-            do_quit();
-            break;
-        case A_MAGICMAP:
-            magic_mapping();
-            break;
-        case A_HEAT:
-            switch_viewmode();
-            break;
-        case A_NONE:
-            break;
-        default:
-            logma(RED, "Action %d? I don't understand.", actnum);
-            break;
-    }
-    return ret;
+    return do_nothing();
 }

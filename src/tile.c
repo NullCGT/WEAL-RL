@@ -64,6 +64,13 @@ struct tile *init_tile(struct tile *intile, int tindex) {
 int open_door(struct actor *actor, int x, int y) {
     struct tile *intile = &g.levmap[x][y];
     int tindex = intile->pt->id;
+    struct coord new_dir;
+
+    if (actor == g.player && g.player->x == x && g.player->y == y) {
+        new_dir = get_direction("open");
+        x = new_dir.x;
+        y = new_dir.y;
+    }
 
     if (tindex != T_DOOR_CLOSED) {
         logm("There is nothing to open in that direction.");
@@ -93,6 +100,13 @@ int open_door(struct actor *actor, int x, int y) {
 int close_door(struct actor *actor, int x, int y) {
     struct tile *intile = &g.levmap[x][y];
     int tindex = intile->pt->id;
+    struct coord new_dir;
+
+    if (actor == g.player && g.player->x == x && g.player->y == y) {
+        new_dir = get_direction("close");
+        x = new_dir.x;
+        y = new_dir.y;
+    }
 
     if (tindex != T_DOOR_OPEN) {
         logm("There is nothing to close in that direction.");

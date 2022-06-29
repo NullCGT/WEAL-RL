@@ -27,6 +27,7 @@ typedef struct global {
     struct actor *active_attacker;
     struct msg *msg_list;
     struct msg *msg_last;
+    struct action *prev_action; /* for the moment, only used for runmode */
     unsigned char active_attack_index;
     int turns;
     int depth;
@@ -36,7 +37,6 @@ typedef struct global {
     int cursor_x, cursor_y; /* In-game cursor location */
     int goal_x, goal_y; /* Traveling */
     int display_heat;
-    int prev_action; /* for the moment, only used for runmode */
 } global;
 
 typedef struct bitflags {
