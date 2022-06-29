@@ -29,11 +29,13 @@ void load_active_attacker(void);
 /**
  * @brief Save the game and immediately exit.
  * 
+ * @return The cost in energy of saving (always zero).
  */
-void save_exit(void) {
+int save_exit(void) {
     save_game("save.bin");
     cleanup_screen();
     exit(0);
+    return 0;
 }
 
 /**

@@ -29,10 +29,54 @@ int is_player(struct actor *);
 int autoexplore(void);
 int travel(void);
 int look_down(void);
-int pick_up(struct actor *);
+int pick_up(struct actor *, int, int);
 int lookmode(void);
 int directional_action(const char *, int (* act)(struct actor *, int, int));
 struct coord action_to_dir(int);
+int display_help(void);
+
+#define ACTION_COUNT 25
+#define MOV_ACT(name, index, code, alt_code) \
+    { name, index, code, alt_code, {.dir_act=move_mon}, 0, 1, 1 }
+#define DIR_ACT(name, index, code, alt_code, func, debug_only, movement) \
+    { name, index, code, alt_code, {.dir_act=func}, debug_only, 1, movement }
+#define VOID_ACT(name, index, code, alt_code, func, debug_only, movement) \
+    { name, index, code, alt_code, {.void_act=func}, debug_only, 0, movement }
+
+/* Be VERY careful that you have correctly specified a function as directed
+   action versus a void action. If you are not careful, you risk corrupting
+   the stack pointer. */
+/* The order of this array is largely agnostic, with the notable exception of
+   the movement keys. The movement keys must come first, and must be in the
+   correct dorder. Besides those, just try to keep things organized so that
+   the most common inputs appear early in the list. */
+struct action actions[ACTION_COUNT] = {
+    MOV_ACT("west",        A_WEST,       'h',  '4'),
+    MOV_ACT("east",        A_EAST,       'l',  '6'),
+    MOV_ACT("north",       A_NORTH,      'k',  '8'),
+    MOV_ACT("south",       A_SOUTH,      'j',  '2'),
+    MOV_ACT("northwest",   A_NORTHWEST,  'y',  '7'),
+    MOV_ACT("northeast",   A_NORTHEAST,  'u',  '9'),
+    MOV_ACT("southwest",   A_SOUTHWEST,  'b',  '1'),
+    MOV_ACT("southeast",   A_SOUTHEAST,  'n',  '3'),
+    MOV_ACT("rest",        A_REST,       '.',  '5'),
+    DIR_ACT("open",        A_OPEN,       'o',  -1,  open_door, 0, 0),
+    DIR_ACT("close",       A_CLOSE,      'c',  -1,  close_door, 0, 0),
+    DIR_ACT("pick up",     A_PICK_UP,    ',',  'g', pick_up, 0, 0),
+    VOID_ACT("cycle",      A_CYCLE,      '\t', -1,  cycle_active_attack, 0, 0),
+    VOID_ACT("look",       A_LOOK,       ';',  -1,  lookmode, 0, 0),
+    VOID_ACT("ascend",     A_ASCEND,     '<',  -1,  ascend, 0, 0),
+    VOID_ACT("descend",    A_DESCEND,    '>',  -1,  descend, 0, 0),
+    VOID_ACT("look down",  A_LOOK_DOWN,  ':',  -1,  look_down, 0, 0),
+    VOID_ACT("explore",    A_EXPLORE,    'x',  -1,  NULL, 0, 0),
+    VOID_ACT("inventory",  A_INVENT,     'i',  -1,  display_invent, 0, 0),
+    VOID_ACT("help",       A_HELP,       '?',  -1,  display_help, 0, 0),
+    VOID_ACT("save",       A_SAVE,       'S',  -1,  save_exit, 0, 0),
+    VOID_ACT("quit",       A_QUIT,       'Q',  -1,  do_quit, 0, 0),
+    VOID_ACT("debugmap",   A_MAGICMAP,   '[',  -1,  magic_mapping, 1, 0),
+    VOID_ACT("debugheat",  A_HEAT,       ']',  -1,  switch_viewmode, 1, 0),
+    VOID_ACT("none",       A_NONE,        -1,  -1,  NULL, 0, 0),
+};
 
 /**
  * @brief Determine if a given actor is the player
@@ -122,17 +166,19 @@ int look_down() {
 /**
  * @brief Pick up an item located at a given creature's location.
  * 
- * @param creature 
+ * @param creature The creature picking up an item
+ * @param x The x coordinate of the item to be picked up
+ * @param y The y coordinate of the item to be picked up
  * @return int The cost of picking up an item in energy.
  Failing to pick up an item costs 100 energy.
  Picking up an item costs 50 energy.
  Fumbling an item in an attempt to pick it up costs 50 energy.
  */
-int pick_up(struct actor *creature) {
-    struct actor *item = ITEM_AT(creature->x, creature->y);
+int pick_up(struct actor *creature, int x, int y) {
+    struct actor *item = ITEM_AT(x, y);
     if (!item) {
         logm("You brush the %s beneath you with your fingers. There is nothing there to pick up.",
-            g.levmap[creature->x][creature->y].pt->name);
+            g.levmap[x][y].pt->name);
         return 0;
     }
     /* Remove the actor. If we cannot put it in the inventory, put it back. */
@@ -301,6 +347,16 @@ void stop_running(void) {
 }
 
 /**
+ * @brief Display the help file to the user.
+ * 
+ * @return int The cost in energy of displaying the help file.
+ */
+int display_help(void) {
+    display_file_text("data/text/help.txt");
+    return 0;
+}
+
+/**
  * @brief Prompt the user for a direction in which to perform an action.
  * 
  * @param actstr A string denoting the action that the player user is preparing to take.
@@ -331,6 +387,7 @@ int directional_action(const char *actstr, int (* act)(struct actor *, int, int)
  * @return int The cost of the action to be taken.
  */
 int get_action(void) {
+    int i;
     /* If we are in runmode or are exploring, don't block input. */
     if (f.mode_explore) {
         return autoexplore();
@@ -344,7 +401,14 @@ int get_action(void) {
         return g.prev_action;
     }
     /* Otherwise, block input all day :) */
-    return handle_keys();
+    int keycode = handle_keys();
+    for (i = 0; i < ACTION_COUNT; i++) {
+        if (actions[i].code == keycode
+            || actions[i].alt_code == keycode) {
+                return actions[i].index;
+            }
+    }
+    return A_NONE;
 }
 
 static int dir_act_array[3][3] = {
@@ -390,6 +454,40 @@ struct coord action_to_dir(int actnum) {
     return act_dir_array[actnum];
 }
 
+#if 0
+
+struct action *dir_to_action(struct coord) {
+    int index = dir_act_array[y + 1][x + 1];
+    if (index >= A_REST)
+        return &actions[A_REST];
+    return &actions[index];
+}
+
+struct coord action_to_dir(struct action *action) {
+    if (action->index >= A_REST)
+        return act_dir_array[A_REST];
+    return act_dir_array[action.index];
+}
+
+int execute_action(struct actor *actor, struct action *action) {
+    struct coord move_coord;
+    // if (actnum && actor == g.player) g.prev_action = actnum;
+    // Autoexploring
+    if (action.debug_only) {
+        logma(MAGENTA, "Warning: Performing a DEBUG action.");
+    }
+    if (action.movement) {
+        move_coord = action_to_dir(action);
+        return action.func.dir_act(g.player, move_coord.x, move_coord.y);
+    } else if (action.directed) {
+        return action.func.dir_act(g.player, g.player->x, g.player->y);
+    } else {
+        return action.func.void_act();
+    }
+    return 0;
+}
+#endif
+
 /**
  * @brief Executes an action and returns the cost in energy.
  * 
@@ -425,16 +523,16 @@ int execute_action(struct actor *actor, int actnum) {
             ret = lookmode();
             break;
         case A_ASCEND:
-            ret = climb(-1);
+            ret = ascend();
             break;
         case A_DESCEND:
-            ret = climb(1);
+            ret = descend();
             break;
         case A_LOOK_DOWN:
             ret = look_down();
             break;
         case A_PICK_UP:
-            ret = pick_up(g.player);
+            ret = pick_up(g.player, g.player->x, g.player->y);
             break;
         case A_INVENT:
             ret = display_invent();
@@ -443,20 +541,18 @@ int execute_action(struct actor *actor, int actnum) {
             draw_msg_window(term.h, 1);
             break;
         case A_HELP:
-            display_file_text("data/text/help.txt");
+            display_help();
             break;
         case A_SAVE:
             save_exit();
             break;
         case A_QUIT:
-            logm("The quest has become too much. You surrender yourself to fate...");
-            g.target = NULL;
-            end_game(0);
+            do_quit();
             break;
-        case A_DEBUG_MAGICMAP:
+        case A_MAGICMAP:
             magic_mapping();
             break;
-        case A_DEBUG_HEAT:
+        case A_HEAT:
             switch_viewmode();
             break;
         case A_NONE:

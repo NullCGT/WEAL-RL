@@ -374,11 +374,11 @@ int handle_keys(void) {
             break;
         case 'R':
             if (input.modifiers & NCKEY_MOD_CTRL)
-                ret = A_DEBUG_MAGICMAP;
+                ret = A_MAGICMAP;
             break;
         case 'E':
             if (input.modifiers & NCKEY_MOD_CTRL)
-                ret = A_DEBUG_HEAT;
+                ret = A_HEAT;
             break;
         default:
             break;

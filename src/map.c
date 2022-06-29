@@ -17,6 +17,8 @@
 #include "random.h"
 #include "gameover.h"
 
+int climb(int);
+
 /**
  * @brief Make a point on the map visible and explored.
  * 
@@ -53,8 +55,9 @@ struct coord rand_open_coord(void) {
 /**
  * @brief Marks every cell in the map as explored.
  * 
+ * @return The cost in energy of magic maping (always 0).
  */
-void magic_mapping(void) {
+int magic_mapping(void) {
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
             g.levmap[x][y].explored = 1;
@@ -62,6 +65,25 @@ void magic_mapping(void) {
     }
     logma(MAGENTA, "You punch in the debug function that lets me see the entire map.");
     f.update_map = 1;
+    return 0;
+}
+
+/**
+ * @brief Ascend one level of the dungeon.
+ * 
+ * @return int The cost in energy of ascending.
+ */
+int ascend() {
+    return climb(-1);
+}
+
+/**
+ * @brief Descend one level of the dungeon.
+ * 
+ * @return int The cost in energy of descending.
+ */
+int descend() {
+    return climb(1);
 }
 
 /**

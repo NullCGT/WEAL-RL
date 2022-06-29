@@ -270,7 +270,7 @@ void display_file_text(const char *fname) {
 
         action = handle_keys();
         switch (action) {
-            case A_QUIT:
+            case 27:
                 werase(new_win);
                 prefresh(new_win, j, 0, 0, 0, term.h - 1, term.w - 1);
                 delwin(new_win);
@@ -278,12 +278,12 @@ void display_file_text(const char *fname) {
                 f.update_msg = 1;
                 f.mode_map = 1;
                 return;
-            case A_NORTH:
-            case A_ASCEND:
+            case KEY_UP:
+            case '8':
                 j -= 1;
                 break;
-            case A_SOUTH:
-            case A_DESCEND:
+            case KEY_DOWN:
+            case '2':
                 j += 1;
                 break;
         }
@@ -660,100 +660,18 @@ int handle_keys(void) {
        since curses picks up character codes, rather than
        keyboard strikes. */
     switch(keycode) {
-        case 'H':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'h':
-        case KEY_LEFT:
-        case '4':
-            return A_WEST;
-        case 'J':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'j':
-        case KEY_DOWN:
-        case '2':
-            return A_SOUTH;
-        case 'K':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'k':
-        case KEY_UP:
-        case '8':
-            return A_NORTH;
-        case 'L':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'l':
-        case KEY_RIGHT:
-        case '6':
-            return A_EAST;
-        case 'Y':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'y':
-        case '7':
-            return A_NORTHWEST;
-        case 'U':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'u':
-        case '9':
-            return A_NORTHEAST;
-        case 'N':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'n':
-        case '3':
-            return A_SOUTHEAST;
-        case 'B':
-            f.mode_run = f.mode_map;
-            /* FALLTHRU */
-        case 'b':
-        case '1':
-            return A_SOUTHWEST;
-        case '.':
-        case '5':
-            return A_REST;
-        case KEY_STAB:
-        case '\t':
-            return A_CYCLE;
-        case 'o':
-            return A_OPEN;
-        case 'c':
-            return A_CLOSE;
-        case ';':
-            return A_LOOK;
         case KEY_MOUSE:
             return handle_mouse();
-        case 'p':
-            return A_FULLSCREEN;
-        case '>':
-            return A_DESCEND;
-        case '<':
-            return A_ASCEND;
-        case ',':
-            return A_PICK_UP;
-        case ':':
-            return A_LOOK_DOWN;
-        case 'i':
-            return A_INVENT;
-        case 'x':
-            return A_EXPLORE;
-        case '?':
-            return A_HELP;
-        case 'S':
-            return A_SAVE;
-        case 27:
-            return A_QUIT;
+        case KEY_UP:
+            return '8';
+        case KEY_DOWN:
+            return '2';
+        case KEY_LEFT:
+            return '4';
+        case KEY_RIGHT:
+            return '6';
         default:
-            break;
+            return keycode;
     }
-    /* Handle combination keys */
-    const char *key_name = keyname(keycode);
-    if (!strncmp(key_name, "^R", 2))
-        return A_DEBUG_MAGICMAP;
-    if (!strncmp(key_name, "^E", 2))
-        return A_DEBUG_HEAT;
-    return A_NONE;
+    return 0;
 }

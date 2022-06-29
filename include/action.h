@@ -31,8 +31,25 @@ enum actionnum {
     A_HELP,
     A_SAVE,
     A_QUIT,
-    A_DEBUG_MAGICMAP = DEBUG_CUTOFF,
-    A_DEBUG_HEAT
+    A_MAGICMAP = DEBUG_CUTOFF,
+    A_HEAT
+};
+
+union act_func {
+    int (*dir_act) (struct actor *, int, int);
+    int (*void_act) (void);
+};
+
+struct action {
+    const char *name;
+    int index;
+    int code, alt_code;
+    union act_func func;
+    /* bitflags */
+    unsigned int debug_only : 1;
+    unsigned int directed : 1;
+    unsigned int movement : 1;
+    /* 5 free bits */
 };
 
 #define is_movement(a) \

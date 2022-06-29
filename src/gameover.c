@@ -15,12 +15,25 @@
 #include "register.h"
 #include "message.h"
 #include "windows.h"
+#include "gameover.h"
 
 int write_dumplog(const char *, int);
 void dump_target(FILE *);
 void dump_levmap(FILE *);
 void dump_messages(FILE *);
 void dump_inventory(FILE *);
+
+/**
+ * @brief The action by which the player manually quits the game.
+ * 
+ * @return int The cost in actions of quitting the game (always 0).
+ */
+int do_quit(void) {
+    logm("The quest has become too much. You surrender yourself to fate...");
+    g.target = NULL;
+    end_game(0);
+    return 0;
+}
 
 /**
  * @brief End the game.

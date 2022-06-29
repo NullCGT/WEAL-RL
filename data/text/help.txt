@@ -55,6 +55,8 @@ Key     Function        Explanation
  ;      Look            Look at a character on the screen.
  ?      Help            View this manual.
  Tab    Cycle           Cycle attacks.
+ S      Save            Save and quit.
+ Q      Quit            Abandon character.
 
              |= ADVANCED KEYBINDS =|
 
@@ -88,6 +90,6 @@ Best of luck out there. I hope you find Kate.
 
 Key     Function        Explanation
 -----------------------------------------------------------
- ^E     Show Heatmap    Display internal heatmaps.
- ^R     Reveal Map      Reveal the entire map.
+ ]      Show Heatmap    Display internal heatmaps.
+ [      Reveal Map      Reveal the entire map.
  ###########################################################

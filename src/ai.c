@@ -91,7 +91,7 @@ void take_turn(struct actor *actor) {
                 }
             }
             if (lx == -99 || ly == -99) {
-                action = A_REST;
+                action = dir_to_action(0, 0);
             } else {
                 action = dir_to_action(lx, ly);
             }

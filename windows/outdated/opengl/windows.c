@@ -266,9 +266,9 @@ int handle_keys(void) {
     } else if (((keycode == TK_Q) && shift) || keycode == TK_ESCAPE) {
         ret = A_QUIT;
     } else if ((keycode == TK_R) && terminal_check(TK_CONTROL)) {
-        ret = A_DEBUG_MAGICMAP;
+        ret = A_MAGICMAP;
     } else if ((keycode == TK_E) && terminal_check(TK_CONTROL)) {
-        ret = A_DEBUG_HEAT;
+        ret = A_HEAT;
     }
     /* Toggle runmode */
     if (is_movement(ret) && shift) {

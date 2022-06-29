@@ -41,8 +41,9 @@ struct coord {
 /* Function Prototypes */
 int make_visible(int, int);
 struct coord rand_open_coord(void);
-void magic_mapping(void);
-int climb(int);
+int magic_mapping(void);
+int ascend(void);
+int descend(void);
 int change_depth(int);
 void do_heatmaps(void);
 

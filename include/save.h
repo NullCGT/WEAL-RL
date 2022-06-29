@@ -3,7 +3,7 @@
 
 /* Function Prototypes */
 int file_exists(const char *);
-void save_exit(void);
+int save_exit(void);
 void load_game(const char *);
 
 #endif
