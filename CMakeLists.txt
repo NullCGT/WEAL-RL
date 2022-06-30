@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.23.1)
 set(CMAKE_C_STANDARD 99)
 set(PROJECT_NAME weal_ncurses)
-
+set(PROJECT_VENDOR Kestrel Gregorich-Trevor)
+set(PROJECT_DESCRIPTION A roguelike about ascension.)
+set(WEAL_DESKTOP_DIR /usr/share/applications)
 # Set up version.h
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 0)
@@ -10,6 +12,10 @@ SET(RELEASE_TYPE "alpha")
 configure_file (
     "${CMAKE_SOURCE_DIR}/include/version.h.in"
     "${CMAKE_SOURCE_DIR}/include/version.h"
+)
+configure_file (
+    "${CMAKE_SOURCE_DIR}/share/weal.desktop.in"
+    "${CMAKE_SOURCE_DIR}/share/weal.desktop"
 )
 
 # Set up our projects
@@ -43,10 +49,19 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 message(STATUS "Configuring CMake for ${PROJECT_NAME} v${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${RELEASE_TYPE}")
 
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+# Installation
+install(TARGETS ${PROJECT_NAME} DESTINATION .)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/ DESTINATION data)
+# install(FILES share/weal.desktop DESTINATION ${WEAL_DESKTOP_DIR})
+
 #CPack
 include(InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR}")
 set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
+set(CPACK_PACKAGE_EXECUTABLES "weal-ncurses;Weal")
 include(CPack)

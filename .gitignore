@@ -6,6 +6,7 @@ obj/
 *.o
 /makefile
 version.h
+*.desktop
 
 # CMake artifacts
 build/
