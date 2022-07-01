@@ -16,6 +16,7 @@
 #include "register.h"
 #include "windows.h"
 #include "message.h"
+#include "render.h"
 
 int log_string(const char *, int, va_list);
 void wrap_string(char *, int);
@@ -188,4 +189,26 @@ const char *an(const char *str) {
     if (str && vowel(str[0]))
         return "an";
     return "a";
+}
+
+/**
+ * @brief Prompt the user to answer a yes/no message in the message log.
+ * 
+ * @param prompt The prompt that the user sees.
+ * @param def_choice The default option for the prompt.
+ * @return int Return 1 if yes, 0 if no.
+ */
+int yn_prompt(const char *prompt, int def_choice) {
+    int keycode;
+    logma(BLUE, "%s (%s)", prompt, def_choice ? "Yn" : "yN");
+    render_all();
+    while ((keycode = handle_keys())) {
+        if (keycode == 'y' || keycode == 'Y')
+            return 1;
+        else if (keycode == 'n' || keycode == 'N')
+            return 0;
+        else if (keycode == 27 || keycode == '\n')
+            return def_choice;
+    }
+    return def_choice;
 }

@@ -19,5 +19,6 @@ char *unwrap_string(char *);
 int logm(const char *, ...);
 int logma(int, const char *, ...);
 const char *an(const char *);
+int yn_prompt(const char *, int);
 
 #endif

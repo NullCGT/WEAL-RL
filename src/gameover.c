@@ -29,6 +29,10 @@ void dump_inventory(FILE *);
  * @return int The cost in actions of quitting the game (always 0).
  */
 int do_quit(void) {
+    if (!yn_prompt("Are you sure you want to give up? THIS CANNOT BE UNDONE.", 0)) {
+        logm("You decide not to give up.");
+        return 0;
+    }
     logm("The quest has become too much. You surrender yourself to fate...");
     g.target = NULL;
     end_game(0);

@@ -33,6 +33,7 @@ void wcolor_off(WINDOW *, unsigned char);
 void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
+void popup_warning(const char *);
 void display_stats(WINDOW *, int *, struct actor *);
 void print_dtypes(WINDOW *, int, int, short, unsigned char);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
@@ -99,7 +100,8 @@ void title_screen(void) {
                 display_file_text("dumplog.txt");
                 break;
             case 'r':
-                continue;
+                popup_warning("The high score list has not yet been implemented.");
+                break;
             case 'h':
                 display_file_text("data/text/help.txt");
                 break;
@@ -167,7 +169,7 @@ void setup_screen(void) {
     setup_locale();
     noecho();
     raw();
-    keypad(stdscr, TRUE);
+    keypad(stdscr, 1);
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     refresh();
     setup_gui();
@@ -240,6 +242,30 @@ void cleanup_win(WINDOW *win) {
 }
 
 /**
+ * @brief Display a warning message popup.
+ * 
+ * @param text The warning message.
+ */
+void popup_warning(const char *text) {
+    WINDOW *new_win;
+    int keycode;
+
+    new_win = newwin(term.h, term.w, 0, 0);
+    box(new_win, 0, 0);
+    mvwprintw(new_win, 1, 1, text);
+    wrefresh(new_win);
+
+    while ((keycode = handle_keys())) {
+        if (keycode == 27 || keycode == '\n')
+            break;
+    }
+    
+    werase(new_win);
+    wrefresh(new_win);
+    delwin(new_win);
+}
+
+/**
  * @brief Display the text of a file in a scrollable pad.
  * 
  * @param fname Filename to be displayed.
@@ -247,7 +273,7 @@ void cleanup_win(WINDOW *win) {
 void display_file_text(const char *fname) {
     FILE *fp;
     WINDOW *new_win;
-    int i =0;
+    int i = 1;
     int j = 0;
     int key = 0;
     char *line = NULL;
@@ -259,7 +285,7 @@ void display_file_text(const char *fname) {
         return;
     new_win = newpad(MAX_FILE_LEN, term.w);
     while (getline(&line, &len, fp) != -1) {
-        mvwprintw(new_win, i++, 0, line);
+        mvwprintw(new_win, i++, 1, line);
     }
     free(line);
     fclose(fp);
@@ -287,7 +313,7 @@ void display_file_text(const char *fname) {
                 j += 1;
                 break;
         }
-        j = max(0, j);
+        j = min(max(0, j), max(0, i - term.h));
     }
 }
 
