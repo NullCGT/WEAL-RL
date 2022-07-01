@@ -17,11 +17,14 @@
 #include "message.h"
 #include "menu.h"
 #include "register.h"
+#include "spawn.h"
 
+void clean_item_slots(struct actor *, struct actor *);
 struct actor *win_pick_invent(void);
 int win_use_item(struct actor *);
 int win_extequip_item(struct actor *);
 int equip_item(struct actor *, struct actor *, int);
+int drop_item(struct actor *, struct actor *);
 int takeoff_item(struct actor *, struct actor *);
 
 struct slot_type slot_types[MAX_SLOTS] = {
@@ -63,20 +66,6 @@ struct equip *init_equip(struct actor *actor) {
     new_equip->parent = actor;
     actor->equip = new_equip;
     return new_equip;
-}
-
-/**
- * @brief Perform an action with an item picked from the inventory.
- * 
- * @return The costi n energy of the performed action. 
- */
-int display_invent(void) {
-    int ret = 0;
-    struct actor *item;
-    item = win_pick_invent();
-    if (item)
-        ret = win_use_item(item);
-    return ret;
 }
 
 /**
@@ -123,6 +112,71 @@ int add_to_invent(struct actor *creature, struct actor *item) {
         creature->invent = item;
     }
     return 1;
+}
+
+/**
+ * @brief Internal function that resets an item's slot information and
+resets the actor wielding that item's equip information.
+ * 
+ * @param actor the actor wielding the item.
+ * @param item the item actor.
+ */
+void clean_item_slots(struct actor *actor, struct actor *item) {
+    actor->equip->slots[item->item->slot] = NULL;
+    item->item->slot = NO_SLOT;
+    if (actor == g.player) {
+        g.active_attack_index = 0;
+        g.active_attacker = g.player;
+    }
+}
+
+/**
+ * @brief Perform an action with an item picked from the inventory.
+ * 
+ * @return The costi n energy of the performed action. 
+ */
+int display_invent(void) {
+    int ret = 0;
+    struct actor *item;
+    item = win_pick_invent();
+    if (item)
+        ret = win_use_item(item);
+    return ret;
+}
+
+/**
+ * @brief Remove an item from the inventory of an actor. The caller is
+ expected to handle the item afterward and prevent it from being orphaned.
+ * 
+ * @param holding_actor The actor holding the item.
+ * @param held_actor The actor representing the item.
+ * @return int Rteturn 1 if called in error, 0 otherwise.
+ */
+int remove_from_invent(struct actor *holding_actor, struct actor *held_actor) {
+    struct actor *cur = holding_actor->invent;
+    struct actor *prev = NULL;
+    int found_item = 0;
+
+    /* Remove the item from the inventory. */
+    while (cur != NULL) {
+        if (cur == held_actor) {
+            found_item = 1;
+            break;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+    if (!found_item) {
+        logma(MAGENTA, "Error: Attempting to remove an item from an inventory it is not present in?");
+        return 1;
+    }
+    if (prev != NULL) prev->next = cur->next;
+    else {
+        holding_actor->invent = cur->next;
+    }
+    clean_item_slots(holding_actor, held_actor);
+    /* Caller MUST take care of adding item to master and pushing, otherwise it will be orphaned. */
+    return 0;
 }
 
 /**
@@ -187,9 +241,8 @@ int win_use_item(struct actor *item) {
         selected = menu_do_choice(selector, 1);
         switch (selected) {
             case 'd':
-                logm("Dropping %s!", actor_name(item, NAME_THE));
                 menu_destroy(selector);
-                return 0;
+                return drop_item(g.player, item);
             case 'w':
                 menu_destroy(selector);
                 return equip_item(g.player, item, item->item->pref_slot);
@@ -214,6 +267,12 @@ int win_use_item(struct actor *item) {
     return 0;
 }
 
+/**
+ * @brief Display the menu for equipping an item in an odd slot.
+ * 
+ * @param item The actor representing the item to be equipped.
+ * @return int The cost in energy of equipping the item, or -1 if it could not be done.
+ */
 int win_extequip_item(struct actor *item) {
     struct menu *selector;
     int selected = -1;
@@ -236,6 +295,14 @@ int win_extequip_item(struct actor *item) {
     }
 }
 
+/**
+ * @brief Equip an item.
+ * 
+ * @param actor The actor doing the equipping.
+ * @param item The actor representing the item to be equipped.
+ * @param inslot The slot the item is to be equipped to.
+ * @return int The cost of equipping an item in energy.
+ */
 int equip_item(struct actor *actor, struct actor *item, int inslot) {
     if (!actor->equip) {
         logm("You lack the ability to equip items%s", 
@@ -279,12 +346,39 @@ int equip_item(struct actor *actor, struct actor *item, int inslot) {
     return 100;
 }
 
+/**
+ * @brief Drop an item.
+ * 
+ * @param actor The actor dropping the item.
+ * @param item The actor representing the item.
+ * @return int The cost of dropping an item in energy.
+ */
+int drop_item(struct actor *actor, struct actor *item) {
+    int x = actor->x;
+    int y = actor->y;
+
+    if (item->item->slot != NO_SLOT && item->item->slot != SLOT_OFF && item->item->slot != SLOT_WEP) {
+        logm("You need to remove your %s before dropping it.", actor_name(item, 0));
+        return 0;
+    }
+    if (nearest_pushable_cell(item, &x, &y)) {
+        logm("There is not enough room here to drop %s.", actor_name(item, NAME_THE));
+        return 0;
+    }
+
+    logm("You drop %s.", actor_name(item, NAME_THE));
+    remove_from_invent(actor, item);
+    add_actor_to_main(item);
+    push_actor(item, x, y);
+    return 50;
+}
+
 int takeoff_item(struct actor *actor, struct actor *item) {
     if (!actor->equip) {
         logm("You lack the ability to remove items.");
         return 0;
     }
-    if (item->item->slot == -1) {
+    if (item->item->slot == NO_SLOT) {
         if (actor == g.player) {
             logm("Already done.");
         }
@@ -293,20 +387,6 @@ int takeoff_item(struct actor *actor, struct actor *item) {
     if (actor == g.player)
         logm("You %s%s your %s.", in_danger(actor) ? "hastily " : "", 
              slot_types[item->item->slot].off_msg, actor_name(item, 0));
-    actor->equip->slots[item->item->slot] = NULL;
-    item->item->slot = NO_SLOT;
-    if (actor == g.player) {
-        g.active_attack_index = 0;
-        g.active_attacker = g.player;
-    }
+    clean_item_slots(actor, item);
     return 100;
 }
-#if 0
-struct coord nearest_empty_space(int x, int y) {
-    for (int x0 = x - 1; x0 < x + 1; x++) {
-        for (int y0 = y - 1; y0 < y + 1; y++) {
-            
-        }
-    }
-}
-#endif

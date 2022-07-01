@@ -85,7 +85,9 @@ struct actor {
     (!(x.dam_n || x.dam_d))
 
 /* Function Prototypes */
-void push_actor(struct actor *, int, int);
+int can_push(struct actor *, int, int);
+int nearest_pushable_cell(struct actor *, int *, int *);
+int push_actor(struct actor *, int, int);
 struct actor *remove_actor(struct actor *);
 void actor_sanity_checks(struct actor *);
 char *actor_name(struct actor *, unsigned);

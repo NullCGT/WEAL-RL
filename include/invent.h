@@ -65,7 +65,7 @@ extern struct slot_type slot_types[MAX_SLOTS];
 /* Function Prototypes */
 struct item *init_item(struct actor *);
 struct equip *init_equip(struct actor *);
-int display_invent(void);
 int add_to_invent(struct actor *, struct actor *);
+int display_invent(void);
 
 #endif

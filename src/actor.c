@@ -57,15 +57,75 @@ struct tag tags_arr[MAX_TAGS] = {
 };
 
 /**
+ * @brief test whether an actor can be pushed to a given map location.
+ * 
+ * @param actor The actor to be pushed.
+ * @param x the x coordinate to test.
+ * @param y the y coordinate to test.
+ * @return int returns 1 if the actor can be pushed, 0 if not.
+ */
+int can_push(struct actor *actor, int x, int y) {
+    if (is_blocked(x, y))
+        return 0;
+    if (actor->item && g.levmap[x][y].item_actor != NULL)
+        return 0;
+    if (actor->item == NULL && g.levmap[x][y].actor != NULL)
+        return 0;
+    return 1;
+}
+
+/**
+ * @brief Find the nearest cell that an actor can be pushed to.
+ * 
+ * @param actor the actor to push.
+ * @param x the x coordinate to begin searching at.
+ * @param y the y coordinate to begin searching at.
+ * @return int returns 1 if the actor was successfully pushed, 0 if not.
+ */
+int nearest_pushable_cell(struct actor *actor, int *x, int *y) {
+    int nx = *x;
+    int ny = *y;
+    /* TODO: Replace this with breadth-first search that searches within several tiles. */
+    if (can_push(actor, nx, ny)) {
+        *x = nx;
+        *y = ny;
+        return 0;
+    }
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            nx = *x + i;
+            ny = *y + j;
+            if (can_push(actor, nx, ny)) {
+                *x = nx;
+                *y = ny;
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+/**
  * @brief Pushes an actor to a new location and updates the levmap
  accordingly.
  * 
  * @param actor The actor to be pushed.
  * @param dx The x coordinate the actor is to be pushed to.
  * @param dy The y coordinate the actor is to be pushed to.
+ *
+ * @return int Return 1 if the actor could not be pushed, 0 otherwise.
+   It is the caller's responsibility to handle this situation.
  */
-void push_actor(struct actor *actor, int dx, int dy) {
+int push_actor(struct actor *actor, int dx, int dy) {
     mark_refresh(actor->x, actor->y);
+
+    if ((actor->item && g.levmap[dx][dy].item_actor) ||
+        (actor->item == NULL && g.levmap[dx][dy].actor)) {
+        if (nearest_pushable_cell(actor, &dx, &dy)) {
+            return 1;
+        }
+    }
+
     if (actor->item) {
         g.levmap[actor->x][actor->y].item_actor = NULL;
         actor->x = dx;
@@ -78,6 +138,7 @@ void push_actor(struct actor *actor, int dx, int dy) {
         g.levmap[actor->x][actor->y].actor = actor;
     }
     mark_refresh(actor->x, actor->y);
+    return 0;
 }
 
 /**
@@ -100,7 +161,9 @@ struct actor *remove_actor(struct actor *actor) {
     while (cur != NULL) {
         if (cur == actor) {
             if (prev != NULL) prev->next = cur->next;
-            else prev = NULL;
+            else {
+                g.player = cur->next;
+            }
             actor->next = NULL;
             return actor;
         }

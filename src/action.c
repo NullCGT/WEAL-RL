@@ -196,8 +196,8 @@ int pick_up(struct actor *creature, int x, int y) {
         logm("You pick up %s [%c].", actor_name(item, NAME_THE), item->item->letter);
         return 50;
     } else {
-        push_actor(item, item->x, item->y);
-        logm("My bag is too full.");
+        push_actor(item, creature->x, creature->y);
+        logm("Your bag is too full to pick up %s.", actor_name(item, NAME_THE));
         return 50;
     }
 }

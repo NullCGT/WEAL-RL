@@ -76,28 +76,10 @@ struct actor *spawn_item(const char *name, int x, int y) {
     return actor;
 }
 
-/**
- * @brief Spawn an actor at a location. If an invalid
- location is passed in, then choose a random one.
- * 
- * @param name The filename of the actor's JSON definition.
- * @param x The x coordinate to spawn at.
- * @param y THe y coordinate to spawn at.
- * @return struct actor* A pointer to the actor spawned.
- */
-struct actor *spawn_actor(const char *name, int x, int y) {
+struct actor *add_actor_to_main(struct actor *actor) {
     struct actor *cur_actor = g.player;
-    struct actor *prev_actor = cur_actor;
-    struct actor *actor = actor_from_file(name);
+    struct actor *prev_actor = cur_actor; 
 
-    if (!actor)
-        return NULL;
-
-    mod_attributes(actor);
-    mod_ai(actor->ai);
-    mod_slots(actor->item);
-
-    /* Add the actor the list of actors. */
     while (cur_actor != NULL) {
         prev_actor = cur_actor;
         cur_actor = cur_actor->next;
@@ -108,6 +90,30 @@ struct actor *spawn_actor(const char *name, int x, int y) {
         prev_actor->next = actor;
     }
     actor->next = NULL;
+    return actor;
+}
+
+/**
+ * @brief Spawn an actor at a location. If an invalid
+ location is passed in, then choose a random one.
+ * 
+ * @param name The filename of the actor's JSON definition.
+ * @param x The x coordinate to spawn at.
+ * @param y THe y coordinate to spawn at.
+ * @return struct actor* A pointer to the actor spawned.
+ */
+struct actor *spawn_actor(const char *name, int x, int y) {
+    struct actor *actor = actor_from_file(name);
+
+    if (!actor)
+        return NULL;
+
+    mod_attributes(actor);
+    mod_ai(actor->ai);
+    mod_slots(actor->item);
+
+    /* Add the actor the list of actors. */
+    add_actor_to_main(actor);
 
     /* Spawn at a given location. */
     if (!in_bounds(x, y)) {
