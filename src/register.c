@@ -1,6 +1,6 @@
 /**
  * @file register.c
- * @author your name (you@domain.com)
+ * @author Kestrel (kestrelg@kestrelscry.com)
  * @brief Holds information about the overall game state.
  * @version 1.0
  * @date 2022-05-27

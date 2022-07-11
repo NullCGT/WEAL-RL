@@ -1,6 +1,6 @@
 /**
  * @file combat.c
- * @author yKestrel (kestrelg@kestrelscry.com)
+ * @author Kestrel (kestrelg@kestrelscry.com)
  * @brief Combat-related functionality.
  * @version 1.0
  * @date 2022-05-26

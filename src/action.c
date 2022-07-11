@@ -1,6 +1,6 @@
 /**
  * @file action.c
- * @author Kestrle (kestrelg@kestrelscry.com)
+ * @author Kestrel (kestrelg@kestrelscry.com)
  * @brief Contains functionality related to actions. Actions are decisions
  made by the player or other actors which may cost energy.
  * @version 1.0
