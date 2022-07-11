@@ -1,22 +1,22 @@
 {
-    "name": "skeleton",
+    "name": "skelpeton",
     "chr": "Z",
     "tile": 0,
     "color": "bright white",
-    "hp": 6,
+    "hp": 10,
     "weight": 18,
     "speed": 100,
     "attacks": [
         {
-            "dice": 1,
-            "sides": 6,
+            "dice": 2,
+            "sides": 3,
             "knockback": 0,
             "accuracy": 70,
             "types": ["cut"]
         },
         {
-            "dice": 1,
-            "sides": 4,
+            "dice": 2,
+            "sides": 2,
             "knockback": 0,
             "accuracy": 60,
             "types": ["stab", "unholy"]
@@ -28,5 +28,6 @@
     "weak": ["holy", "bash"],
     "resist": ["poison", "cut", "stab", "ice", "unholy"],
     "tags": ["undead", "unholy"],
-    "description": "Bones bleached white by the dying sun."
+    "grow_up": "tanglebones",
+    "description": "Seaweed and garbage cling to every inch of this moldering corpse. The air around it is thick with the smell of rotting fish."
 }

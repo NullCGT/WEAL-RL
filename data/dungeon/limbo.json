@@ -1,0 +1,16 @@
+{
+    "spawns": {
+        "0": [
+            ["skelpeton"],
+            ["ruffuser", "ruffuser"]
+        ]
+    },
+    "forbidden_tags" : [],
+    "preferred_tags" : [ "undead", "animal", "construct", "neutral" ],
+    "required_tags" : [],
+    "randomness": 10,
+    "name" : "Limbo",
+    "wall_color": "yellow",
+    "short description" : "dank mountains of refuse.",
+    "description" : "Mountains of flaming refuse mark this place for what it is: A resting place for the byproducts of creation, and a graveyard for those who have been cast aside by their makers."
+}

@@ -126,7 +126,6 @@ int attack_roll(struct actor *aggressor, struct actor *target, struct attack *at
     /* TODO: Check status effects and equips on target and aggressor. */
     goal += calculate_accuracy(aggressor, attack);
     goal -= calculate_evasion(target);
-    //logm("%d %d %d %d", attack->accuracy, aggressor->temp_accuracy, target->temp_evasion, base_accuracy);
 
     return (rndrng(1, 101) < goal);
 }
@@ -138,7 +137,7 @@ int attack_roll(struct actor *aggressor, struct actor *target, struct attack *at
  * @return int The evasion percentage in integer form.
  */
 int calculate_evasion(struct actor *actor) {
-    return actor->temp_evasion;
+    return actor->evasion + actor->temp_evasion;
 }
 
 /**
@@ -149,7 +148,7 @@ int calculate_evasion(struct actor *actor) {
  * @return int The accuracy percentage in integer form.
  */
 int calculate_accuracy(struct actor *actor, struct attack *attack) {
-    return actor->temp_accuracy + attack->accuracy;
+    return actor->temp_accuracy + actor->accuracy + attack->accuracy;
 }
 
 
@@ -187,7 +186,7 @@ int cycle_active_attack(void) {
     /* Notify the player with a message. */
     new_attack = get_active_attack();
     if (old_attacker != g.active_attacker && g.active_attacker != g.player) {
-        logm("You brandish your %s [%d%%](%dd%d).", actor_name(g.active_attacker, 0),
+        logm("You brandish %s [%d%%](%dd%d).", actor_name(g.active_attacker, NAME_YOUR),
              new_attack->accuracy, new_attack->dam_n, new_attack->dam_d);
     } else if (old_attacker != g.active_attacker) {
         logm("You switch to using unarmed attacks [%d%%](%dd%d).",

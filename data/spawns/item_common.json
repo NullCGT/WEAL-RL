@@ -1,0 +1,26 @@
+{
+    "weapons": {
+        "spawns": {
+            "0": [
+                ["knife"],
+                ["pipe"],
+                ["shortsword"],
+                ["longsword"]
+            ]
+        }
+    },
+    "armor": {
+        "spawns": {
+            "0": [
+                ["tee shirt"],
+                ["pants"],
+                ["hard hat"],
+                ["leather jacket"],
+                ["skirt"],
+                ["cloak"],
+                ["riot shield"],
+                ["work boots"]
+            ]
+        }
+    }
+}

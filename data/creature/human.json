@@ -3,15 +3,15 @@
     "chr": "@",
     "tile": 0,
     "color": "bright white",
-    "hp": 20,
+    "hp": 50,
     "weight": 100,
     "speed": 100,
     "attacks": [
         {
-            "dice": 1,
-            "sides": 6,
+            "dice": 2,
+            "sides": 3,
             "knockback": 0,
-            "accuracy": 80,
+            "accuracy": 90,
             "types": ["bash"]
         }
     ],

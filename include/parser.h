@@ -4,5 +4,6 @@
 /* Function Prototypes */
 struct actor *actor_from_file(const char *);
 void dungeon_from_file(const char *);
+void spawns_from_dungeon(const char *, int, int, int);
 
 #endif

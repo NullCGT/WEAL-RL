@@ -28,9 +28,14 @@ enum actionnum {
     A_HELP,
     A_SAVE,
     A_QUIT,
+    A_LIST,
     A_MAGICMAP,
-    A_HEAT
+    A_HEAT,
+    A_SPAWN,
+    A_WISH
 };
+
+#define ACTION_COUNT 28
 
 union act_func {
     int (*dir_act) (struct actor *, int, int);
@@ -55,6 +60,7 @@ struct action {
 /* Function Prototypes */
 int move_mon(struct actor*, int, int);
 struct coord action_to_dir(struct action *);
+int pick_up(struct actor *, int, int);
 int look_at(int, int);
 void stop_running(void);
 struct action *get_action(void);

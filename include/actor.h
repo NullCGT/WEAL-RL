@@ -53,8 +53,8 @@ struct actor {
     int hp, hpmax;
     int weight;
     int speed; /* For creatures, denotes move speed. For items, attack speed. */
-    signed char temp_evasion;
-    signed char temp_accuracy;
+    signed char evasion, accuracy;
+    signed char temp_evasion, temp_accuracy;
     /* Attack list */
     struct attack attacks[MAX_ATTK];
     /* Components */
@@ -78,8 +78,9 @@ struct actor {
 #define NAME_CAP      0x01
 #define NAME_THE      0x02
 #define NAME_A        0x04
-#define NAME_MY       0x08
+#define NAME_YOUR     0x08
 #define NAME_EQ       0x10
+#define NAME_EX       0x20
 
 #define is_noatk(x) \
     (!(x.dam_n || x.dam_d))

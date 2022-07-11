@@ -32,7 +32,7 @@ void load_active_attacker(void);
  * @return The cost in energy of saving (always zero).
  */
 int save_exit(void) {
-    if (!yn_prompt("Do you want to save and quit?", 0))
+    if (!yn_prompt("Do you want to save and exit?", 0))
         return 0;
     save_game("save.bin");
     cleanup_screen();

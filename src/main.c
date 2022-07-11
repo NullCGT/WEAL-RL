@@ -93,14 +93,16 @@ void handle_sigsegv(int sig) {
  */
 void new_game(void) {
     struct coord c;
-    logma(CYAN, "The air cools as you step into the shadow of the Tower.");
-    logma(CYAN, "Ivy creeps down the crystaline crenalations, and birds nest upon battlements high above.");
+    logma(CYAN, "Welcome to Limbo. You are knee-deep in garbage.");
     /* Spawn player */
     if (g.player == NULL) {
         g.player = spawn_creature("human", 0, 0);
-        strcpy(g.player->name->given_name, "Player");
+        getlogin_r(g.player->name->given_name, sizeof(g.player->name->given_name));
         g.player->unique = 1;
         g.active_attacker = g.player;
+        text_entry("What is your name?", g.player->name->given_name, MAXNAMESIZ);
+        if (g.player->name->given_name[0] > 'Z')
+            g.player->name->given_name[0] = g.player->name->given_name[0] - 32;
     }
     /* Make level */
     make_level();

@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "register.h"
 #include "action.h"
@@ -24,17 +25,17 @@
 #include "save.h"
 #include "combat.h"
 #include "invent.h"
+#include "spawn.h"
 
 int do_nothing(void);
 int is_player(struct actor *);
 int autoexplore(void);
 struct action *travel(void);
 int look_down(void);
-int pick_up(struct actor *, int, int);
 int lookmode(void);
 int display_help(void);
+int list_actions_exec(void);
 
-#define ACTION_COUNT 25
 #define MOV_ACT(name, index, code, alt_code) \
     { name, index, code, alt_code, {.dir_act=move_mon}, 0, 1, 1 }
 #define DIR_ACT(name, index, code, alt_code, func, debug_only, movement) \
@@ -74,8 +75,12 @@ struct action actions[ACTION_COUNT] = {
     VOID_ACT("help",       A_HELP,       '?',  -1,  display_help, 0, 0),
     VOID_ACT("save",       A_SAVE,       'S',  -1,  save_exit, 0, 0),
     VOID_ACT("quit",       A_QUIT,       'Q',  -1,  do_quit, 0, 0),
+    VOID_ACT("list actions", A_LIST,     '#',  -1,  list_actions_exec, 0, 0),
+// DEBUG ACTIONS
     VOID_ACT("debugmap",   A_MAGICMAP,   '[',  -1,  magic_mapping, 1, 0),
     VOID_ACT("debugheat",  A_HEAT,       ']',  -1,  switch_viewmode, 1, 0),
+    VOID_ACT("debugsummon", A_SPAWN,      '\\', -1,  debug_summon, 1, 0),
+    VOID_ACT("debugwish",  A_WISH,       '/',  -1,  debug_wish, 1, 0)
 };
 
 /**
@@ -458,4 +463,16 @@ int execute_action(struct actor *actor, struct action *action) {
         return action->func.void_act();
     }
     return do_nothing();
+}
+
+int list_actions_exec(void) {
+    char buf[32] = {'\0'};
+    text_entry("What action do you want to execute?", buf, 32);
+    for (int i = 0; i < ACTION_COUNT; i++) {
+        if (!strncmp(actions[i].name, buf, sizeof(buf))) {
+            return execute_action(g.player, &actions[i]);
+        }
+    }
+    logm("Unable to execute the action \"%s.\"", buf);
+    return 0;
 }

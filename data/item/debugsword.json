@@ -1,0 +1,45 @@
+{
+    "name": "blade of debugging",
+    "chr": "\\",
+    "tile": 0,
+    "color": "magenta",
+    "hp": 100,
+    "weight": 1,
+    "speed": 100,
+    "attacks": [
+        {
+            "dice": 100,
+            "sides": 10,
+            "knockback": 0,
+            "accuracy": 100,
+            "types": []
+        },
+        {
+            "dice": 1,
+            "sides": 6,
+            "knockback": 0,
+            "accuracy": 100,
+            "types": ["cut"]
+        },
+        {
+            "dice": 1,
+            "sides": 6,
+            "knockback": 0,
+            "accuracy": 100,
+            "types": ["bash"]
+        },
+        {
+            "dice": 1,
+            "sides": 6,
+            "knockback": 0,
+            "accuracy": 100,
+            "types": ["stab"]
+        }
+    ],
+    "item": {
+        "pref_slot": "weapon"
+    },
+    "weak": [],
+    "resist": ["cut", "stab", "bash"],
+    "description": ""
+}

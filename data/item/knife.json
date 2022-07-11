@@ -8,10 +8,10 @@
     "speed": 50,
     "attacks": [
         {
-            "dice": 1,
-            "sides": 8,
+            "dice": 2,
+            "sides": 4,
             "knockback": 0,
-            "accuracy": 70,
+            "accuracy": 85,
             "types": ["stab"]
         }
     ],

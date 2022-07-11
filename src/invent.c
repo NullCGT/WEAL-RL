@@ -196,7 +196,7 @@ struct actor *win_pick_invent(void) {
 
     selector = menu_new("Inventory", 0, 0, term.w, term.h);
     while (cur != NULL) {
-        menu_add_item(selector, cur->item->letter, actor_name(cur, NAME_EQ));
+        menu_add_item(selector, cur->item->letter, actor_name(cur, NAME_EQ | NAME_EX));
         cur = cur->next;
     }
     while (1) {
@@ -236,6 +236,7 @@ int win_use_item(struct actor *item) {
     if (equipped)
         menu_add_item(selector, 'r', "remove");
     menu_add_item(selector, 'e', "extended equip");
+    menu_add_item(selector, 'n', "rename");
 
     while (1) {
         selected = menu_do_choice(selector, 1);
@@ -258,6 +259,9 @@ int win_use_item(struct actor *item) {
                 if (selected != -1)
                     menu_destroy(selector);
                 return selected;
+            case 'n':
+                text_entry("What do you want to name this item?", item->name->given_name, MAXNAMESIZ);
+                return 0;
             case -1:
                 menu_destroy(selector);
                 return 0;
@@ -358,7 +362,7 @@ int drop_item(struct actor *actor, struct actor *item) {
     int y = actor->y;
 
     if (item->item->slot != NO_SLOT && item->item->slot != SLOT_OFF && item->item->slot != SLOT_WEP) {
-        logm("You need to remove your %s before dropping it.", actor_name(item, 0));
+        logm("You need to remove %s before dropping it.", actor_name(item, NAME_YOUR));
         return 0;
     }
     if (nearest_pushable_cell(item, &x, &y)) {
@@ -385,8 +389,8 @@ int takeoff_item(struct actor *actor, struct actor *item) {
         return 0;
     }
     if (actor == g.player)
-        logm("You %s%s your %s.", in_danger(actor) ? "hastily " : "", 
-             slot_types[item->item->slot].off_msg, actor_name(item, 0));
+        logm("You %s%s %s.", in_danger(actor) ? "hastily " : "", 
+             slot_types[item->item->slot].off_msg, actor_name(item, NAME_YOUR));
     clean_item_slots(actor, item);
     return 100;
 }

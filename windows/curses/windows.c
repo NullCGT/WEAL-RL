@@ -266,6 +266,50 @@ void popup_warning(const char *text) {
 }
 
 /**
+ * @brief A text entry prompt.
+ * 
+ * @param prompt What to prompt the player with.
+ * @param buf The buffer to write to.
+ * @param bufsiz The size of the buffer to write to.
+ */
+void text_entry(const char *prompt, char *buf, int bufsiz) {
+    WINDOW *new_win;
+    int keycode;
+    int index = 0;
+    bufsiz = bufsiz - 1;
+
+    new_win = newwin(term.h, term.w, 0, 0);
+
+    while (buf[index] != '\0') {
+        index++;
+    }
+    werase(new_win);
+    box(new_win, 0, 0);
+    mvwprintw(new_win, 1, 1, prompt);
+    mvwprintw(new_win, 3, 1, buf);
+    wrefresh(new_win);
+
+    while ((keycode = handle_keys())) {
+        if (keycode >= 'A' && keycode <= 'z' && index < bufsiz) {
+            buf[index++] = keycode;
+        } else if (keycode == '\b') {
+            index--;
+            buf[index] = '\0';
+        } else if (keycode == '\n') {
+            break;
+        }
+        if (index < 0) index = 0;
+        if (index > bufsiz) index = bufsiz - 1;
+        werase(new_win);
+        box(new_win, 0, 0);
+        mvwprintw(new_win, 1, 1, prompt);
+        mvwprintw(new_win, 3, 1, buf);
+        wrefresh(new_win);
+    }
+    delwin(new_win);
+}
+
+/**
  * @brief Display the text of a file in a scrollable pad.
  * 
  * @param fname Filename to be displayed.
@@ -341,10 +385,12 @@ void display_energy_win(void) {
     print_dtypes(sb_win, j++, 1 + strlen(buf), cur_attack->dtype, 0);
 
     memset(buf, 0, 128);
-    if (g.depth)
-        snprintf(buf, sizeof(buf), "Depth: %d meters", g.depth * 4);
-    else
+    if (!g.depth)
         snprintf(buf, sizeof(buf), "Depth: Surface");
+    else if (g.depth != g.max_depth)
+        snprintf(buf, sizeof(buf), "Depth: %d (max %d)", g.depth, g.max_depth);
+    else
+        snprintf(buf, sizeof(buf), "Depth: %d", g.depth);
     mvwprintw(sb_win, j++, 1, buf);
 
     memset(buf, 0, 128);
@@ -436,6 +482,9 @@ void display_stats(WINDOW *win, int *i, struct actor *actor) {
         wcolor_off(win, (actor->energy != 0 && actor->energy != 100) ? BRIGHT_GREEN : GREEN);
     }
 
+    mvwprintw(win, *i, 1, "EV: %d%% AC: %d%%\t", actor->evasion, actor->accuracy);
+    *i += 1;
+
     if (actor != g.player) {
         if (is_aware(actor, g.player)) {
             wcolor_on(win, BRIGHT_YELLOW);
@@ -467,8 +516,8 @@ void print_dtypes(WINDOW *win, int y, int x, short dtypes, unsigned char blanks)
             wcolor_off(win, dtypes_arr[i].color);
         } else if (blanks) {
             mvwprintw(win, y, x, "_");
-            x++;
         }
+        x++;
     }
 }
 
@@ -696,6 +745,8 @@ int handle_keys(void) {
             return '4';
         case KEY_RIGHT:
             return '6';
+        case KEY_BACKSPACE:
+            return '\b';
         default:
             return keycode;
     }

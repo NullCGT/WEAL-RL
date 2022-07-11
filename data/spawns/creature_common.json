@@ -1,0 +1,13 @@
+{
+    "spawns": {
+        "0": [
+            ["skelpeton"],
+            ["ruffuser", "ruffuser"]
+        ],
+        "1": [
+            ["skelpeton"],
+            ["ruffuser", "ruffuser"],
+            ["skelpeton", "skelpeton"]
+        ]
+    }
+}

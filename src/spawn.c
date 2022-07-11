@@ -23,6 +23,8 @@
 #include "message.h"
 #include "invent.h"
 #include "parser.h"
+#include "windows.h"
+#include "action.h"
 
 struct actor *spawn_actor(const char *name, int x, int y);
 void mod_attributes(struct actor *);
@@ -104,6 +106,7 @@ struct actor *add_actor_to_main(struct actor *actor) {
  */
 struct actor *spawn_actor(const char *name, int x, int y) {
     struct actor *actor = actor_from_file(name);
+    int i = 0;
 
     if (!actor)
         return NULL;
@@ -121,11 +124,51 @@ struct actor *spawn_actor(const char *name, int x, int y) {
         x = c.x;
         y = c.y;
     }
-    actor->x = x;
-    actor->y = y;
-    push_actor(actor, x, y);
+    while (push_actor(actor, x, y) && i++ < 10) {
+        struct coord c = rand_open_coord();
+        x = c.x;
+        y = c.y;
+    }
+    if (i >= 10) free_actor(actor);
 
     return actor;
+}
+
+/**
+ * @brief Debug action for summoning a creature.
+ * 
+ * @return int The cost of summoning.
+ */
+int debug_summon(void) {
+    char buf[MAXNAMESIZ] = {'\0'};
+    struct actor *actor = NULL;
+    text_entry("What creature do you want to summon?", buf, MAXNAMESIZ);
+    actor = spawn_creature(buf, g.player->x, g.player->y);
+    if (actor) {
+        logm("Summoned %s.", actor_name(actor, NAME_A));
+    } else {
+        logm("Unable to summon a creature called \"%s.\"", buf);
+    }
+    return 0;
+}
+
+/**
+ * @brief Debug action for wishing for an item.
+ * 
+ * @return int The cost of wishing.
+ */
+int debug_wish(void) {
+    char buf[MAXNAMESIZ] = {'\0'};
+    struct actor *actor = NULL;
+    text_entry("What item do you wish for?", buf, MAXNAMESIZ);
+    /* TODO: Put it directly in the inventory instead of using this jank. */
+    actor = spawn_item(buf, g.player->x, g.player->y);
+    if (!actor) {
+        logm("Unable to create an item called \"%s.\"", buf);
+        return 0;
+    }
+    pick_up(g.player, actor->x, actor->y);
+    return 0;
 }
 
 /**

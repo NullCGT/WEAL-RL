@@ -1,0 +1,31 @@
+{
+    "name": "longsword",
+    "chr": "\\",
+    "tile": 0,
+    "color": "white",
+    "hp": 12,
+    "weight": 20,
+    "speed": 100,
+    "attacks": [
+        {
+            "dice": 3,
+            "sides": 3,
+            "knockback": 0,
+            "accuracy": 80,
+            "types": ["cut"]
+        },
+        {
+            "dice": 5,
+            "sides": 3,
+            "knockback": 0,
+            "accuracy": 20,
+            "types": ["stab"]
+        }
+    ],
+    "item": {
+        "pref_slot": "weapon"
+    },
+    "weak": [],
+    "resist": ["cut", "stab"],
+    "description": ""
+}

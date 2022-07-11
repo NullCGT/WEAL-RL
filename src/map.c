@@ -20,6 +20,7 @@
 #include "action.h"
 
 int climb(int);
+void update_max_depth(void);
 
 /**
  * @brief Ask the player to input a direction, and return a coordinate.
@@ -147,14 +148,8 @@ int climb(int change) {
  */
 int change_depth(int change) {
     g.depth += change;
-    if (g.depth > g.max_depth) {
-        if (in_danger(g.player)) {
-            g.score += (1200 * (g.depth - g.max_depth));
-        } else {
-            g.score += (1000 * (g.depth - g.max_depth));
-        }
-        g.max_depth = g.depth;
-    }
+    if (g.depth > g.max_depth)
+        update_max_depth();
     if (g.depth >= 25) {
         /* A winner is you. */
         end_game(1);
@@ -164,6 +159,27 @@ int change_depth(int change) {
     make_level();
     push_actor(g.player, g.player->x, g.player->y);
     return 50;
+}
+
+/**
+ * @brief Update the maximum depth and update score and hit points.
+ * 
+ */
+void update_max_depth(void) {
+    int diff = g.depth - g.max_depth;
+    /* Restore 50% of health and increase max health by 1. */
+    g.player->hpmax += diff;
+    g.player->hp += (g.player->hpmax * 0.5 * diff);
+    if (g.player->hp > g.player->hpmax) g.player->hp = g.player->hpmax;
+    logma(GREEN, "The warm glow of progress restores your health.");
+    /* Increase score */
+    if (in_danger(g.player)) {
+        g.score += (1200 * (diff));
+    } else {
+        g.score += (1000 * (diff));
+    }
+    /* Update the max depth */
+    g.max_depth = g.depth;
 }
 
 static struct coord cardinal_dirs[] = {

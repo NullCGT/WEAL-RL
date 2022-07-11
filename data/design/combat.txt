@@ -88,3 +88,21 @@ Potential Mitigations:
 - Straight hit points with no natural health regen.
 - Many ways to restore hit points the normal way.
 - HP is fully restored upon entering an area that has not been visited.
+
+
+== SYSTEM FOUR: CRAZINESS ==
+- Straight hit points with no natural health regen.
+- Armor changes your dodge rate and your hit points:
+  - Dodge rate is just percentage-based chance to dodge, and modifies enemies to-hit percentages.
+  - Armor hit points are the hit points of the object.
+    - When you put on a piece of armor, its hit points are added to your own.
+    - Armor hit points are lost before any other kind of hit points.
+- Armor points are restored when descending to a level that you have not visited before.
+- Hit points do not regenerate except via direct intervention, or by entering an entirely
+  new area. 
+
+This allows for interesting situations:
+- Wearing your weapon on your back as a last ditch attempt to gain a few extra hit points.
+- HP-to-1 attacks are perfectly viable, and slightly less unfair than they would otherwise be.
+- Swapping to a newer piece of armor in order to better protect yourself. 
+- Taking off a broken piece of armor that penalizes your chance to dodge.

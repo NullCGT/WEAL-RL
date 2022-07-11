@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <cjson/cJSON.h>
+
 #include "message.h"
 #include "parser.h"
 #include "spawn.h"
@@ -21,9 +22,12 @@
 #include "ai.h"
 #include "register.h"
 #include "invent.h"
+#include "random.h"
+#include "spawn.h"
 
 void remove_whitespace(unsigned char *);
 struct cJSON* json_from_file(const char *);
+void spawns_from_table(cJSON *, int, int);
 struct ai *ai_from_json(struct ai *, cJSON *);
 struct item *item_from_json(struct item *, cJSON *);
 struct actor *actor_primitives_from_json(struct actor *, cJSON *);
@@ -176,6 +180,72 @@ void dungeon_from_file(const char *fname) {
 }
 
 /**
+ * @brief Spawn creatures from a dungeon file with a set difficulty.
+ * 
+ * @param fname The name of the dungeon file.
+ * @param difficulty The difficulty of the dungeon level.
+ * @param x The x coordinate to spawn at.
+ * @param y The y coordinate to spawn at.
+ */
+void spawns_from_dungeon(const char *fname, int difficulty, int x, int y) {
+    cJSON *dgn_json = NULL;
+    cJSON *levelled_list_json = NULL;
+    cJSON *spawn_list_json = NULL;
+    cJSON *spawn_json = NULL;
+    char difficulty_string[12];
+
+    dgn_json = json_from_file(fname);
+    if (!dgn_json)
+        return;
+    snprintf(difficulty_string, sizeof(difficulty_string), "%d", difficulty);
+    
+    spawn_list_json = cJSON_GetObjectItemCaseSensitive(dgn_json, "spawns");
+    spawn_json = cJSON_GetObjectItemCaseSensitive(spawn_list_json, difficulty_string);
+    if (!spawn_json || !rndmx(dgn.randomness)) {
+        /* If we trigger the randomness variable or do not have any spawns to choose from,
+           fall back on the levelled lists. */
+        levelled_list_json = json_from_file("data/spawns/creature_common.json");
+        if (!levelled_list_json)
+            return;
+        spawn_list_json = cJSON_GetObjectItemCaseSensitive(levelled_list_json, "spawns");
+        /* Find the nearest difficulty *under* the target difficulty. */
+        while (difficulty >= 0) {
+            spawn_json = cJSON_GetObjectItemCaseSensitive(spawn_list_json, difficulty_string);
+            if (cJSON_GetArraySize(spawn_json)) break;
+            difficulty--;
+            snprintf(difficulty_string, sizeof(difficulty_string), "%d", difficulty);
+        }
+    }
+    /* Get a random spawn from the table. */
+    spawns_from_table(spawn_json, x, y);
+    if (levelled_list_json)
+        cJSON_Delete(levelled_list_json);
+    cJSON_Delete(dgn_json);
+}
+
+/**
+ * @brief Spawn a creature from a json table.
+ * 
+ * @param spawn_json The json table to pull from.
+ * @param x The x coordinate to spawn at.
+ * @param y The y cooridinate to spawn at.
+ */
+void spawns_from_table(cJSON *spawn_json, int x, int y) {
+    int num_spawns = cJSON_GetArraySize(spawn_json);
+    int index;
+    struct cJSON *spawn_array = NULL;
+    struct cJSON *monster_json = NULL;
+
+    if (!num_spawns) return;
+    else index = rndmx(num_spawns);
+
+    spawn_array = cJSON_GetArrayItem(spawn_json, index);
+    cJSON_ArrayForEach(monster_json, spawn_array) {
+        spawn_creature(monster_json->valuestring, x, y);
+    }
+}
+
+/**
  * @brief Parse an ai struct from JSON.
  * 
  * @param ai A pointer to the ai struct.
@@ -224,6 +294,17 @@ struct actor *actor_primitives_from_json(struct actor *actor, cJSON *actor_json)
     actor->weight = field->valueint;
     field = cJSON_GetObjectItemCaseSensitive(actor_json, "speed");
     actor->speed = field->valueint;
+
+    field = cJSON_GetObjectItemCaseSensitive(actor_json, "evasion");
+    if (!field)
+        actor->evasion = 0;
+    else
+        actor->evasion = field->valueint;
+    field = cJSON_GetObjectItemCaseSensitive(actor_json, "accuracy");
+    if (!field)
+        actor->accuracy = 0;
+    else
+        actor->accuracy = field->valueint;
     return actor;
 }
 

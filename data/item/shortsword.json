@@ -1,0 +1,31 @@
+{
+    "name": "shortsword",
+    "chr": "/",
+    "tile": 0,
+    "color": "white",
+    "hp": 4,
+    "weight": 2,
+    "speed": 100,
+    "attacks": [
+        {
+            "dice": 1,
+            "sides": 10,
+            "knockback": 0,
+            "accuracy": 75,
+            "types": ["stab"]
+        },
+        {
+            "dice": 1,
+            "sides": 6,
+            "knockback": 0,
+            "accuracy": 50,
+            "types": ["cut"]
+        }
+    ],
+    "item": {
+        "pref_slot": "weapon"
+    },
+    "weak": ["bash"],
+    "resist": ["cut", "stab"],
+    "description": "This sword is short, but not so short as the tempers of those who often carry it."
+}

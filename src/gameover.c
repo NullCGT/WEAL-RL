@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "register.h"
 #include "message.h"
@@ -47,7 +48,8 @@ int do_quit(void) {
  0 if the game was lost.
  */
 void end_game(int winner) {
-    if (!write_dumplog("dumplog.txt", winner)) {
+    if (!write_dumplog("dumplog.txt", winner)
+        && yn_prompt("Do you want to view your character summary?", 1)) {
         display_file_text("dumplog.txt");
     }
     cleanup_screen();
@@ -67,11 +69,14 @@ void end_game(int winner) {
  */
 int write_dumplog(const char *fname, int winner) {
     FILE *fp;
+    char userbuf[256];
     fp = fopen(fname, "w");
     if (!fp) {
         return 1;
     }
+    getlogin_r(userbuf, sizeof(userbuf));
     fputs("== Final Statics ==\n", fp);
+    fprintf(fp, "Your name was %s, servant of the higher entity named %s.\n", actor_name(g.player, 0), userbuf);
     if (winner) {
         fprintf(fp, "You won on turn %d.\n", g.turns);
     } else if (g.target) {

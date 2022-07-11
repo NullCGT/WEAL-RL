@@ -65,7 +65,7 @@ struct tag tags_arr[MAX_TAGS] = {
  * @return int returns 1 if the actor can be pushed, 0 if not.
  */
 int can_push(struct actor *actor, int x, int y) {
-    if (is_blocked(x, y))
+    if (!in_bounds(x, y) || is_blocked(x, y))
         return 0;
     if (actor->item && g.levmap[x][y].item_actor != NULL)
         return 0;
@@ -95,6 +95,8 @@ int nearest_pushable_cell(struct actor *actor, int *x, int *y) {
         for (int j = -1; j <= 1; j++) {
             nx = *x + i;
             ny = *y + j;
+            if (!in_bounds(nx, ny))
+                continue;
             if (can_push(actor, nx, ny)) {
                 *x = nx;
                 *y = ny;
@@ -182,8 +184,8 @@ struct actor *remove_actor(struct actor *actor) {
  */
 void actor_sanity_checks(struct actor *actor) {
     if (g.levmap[actor->x][actor->y].actor != actor) {
-        logma(MAGENTA, "Sanity check fail: Actor claims to be at (%d, %d), but is not there.",
-              actor->x, actor->y);
+        logma(MAGENTA, "Sanity check fail: %s claims to be at (%d, %d), but is not there.",
+              actor_name(actor, 0), actor->x, actor->y);
     }
 }
 
@@ -234,23 +236,29 @@ static char namebuf[4][64];
  * @return char* The name of the actor.
  */
 char *actor_name(struct actor *actor, unsigned flags) {
+    int no_given_name = (actor->name->given_name[0] == '\0');
     /* Increase the namebuffer index. */
     nbi = (nbi + 1) % 4;
     
     /* Reset the name buffer. */
     memset(namebuf[nbi], 0, 64);
     const char *actname;
-    if (actor->name->given_name[0] != '\0') actname = actor->name->given_name;
+    if ((!(flags & NAME_EX)) && !no_given_name) actname = actor->name->given_name;
     else actname = actor->name->real_name;
 
-    if ((flags & NAME_THE) && !actor->unique) {
+    if ((flags & NAME_THE) && !actor->unique && no_given_name) {
         snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "the %s", actname);
-    } else if ((flags & NAME_MY) && !actor->unique) {
-        snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "my %s", actname);
-    } else if ((flags & NAME_A) && !actor->unique) {
+    } else if ((flags & NAME_YOUR) && !actor->unique && no_given_name) {
+        snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "your %s", actname);
+    } else if ((flags & NAME_A) && !actor->unique && no_given_name) {
         snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "%s %s", !vowel(namebuf[nbi][0]) ? "a" : "an", actname);
     } else {
         snprintf(namebuf[nbi], sizeof(namebuf[nbi]), "%s", actname);
+    }
+    /* Explanation */
+    if ((flags & NAME_EX) && !no_given_name) {
+        snprintf(namebuf[nbi] + strlen(namebuf[nbi]), sizeof(namebuf[nbi]), " named \"%s\"", 
+                 actor->name->given_name);
     }
     /* Equip Status */
     if ((flags & NAME_EQ) && actor->item && actor->item->slot >= 0) {

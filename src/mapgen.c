@@ -277,7 +277,7 @@ void make_level(void) {
     struct coord c;
     struct rect level_rect = { 1, 1, MAPW - 1, MAPH - 1 };
     /* Temporary: Parse the dungeon. */
-    dungeon_from_file("data/dungeon/entrance.json");
+    dungeon_from_file("data/dungeon/limbo.json");
     /* Draw the map */
     init_map();
     cellular_automata(level_rect, 45, 5);
@@ -291,7 +291,8 @@ void make_level(void) {
     init_tile(&g.levmap[c.x][c.y], T_STAIR_DOWN);
     /* Populate level */
     for (int i = 0; i < 3; i++) {
-        spawn_creature("skeleton", -1, -1);
+        c = rand_open_coord();
+        spawns_from_dungeon(dgn.filename, g.depth, c.x, c.y);
     }
     for (int i = 0; i < 10; i++) {
         spawn_item("knife", -1, -1);

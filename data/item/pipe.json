@@ -1,0 +1,24 @@
+{
+    "name": "pipe",
+    "chr": "|",
+    "tile": 0,
+    "color": "white",
+    "hp": 10,
+    "weight": 6,
+    "speed": 100,
+    "attacks": [
+        {
+            "dice": 1,
+            "sides": 12,
+            "knockback": 0,
+            "accuracy": 80,
+            "types": ["bash"]
+        }
+    ],
+    "item": {
+        "pref_slot": "weapon"
+    },
+    "weak": ["bash"],
+    "resist": ["cut", "stab", "bash"],
+    "description": "What once was the carrier is now the carried, and what once brought life can now bring death."
+}

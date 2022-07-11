@@ -1,0 +1,26 @@
+{
+    "name": "ruffuser",
+    "chr": "d",
+    "tile": 0,
+    "color": "white",
+    "hp": 6,
+    "weight": 40,
+    "speed": 50,
+    "attacks": [
+        {
+            "dice": 2,
+            "sides": 2,
+            "knockback": 0,
+            "accuracy": 75,
+            "types": ["stab"]
+        }
+    ],
+    "ai": {
+        "seekdef": 10
+    },
+    "weak": ["ice", "lightning"],
+    "resist": ["fire"],
+    "tags": ["construct", "animal"],
+    "grow_up": "D.O.G.",
+    "description": "The whines that issue from this canine monstrosity are all but drowned out by the whine of its servos as it scrambles across the ground. Beady red eyes set into the coiling mass of titanium plates yield only the barest hint of artificial life."
+}
