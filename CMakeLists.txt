@@ -1,5 +1,5 @@
 ##############Basic Project Setup##########################
-#cmake_minimum_required(VERSION 3.23.0)
+cmake_minimum_required(VERSION 3.23.0)
 set(CMAKE_C_STANDARD 99)
 set(PROJECT_NAME weal_ncurses)
 set(PROJECT_VENDOR Kestrel Gregorich-Trevor)
