@@ -23,7 +23,7 @@ jobs:
           buildPreset: 'release'
 
       - name: Create Package
-        run |
+        run: |
           zip --junk-paths -r weal-rl build/weal_ncurses build/data/ README.md
 
       - name: Create Release
