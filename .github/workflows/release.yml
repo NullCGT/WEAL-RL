@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Check out repository code.
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Get CMake.
         uses: lukka/get-cmake@latest
