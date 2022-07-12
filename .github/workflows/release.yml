@@ -7,9 +7,6 @@ jobs:
   build:
     runs-on: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - run: echo "Operating System: ${{ runner.os }}."
-      - run: echo "Branch: ${{ github.ref }}."
-
       - name: Check out repository code.
         uses: actions/checkout@v3
 
