@@ -18,6 +18,11 @@ configure_file (
     "${CMAKE_SOURCE_DIR}/share/weal.desktop"
 )
 
+# Set up vcpkg.
+set(VCPKG_BOOTSTRAP_OPTIONS disableMetrics)
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+  CACHE STRING "Vcpkg toolchain file")
+
 # Set up our projects
 project(${PROJECT_NAME} VERSION 1.0)       # Runs in the console with ncurses.
 

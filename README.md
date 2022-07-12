@@ -25,7 +25,7 @@ fairly closely. Why not make it even more traditional by writing it in pure C?
 In all honesty, though, I simply like C. I love the lack of overhead and the
 granular control.
 
-# Are save files compatible across computers?
+## Are save files compatible across computers?
 
 Short answer: No.
 
