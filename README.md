@@ -9,20 +9,7 @@ judge it too harshly yet.
 ## Building from Source
 WEAL is built using CMake.
 
-### Release
-To compile the game for play and installation, run the following commands:
-```
-mkdir build
-cmake --preset=release
-cmake --build build
-cd build
-cpack
-```
-A zip folder containing the game and necessary data files will be located
-in the newly-created build directory.
-
-### Development
-In order to compile the game for testing locally, run the following commands:
+In order to compile the game for local testing, run the following commands:
 ```
 mkdir build
 cmake --preset=dev
@@ -46,11 +33,10 @@ autoexplore might eat up some RAM in a low memory environment.
 
 ### Why C?
 
-This is a traditional roguelike, which follows the Berlin Interpretation
+This is a traditional roguelike, and follows the Berlin Interpretation
 fairly closely. Why not make it even more traditional by writing it in pure C?
 
-In all honesty, though, I simply like C. I love the lack of overhead and the
-granular control.
+In all honesty, though, I simply like C.
 
 ### Are save files compatible across computers?
 
