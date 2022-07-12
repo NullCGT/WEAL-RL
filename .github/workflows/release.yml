@@ -26,7 +26,7 @@ jobs:
 
       - name: Create Package
         run: |
-          zip --junk-paths -r weal-rl build/weal_ncurses build/data/ README.md
+          zip --junk-paths -rq weal-${{ runner.os }} build/weal_ncurses build/data/ README.md
 
       - name: Create Release
         id: create_release
@@ -48,5 +48,3 @@ jobs:
           asset_path: ./weal-${{ runner.os }}.zip
           asset_name: weal-${{ runner.os }}.zip
           asset_content_type: application/zip
-
-      - run: echo "Job complete. Status is ${{ job.status }}."
