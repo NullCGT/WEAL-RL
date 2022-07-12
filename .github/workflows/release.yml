@@ -5,7 +5,7 @@ on:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
   build:
-    runs-on: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code.
         uses: actions/checkout@v3
