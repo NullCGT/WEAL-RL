@@ -52,6 +52,7 @@ int close_door(struct actor *, int, int);
     FLOOR(STAIR_DOWN, "stairs down",      '>', L'>', 0,         BRIGHT_YELLOW), \
     FLOOR(STAIR_UP,   "stairs up",        '<', L'<', 0,         BRIGHT_YELLOW), \
     WALL(WALL,        "concrete wall",    '#', L'█', 0,         WHITE),  \
+    WALL(EARTH,       "unworked stone",   ' ', L'#', 0,         WHITE), \
     FLOOR(DOOR_OPEN,  "open door",        '|', L'▒', 0,         CYAN),  \
     WALL(DOOR_CLOSED, "closed door",      '+', L'+', open_door, CYAN)
 

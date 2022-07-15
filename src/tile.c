@@ -62,15 +62,18 @@ struct tile *init_tile(struct tile *intile, int tindex) {
  * @return int The cost in energy of opening the door.
  */
 int open_door(struct actor *actor, int x, int y) {
-    struct tile *intile = &g.levmap[x][y];
-    int tindex = intile->pt->id;
+    struct tile *intile;
+    int tindex;
     struct coord new_dir;
 
     if (actor == g.player && g.player->x == x && g.player->y == y) {
         new_dir = get_direction("open");
-        x = new_dir.x;
-        y = new_dir.y;
+        x = new_dir.x + g.player->x;
+        y = new_dir.y + g.player->y;
     }
+    if (!in_bounds(x, y)) return 0;
+    intile = &g.levmap[x][y];
+    tindex = intile->pt->id;
 
     if (tindex != T_DOOR_CLOSED) {
         logm("There is nothing to open in that direction.");
@@ -98,15 +101,18 @@ int open_door(struct actor *actor, int x, int y) {
  * @return int The cost in energy of opening the door.
  */
 int close_door(struct actor *actor, int x, int y) {
-    struct tile *intile = &g.levmap[x][y];
-    int tindex = intile->pt->id;
+    struct tile *intile;
+    int tindex;
     struct coord new_dir;
 
     if (actor == g.player && g.player->x == x && g.player->y == y) {
         new_dir = get_direction("close");
-        x = new_dir.x;
-        y = new_dir.y;
+        x = new_dir.x + g.player->x;
+        y = new_dir.y + g.player->y;
     }
+    if (!in_bounds(x, y)) return 0;
+    intile = &g.levmap[x][y];
+    tindex = intile->pt->id;
 
     if (tindex != T_DOOR_OPEN) {
         logm("There is nothing to close in that direction.");
