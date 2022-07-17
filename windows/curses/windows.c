@@ -306,7 +306,7 @@ void text_entry(const char *prompt, char *buf, int bufsiz) {
         mvwprintw(new_win, 3, 1, buf);
         wrefresh(new_win);
     }
-    delwin(new_win);
+    cleanup_win(new_win);
 }
 
 /**
@@ -569,7 +569,7 @@ void draw_msg_window(int h, int full) {
     while (cur_msg != NULL) {
         getyx(win, y, x);
         (void) x;
-        if (y > h - 1) {
+        if (y > h - 2) {
             cur_msg = cur_msg->next;
             i++;
             continue;

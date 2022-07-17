@@ -21,6 +21,8 @@ struct permtile permtiles[] = {
     PERMTILES
 };
 
+/* TODO: Move these into an array so we can index into it instead of
+   creating a new function for every type of heatmap. */
 int *get_playerh(int x, int y) {
     return &g.levmap[x][y].player_heat;
 }
@@ -33,6 +35,10 @@ int *get_goalh(int x, int y) {
     return &g.levmap[x][y].goal_heat;
 }
 
+int *get_generich(int x, int y) {
+    return &g.levmap[x][y].generic_heat;
+}
+
 /**
  * @brief Initialize the tile struct.
  * 
@@ -41,7 +47,7 @@ int *get_goalh(int x, int y) {
  * @return A pointer to the modified tile.
  */
 struct tile *init_tile(struct tile *intile, int tindex) {
-    if (tindex == T_WALL) {
+    if (tindex == T_WALL || tindex == T_EARTH) {
         intile->color = dgn.wall_color;
     } else {
         intile->color = permtiles[tindex].color;

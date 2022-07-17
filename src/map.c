@@ -21,6 +21,7 @@
 
 int climb(int);
 void update_max_depth(void);
+void create_heatmap(int* (* func) (int, int), int);
 
 /**
  * @brief Ask the player to input a direction, and return a coordinate.
@@ -188,6 +189,10 @@ static struct coord cardinal_dirs[] = {
 
 
 
+/**
+ * @brief Priority queue node.
+ * 
+ */
 struct p_node {
     int heat;
     int x;
@@ -228,11 +233,14 @@ struct p_node pq_pop(struct p_node arr[], int *last) {
  * @brief Create a heatmap.
  * 
  * @param accessor The function used to access the heat variable.
+ * @param tunneling Whether the heatmap should use tile costs for walking
+ over tiles or tunneling through tiles.
  */
-void create_heatmap(int* (* accessor) (int, int)) {
+void create_heatmap(int* (* accessor) (int, int), int tunneling) {
     struct p_node cur;
     int nx, ny;
     int *n_heat;
+    int cost;
     unsigned char visited[MAPW][MAPH] = { 0 };
     struct p_node heap[MAPH * MAPW + 1] = { 0 };
     int last = -1;
@@ -255,10 +263,11 @@ void create_heatmap(int* (* accessor) (int, int)) {
             ny = cur.y + cardinal_dirs[i].y;
             if (!in_bounds(nx, ny) || visited[nx][ny]) continue;
             n_heat = accessor(nx, ny);
+            cost = tunneling ? g.levmap[nx][ny].pt->walk_cost : g.levmap[nx][ny].pt->tunnel_cost;
             visited[nx][ny] = 1;
             if (*n_heat == IMPASSABLE) continue;
-            if (cur.heat + 1 < *n_heat) {
-                *n_heat = cur.heat + 1;
+            if (cur.heat + cost < *n_heat) {
+                *n_heat = cur.heat + cost;
                 pq_push(heap, &last, *n_heat, nx, ny);
             }
         }
@@ -298,9 +307,52 @@ void do_heatmaps(void) {
             }
         }
     }
-    create_heatmap(get_playerh);
+    create_heatmap(get_playerh, 0);
     if (f.mode_run)
-        create_heatmap(get_goalh);
+        create_heatmap(get_goalh, 0);
     if (f.mode_explore)
-        create_heatmap(get_exploreh);
+        create_heatmap(get_exploreh, 0);
+}
+
+
+void generic_heatmap(int gx, int gy, int tunneling) {
+    int y, x;
+    for (y = 0; y < MAPH; y++) {
+        for (x = 0; x < MAPW; x++) {
+            if (!tunneling && is_blocked(x, y) && TILE_AT(x, y) != T_DOOR_CLOSED) {
+                g.levmap[x][y].generic_heat = IMPASSABLE;
+            } else {
+                g.levmap[x][y].generic_heat = MAX_HEAT;
+            }
+        }
+    }
+    g.levmap[gx][gy].generic_heat = 0;
+    create_heatmap(get_generich, tunneling);
+}
+
+struct coord best_adjacent_tile(int cx, int cy, int diagonals, int* (* accessor) (int, int)) {
+    int lx, ly = -99;
+    int lowest = MAX_HEAT;
+    struct coord ret;
+
+    for (int x = -1; x <= 1; x++) {
+        if (x + cx < 0 || x + cx >= MAPW) continue;
+        for (int y = -1; y <= 1; y++) {
+            if ((!x && !y) || (!diagonals && x && y)) continue;
+            if (y + cy < 0 || y + cy >= MAPH) continue;
+            if (*accessor(x + cx, y + cy) <= lowest) {
+                lowest = *accessor(x + cx, y + cy);
+                lx = x;
+                ly = y;
+            }
+        }
+    }
+    if (lx == -99 || ly == -99) {
+        ret.x = 0;
+        ret.y = 0;
+    } else {
+        ret.x = lx;
+        ret.y = ly;
+    }
+    return ret;
 }

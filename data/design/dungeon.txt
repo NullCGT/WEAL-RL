@@ -2,3 +2,34 @@
 
 - Final Layer: Terminus
     - An enormous train station?
+
+DUNGEON DESIGN
+- What do we *need* out of this dungeon?
+    - Ability to stealth around monsters.
+    - High replayability.
+    - Tells a story.
+    - Multiple ways to approach a given situation.
+- Most structures are not similar at a high level. Instead, they are
+  similar at a local level.
+
+DUNGEON GENERATION ALGORITHM
+- Step One: Pick a starting place.
+    - Biased toward the center of the dungeon.
+- Step Two: Generate a room.
+    - Each room has several "candidates" which can hold a door.
+- Step Three: More rooms.
+    - Generate a new room that is contiguous to the old one.
+    - Allow rooms to occasionally (infrequently!) overlap.
+- Step Four: Connections.
+    - Add connections between rooms so that the dungeon is not a perfect
+      tree.
+- Step Five: Dungeon Features:
+    - Carve a river into the dungeon, or a chasm, or something of the sort.
+- Step Five: Room Features.
+    - Assign each room a type, and fill the room with that kind
+      of feature.
+    - Room types could be taken from the dungeon definition file.
+- Step Six: Population.
+    - Populate each room with creatures that are relevant to it.
+    - Prefer monsters whose tags match both the room's tags and
+      the preferred tags of the dungeon???

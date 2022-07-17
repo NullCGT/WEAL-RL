@@ -74,28 +74,11 @@ void take_turn(struct actor *actor) {
             /* TODO: Give monsters something to do when unaware of the player. */
             if (is_aware(actor, g.player)) {
                 /* AI Decision-Making */
-                int lx, ly = -99;
-                int lowest = MAX_HEAT;
-                for (int x = -1; x <= 1; x++) {
-                    if (x + actor->x < 0 || x + actor->x >= MAPW) continue;
-                    for (int y = -1; y <= 1; y++) {
-                        if (!x && !y) continue;
-                        /* Hack to prevent monsters eating each other. Will need to be revised in
-                        the future. */
-                        if (g.levmap[actor->x + x][actor->y + y].actor &&
-                            g.levmap[actor->x + x][actor->y + y].actor != g.player) continue;
-                        if (y + actor->y < 0 || y + actor->y >= MAPH) continue;
-                        if (g.levmap[x + actor->x][y + actor->y].player_heat <= lowest) {
-                            lowest = g.levmap[x + actor->x][y + actor->y].player_heat;
-                            lx = x;
-                            ly = y;
-                        }
-                    }
-                }
-                if (lx == -99 || ly == -99) {
+                struct coord cl = best_adjacent_tile(actor->x, actor->y, 1, get_playerh);
+                if (cl.x == -99 || cl.y == -99) {
                     action = dir_to_action(0, 0);
                 } else {
-                    action = dir_to_action(lx, ly);
+                    action = dir_to_action(cl.x, cl.y);
                 }
             }
         }

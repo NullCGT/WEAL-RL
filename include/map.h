@@ -20,6 +20,8 @@ struct coord {
     (g.levmap[x][y].pt->opaque)
 #define is_blocked(x, y) \
     (g.levmap[x][y].pt->blocked)
+#define is_wall(x, y) \
+    (g.levmap[x][y].pt->blocked && g.levmap[x][y].pt->id != T_DOOR_CLOSED)
 /* tile attributes */
 #define is_visible(x, y) \
     (g.levmap[x][y].visible)
@@ -47,5 +49,7 @@ int ascend(void);
 int descend(void);
 int change_depth(int);
 void do_heatmaps(void);
+void generic_heatmap(int, int, int);
+struct coord best_adjacent_tile(int, int, int, int* (* func) (int, int));
 
 #endif

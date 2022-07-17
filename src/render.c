@@ -34,7 +34,7 @@ void render_all(void) {
     }
     if (f.update_fov) {
         clear_fov();
-        calculate_fov(g.player->x, g.player->y, 12);
+        calculate_fov(g.player->x, g.player->y, 7);
     }
     if (1) {
         render_map();
