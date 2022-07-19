@@ -69,7 +69,7 @@ struct cJSON* json_from_file(const char *fname) {
     /* Read the file. */
     fp = fopen(fname, "rb");
     if (!fp) {
-        logma(MAGENTA, "Error: Could not find file: %s", fname);
+        logm_warning("Error: Could not find file: %s", fname);
         return NULL;
     }
     fseek(fp, 0, SEEK_END);
@@ -82,7 +82,7 @@ struct cJSON* json_from_file(const char *fname) {
     /* Parse the file into JSON. */
     json = cJSON_Parse(buf);
     if (!json) {
-        logma(MAGENTA, "Error: Could not parse JSON in file: %s", fname);
+        logm_warning("Error: Could not parse JSON in file: %s", fname);
         return NULL;
     }
     free(buf);
@@ -177,6 +177,7 @@ void dungeon_from_file(const char *fname) {
     tags_from_json(&(dgn.required_tags), field);
     field = cJSON_GetObjectItemCaseSensitive(dgn_json, "preferred_tags");
     tags_from_json(&(dgn.preferred_tags), field);
+    cJSON_Delete(dgn_json);
 }
 
 /**
