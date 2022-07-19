@@ -120,7 +120,7 @@ int close_door(struct actor *actor, int x, int y) {
     intile = &g.levmap[x][y];
     tindex = intile->pt->id;
 
-    if (tindex != T_DOOR_OPEN) {
+    if ((!new_dir.x && !new_dir.y) || tindex != T_DOOR_OPEN) {
         logm("There is nothing to close in that direction.");
         return 0;
     }
