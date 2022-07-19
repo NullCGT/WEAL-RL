@@ -52,7 +52,7 @@ int close_door(struct actor *, int, int);
 
 /* Tile definitions */
 #define PERMTILES \
-    FLOOR(FLOOR,      "cobbled floor",    '.', L'.', 0,         1, 1,  WHITE),  \
+    FLOOR(FLOOR,      "tiled floor",      '.', L'.', 0,         1, 1,  WHITE),  \
     FLOOR(STAIR_DOWN, "stairs down",      '>', L'>', 0,         1, 1,  BRIGHT_YELLOW), \
     FLOOR(STAIR_UP,   "stairs up",        '<', L'<', 0,         1, 1,  BRIGHT_YELLOW), \
     WALL(WALL,        "concrete wall",    '#', L'█', 0,         3, 20, WHITE),  \
