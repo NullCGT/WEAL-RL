@@ -172,7 +172,7 @@ struct actor *remove_actor(struct actor *actor) {
         prev = cur;
         cur = cur->next;
     }
-    logma(MAGENTA, "Attempting to remove actor that is not there?");
+    logm_warning("Attempting to remove actor that is not there?");
     return actor;
 }
 
@@ -184,7 +184,7 @@ struct actor *remove_actor(struct actor *actor) {
  */
 void actor_sanity_checks(struct actor *actor) {
     if (g.levmap[actor->x][actor->y].actor != actor) {
-        logma(MAGENTA, "Sanity check fail: %s claims to be at (%d, %d), but is not there.",
+        logm_warning("Sanity check fail: %s claims to be at (%d, %d), but is not there.",
               actor_name(actor, 0), actor->x, actor->y);
     }
 }

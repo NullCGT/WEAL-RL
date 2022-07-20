@@ -87,10 +87,11 @@ int write_dumplog(const char *fname, int winner) {
     fprintf(fp, "You scored %d points.\n", g.score);
     fprintf(fp, "You had %d health, with a maximum of %d.\n", g.player->hp, g.player->hpmax);
     fprintf(fp, "You were on level %d of %s.\n", g.depth, dgn.name);
+    fprintf(fp, "Your SIOS was functioning properly.\n");
     if (g.depth <= g.max_depth) {
-        fprintf(fp, "You were in the midst of your longest journey.\n");
+        fprintf(fp, "You were in unknown territory.\n");
     } else {
-        fprintf(fp, "You had journeyed even further in the past, and had reached level %d.\n", g.max_depth);
+        fprintf(fp, "You had journeyed even deeper previously, and had reached level %d.\n", g.max_depth);
     }
 
     if (g.target) {

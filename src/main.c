@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <execinfo.h>
 #include <unistd.h>
-#include <string.h> /* for strcpy */
 
 #include "ai.h"
 #include "invent.h"
@@ -109,6 +108,8 @@ void new_game(void) {
     c = rand_open_coord();
     /* Put player in a random spot */
     push_actor(g.player, c.x, c.y);
+    /* Once we are all done, set up the gui. */
+    setup_gui();
 }
 
 /**

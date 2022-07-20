@@ -84,7 +84,7 @@ int magic_mapping(void) {
             g.levmap[x][y].explored = 1;
         }
     }
-    logma(MAGENTA, "You punch in the debug function that lets me see the entire map.");
+    logm("SIOS Debug Output: Revealed the map.");
     f.update_map = 1;
     return 0;
 }
@@ -136,7 +136,7 @@ int climb(int change) {
             return 0;
         }
     }
-    logma(MAGENTA, "How odd. I appear to be climbing multiple levels?");
+    logm_warning("Climbing multiple levels?");
     return change_depth(change);
 }
 

@@ -30,14 +30,15 @@
 
 void wcolor_on(WINDOW *, unsigned char);
 void wcolor_off(WINDOW *, unsigned char);
-void setup_gui(void);
 void setup_locale(void);
 void setup_colors(void);
 void popup_warning(const char *);
-void display_stats(WINDOW *, int *, struct actor *);
 void print_dtypes(WINDOW *, int, int, short, unsigned char);
 void render_bar(WINDOW*, int, int, int, int, int, int, int);
 int handle_mouse(void);
+void display_sb_nearby(int *);
+void display_sb_controls(int *j);
+void display_sb_stats(WINDOW *, int *, struct actor *);
 
 #define MAX_FILE_LEN 200
 
@@ -49,6 +50,7 @@ struct curse_color {
 
 WINDOW *map_win;
 WINDOW *msg_win;
+WINDOW* msgbox_win;
 WINDOW *sb_win;
 
 /* SCREEN FUNCTIONS */
@@ -120,10 +122,11 @@ void title_screen(void) {
  */
 void setup_gui(void) {
     map_win = create_win(term.mapwin_h, term.mapwin_w, term.mapwin_y, 0);
-    msg_win = create_win(term.msg_h, term.msg_w, term.msg_y, 0);
+    msg_win = newpad(term.h, term.msg_w);
+    msgbox_win = create_win(term.msg_h, term.msg_w, term.msg_y, 0);
     sb_win = create_win(term.sb_h, term.sb_w, 0, term.sb_x);
     f.update_map = 1;
-    draw_msg_window(term.msg_h, 0);
+    draw_msg_window(0);
     wrefresh(map_win);
 }
 
@@ -172,7 +175,6 @@ void setup_screen(void) {
     keypad(stdscr, 1);
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     refresh();
-    setup_gui();
 }
 
 /**
@@ -297,6 +299,9 @@ void text_entry(const char *prompt, char *buf, int bufsiz) {
             buf[index] = '\0';
         } else if (keycode == '\n') {
             break;
+        } else if (keycode == 27) {
+            buf[0] = '\0';
+            break;
         }
         if (index < 0) index = 0;
         if (index > bufsiz) index = bufsiz - 1;
@@ -362,77 +367,110 @@ void display_file_text(const char *fname) {
 }
 
 /**
- * @brief Display the energy window.
+ * @brief Display the sidebar window.
  * 
  */
-/* TODO: This leaks memory because it keeps allocating windows without deleting them. Do not use this in its current iteration. */
-void display_energy_win(void) {
+void display_sb(void) {
     char buf[128];
     struct actor *cur_npc = g.player;
     struct attack *cur_attack = get_active_attack();
     int j = 1;
 
     werase(sb_win);
-    //box(sb_win, 0, 0);
-
-    display_stats(sb_win, &j, cur_npc);
-
-    memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "%s [%d%%%%](%dd%d)", 
-             g.active_attacker == g.player ? "Unarmed" : actor_name(g.active_attacker, NAME_CAP), 
-             cur_attack->accuracy, cur_attack->dam_n, cur_attack->dam_d);
-    mvwprintw(sb_win, j, 1, buf);
-    print_dtypes(sb_win, j++, 1 + strlen(buf), cur_attack->dtype, 0);
-
-    memset(buf, 0, 128);
-    if (!g.depth)
-        snprintf(buf, sizeof(buf), "Depth: Surface");
-    else if (g.depth != g.max_depth)
-        snprintf(buf, sizeof(buf), "Depth: %d (max %d)", g.depth, g.max_depth);
-    else
-        snprintf(buf, sizeof(buf), "Depth: %d", g.depth);
-    mvwprintw(sb_win, j++, 1, buf);
-
-    memset(buf, 0, 128);
-    snprintf(buf, sizeof(buf), "Turn: %d", g.turns);
-    mvwprintw(sb_win, j++, 1, buf);
-    j++;
-
-    if (g.target != NULL) {
-        display_stats(sb_win, &j, g.target);
-        j++;
-    }
-
+    box(sb_win, 0, 0);
     wattron(sb_win, A_STANDOUT);
+    mvwprintw(sb_win, 0, 1, "SIOS-%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH); /* Subdermal Integrated Operating System */
+    wattroff(sb_win, A_STANDOUT);
+    wcolor_on(sb_win, BRIGHT_GREEN);
+    mvwprintw(sb_win, 0, term.sb_w - 6, "[Tab]");
+    wcolor_off(sb_win, BRIGHT_GREEN);
+
+    if (term.hudmode == HUD_MODE_CHAR) {
+
+        display_sb_stats(sb_win, &j, cur_npc);
+
+        memset(buf, 0, 128);
+        snprintf(buf, sizeof(buf), "%s [%d%%%%](%dd%d)", 
+                g.active_attacker == g.player ? "Unarmed" : actor_name(g.active_attacker, NAME_CAP), 
+                cur_attack->accuracy, cur_attack->dam_n, cur_attack->dam_d);
+        mvwprintw(sb_win, j, 1, buf);
+        print_dtypes(sb_win, j++, 1 + strlen(buf), cur_attack->dtype, 0);
+        
+        if (!g.depth)
+            mvwprintw(sb_win, j++, 1, "Depth: Surface");
+        else if (g.depth != g.max_depth)
+            mvwprintw(sb_win, j++, 1, "Depth: %d (max %d)", g.depth, g.max_depth);
+        else
+            mvwprintw(sb_win, j++, 1, "Depth: %d", g.depth);
+        
+
+        mvwprintw(sb_win, j++, 1, "Turn: %d", g.turns);
+        j++;
+
+        if (g.target != NULL) {
+            display_sb_stats(sb_win, &j, g.target);
+            j++;
+        }
+
+    } else if (term.hudmode == HUD_MODE_NEAR) {
+        display_sb_nearby(&j);
+    } else if (term.hudmode == HUD_MODE_CONTROLS) {
+        display_sb_controls(&j);
+    }
+    wrefresh(sb_win);
+}
+
+/**
+ * @brief Print the controls to the sidebar.
+ * 
+ * @param j A pointer to the y value to print at.
+ */
+void display_sb_controls(int *j) {
+    char *action;
+    for (int i = A_REST; i < A_MAGICMAP; i++) {
+        action = stringify_action(i);
+        mvwprintw(sb_win, (*j)++, 1, action);
+        free(action);
+    }
+}
+
+/**
+ * @brief Print the nearby actor list to the sidebar.
+ * 
+ * @param j A pointer to the y value to print at.
+ */
+void display_sb_nearby(int *j) {
+    char buf[128];
+    struct actor *cur_npc = g.player;
+
+    wattron(sb_win, A_UNDERLINE);
     memset(buf, 0, 128);
     snprintf(buf, sizeof(buf), "Nearby");
-    mvwprintw(sb_win, j++, 1, buf);
-    wattroff(sb_win, A_STANDOUT);
+    mvwprintw(sb_win, (*j)++, 1, buf);
+    wattroff(sb_win, A_UNDERLINE);
     while (cur_npc != NULL) {
         if (is_visible(cur_npc->x, cur_npc->y) && cur_npc != g.player) {
             memset(buf, 0, 128);
             snprintf(buf, sizeof(buf), "%c", cur_npc->chr);
             wcolor_on(sb_win, cur_npc->color);
-            mvwprintw(sb_win, j, 1, buf);
+            mvwprintw(sb_win, *j, 1, buf);
             wcolor_off(sb_win, cur_npc->color);
             
             if (is_aware(cur_npc, g.player)) {
                 wcolor_on(sb_win, BRIGHT_YELLOW);
-                mvwprintw(sb_win, j, 2, "!");
+                mvwprintw(sb_win, *j, 2, "!");
                 wcolor_off(sb_win, BRIGHT_YELLOW);
             }
 
             memset(buf, 0, 128);
             snprintf(buf, sizeof(buf), "%s (%d, %d)", actor_name(cur_npc, 0), cur_npc->x, cur_npc->y);
-            mvwprintw(sb_win, j++, 4, buf);
+            mvwprintw(sb_win, (*j)++, 4, buf);
         }
         cur_npc = cur_npc->next;
     }
-
-    wrefresh(sb_win);
 }
 
-void display_stats(WINDOW *win, int *i, struct actor *actor) {
+void display_sb_stats(WINDOW *win, int *i, struct actor *actor) {
     char buf[128];
     int max_x, max_y;
 
@@ -440,14 +478,14 @@ void display_stats(WINDOW *win, int *i, struct actor *actor) {
     (void) max_y;
 
     memset(buf, 0, 128);
-    wattron(win, A_STANDOUT);
+    wattron(win, A_UNDERLINE);
     if (actor == g.player)
         snprintf(buf, sizeof(buf), "%s", actor_name(actor, NAME_CAP));
     else
         snprintf(buf, sizeof(buf), "%s (target)", actor_name(actor, NAME_CAP));
     mvwprintw(win, *i, 1, buf);
     *i+= 1;
-    wattroff(win, A_STANDOUT);
+    wattroff(win, A_UNDERLINE);
 
     memset(buf, 0, 128);
     if (actor == g.player)
@@ -547,46 +585,49 @@ void render_bar(WINDOW *win, int cur, int max, int x, int y,
 }
 
 /**
+ * @brief Action that fullscrens the message window.
+ * 
+ * @return int Cost of fullscreening.
+ */
+int fullscreen_action(void) {
+    draw_msg_window(1);
+    return 0;
+}
+
+/**
  * @brief Draw the message window.
  * 
- * @param h height.
  * @param full wehther it is being drawn fullscreen.
  */
-void draw_msg_window(int h, int full) {
+void draw_msg_window(int full) {
     int i = 0;
-    int x, y;
     struct msg *cur_msg;
-    WINDOW *win;
 
-    if (full) {
-        win = create_win(term.h, term.msg_w, 0, 0);
-    } else {
-        win = msg_win;
-    }
-
-    werase(win);
+    werase(msg_win);
     cur_msg = g.msg_list;
     while (cur_msg != NULL) {
-        getyx(win, y, x);
-        (void) x;
-        if (y > h - 2) {
-            cur_msg = cur_msg->next;
-            i++;
-            continue;
-        }
-        wcolor_on(win, cur_msg->attr);
-        waddstr(win, cur_msg->msg);
-        wcolor_off(win, cur_msg->attr);
-        waddch(win, '\n');
+        wcolor_on(msg_win, cur_msg->attr);
+        waddstr(msg_win, cur_msg->msg);
+        wcolor_off(msg_win, cur_msg->attr);
+        waddch(msg_win, '\n');
         cur_msg = cur_msg->next;
         i++;
     }
-    wrefresh(win);
+    box(msgbox_win, 0, 0); 
+    wattron(msgbox_win, A_STANDOUT);
+    mvwprintw(msgbox_win, 0, 1, "%s.log", actor_name(g.player, 0));
+    wattroff(msgbox_win, A_STANDOUT);
+    wrefresh(msgbox_win);
+    if (full) {
+        prefresh(msg_win, 0, 0, 0, 0, term.h, term.w);
+    } else {
+        prefresh(msg_win, 0, 0, term.msg_y + 1, 1, term.msg_y + term.msg_h - 2, term.msg_w - 2);
+    }
     f.update_msg = 0;
 
     if (full) {
         getch();
-        cleanup_win(win);
+        prefresh(msg_win, 0, 0, 1, 1, term.h - 2, term.w - 2);
         f.update_map = 1;
         f.update_msg = 1;
     }

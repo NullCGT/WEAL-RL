@@ -167,7 +167,7 @@ int remove_from_invent(struct actor *holding_actor, struct actor *held_actor) {
         cur = cur->next;
     }
     if (!found_item) {
-        logma(MAGENTA, "Error: Attempting to remove an item from an inventory it is not present in?");
+        logm_warning("Error: Attempting to remove an item from an inventory it is not present in?");
         return 1;
     }
     if (prev != NULL) prev->next = cur->next;

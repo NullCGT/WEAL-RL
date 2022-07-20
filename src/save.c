@@ -67,7 +67,7 @@ void save_game(const char *fname) {
 
     fp = fopen(fname, "w");
     if (!fp) {
-        logma(MAGENTA, "Save Error: Could not open save file %d.", fname);
+        logm_warning("Could not open save file %d.", fname);
         return;
     }
 
@@ -167,7 +167,7 @@ void load_game(const char *fname) {
 
     fp = fopen(fname, "r");
     if (!fp) {
-        logma(MAGENTA, "Load Error: Could not open save file %d.", fname);
+        logm_warning("Load Error: Could not open save file %d.", fname);
         return;
     }
     /* Read the global struct */
@@ -203,7 +203,8 @@ void load_game(const char *fname) {
     /* Post-load pointer cleanup */
     g.target = NULL;
     load_active_attacker();
-
+    /* Set up the screen. */
+    setup_gui();
 }
 
 /**

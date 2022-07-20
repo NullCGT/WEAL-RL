@@ -75,6 +75,7 @@ typedef struct terminal {
     int sb_x;
     int sb_h;
     char *saved_locale;
+    char hudmode;
 } terminal;
 
 extern struct global g;

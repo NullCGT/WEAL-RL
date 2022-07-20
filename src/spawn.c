@@ -145,9 +145,9 @@ int debug_summon(void) {
     text_entry("What creature do you want to summon?", buf, MAXNAMESIZ);
     actor = spawn_creature(buf, g.player->x, g.player->y);
     if (actor) {
-        logm("Summoned %s.", actor_name(actor, NAME_A));
+        logm("SIOS Debug Output: Summoned %s.", actor_name(actor, NAME_A));
     } else {
-        logm("Unable to summon a creature called \"%s.\"", buf);
+        logm("SIOS Error: Unable to summon a creature called \"%s.\"", buf);
     }
     return 0;
 }
@@ -164,7 +164,7 @@ int debug_wish(void) {
     /* TODO: Put it directly in the inventory instead of using this jank. */
     actor = spawn_item(buf, g.player->x, g.player->y);
     if (!actor) {
-        logm("Unable to create an item called \"%s.\"", buf);
+        logm("SIOS Error: Unable to create an item called \"%s.\"", buf);
         return 0;
     }
     pick_up(g.player, actor->x, actor->y);

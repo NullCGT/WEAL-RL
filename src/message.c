@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "register.h"
 #include "windows.h"
@@ -174,6 +175,26 @@ int logma(int attr, const char *format, ...) {
 
     va_start(arg, format);
     ret = log_string(format, attr, arg);
+    va_end(arg);
+    return ret;
+}
+
+/* TODO: Potentially exploitable? */
+/**
+ * @brief Output a warning message to the log.
+ * 
+ * @param format The format.
+ * @param ... Formatting arguments.
+ * @return int The result of log_string.
+ */
+int logm_warning(const char *format, ...) {
+    int ret;
+    va_list arg;
+    char buf[MAX_MSG_LEN] = "SIOS Kernel Panic: ";
+    strcat(buf, format);
+
+    va_start(arg, format);
+    ret = log_string(buf, MAGENTA, arg);
     va_end(arg);
     return ret;
 }

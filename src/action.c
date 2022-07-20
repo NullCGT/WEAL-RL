@@ -35,6 +35,7 @@ int look_down(void);
 int lookmode(void);
 int display_help(void);
 int list_actions_exec(void);
+int change_hud_mode(void);
 
 #define MOV_ACT(name, index, code, alt_code) \
     { name, index, code, alt_code, {.dir_act=move_mon}, 0, 1, 1 }
@@ -52,36 +53,54 @@ int list_actions_exec(void);
    that the most common inputs appear early in the list, in order to keep the
    number of function calls as low as possible.*/
 struct action actions[ACTION_COUNT] = {
-    VOID_ACT("none",       A_NONE,        -1,  -1,  do_nothing, 0, 0),
-    MOV_ACT("west",        A_WEST,       'h',  '4'),
-    MOV_ACT("east",        A_EAST,       'l',  '6'),
-    MOV_ACT("north",       A_NORTH,      'k',  '8'),
-    MOV_ACT("south",       A_SOUTH,      'j',  '2'),
-    MOV_ACT("northwest",   A_NORTHWEST,  'y',  '7'),
-    MOV_ACT("northeast",   A_NORTHEAST,  'u',  '9'),
-    MOV_ACT("southwest",   A_SOUTHWEST,  'b',  '1'),
-    MOV_ACT("southeast",   A_SOUTHEAST,  'n',  '3'),
-    MOV_ACT("rest",        A_REST,       '.',  '5'),
-    DIR_ACT("open",        A_OPEN,       'o',  -1,  open_door, 0, 0),
-    DIR_ACT("close",       A_CLOSE,      'c',  -1,  close_door, 0, 0),
-    DIR_ACT("pick up",     A_PICK_UP,    ',',  'g', pick_up, 0, 0),
-    VOID_ACT("cycle",      A_CYCLE,      '\t', -1,  cycle_active_attack, 0, 0),
-    VOID_ACT("look",       A_LOOK,       ';',  -1,  lookmode, 0, 0),
-    VOID_ACT("ascend",     A_ASCEND,     '<',  -1,  ascend, 0, 0),
-    VOID_ACT("descend",    A_DESCEND,    '>',  -1,  descend, 0, 0),
-    VOID_ACT("look down",  A_LOOK_DOWN,  ':',  -1,  look_down, 0, 0),
-    VOID_ACT("explore",    A_EXPLORE,    'x',  -1,  autoexplore, 0, 0),
-    VOID_ACT("inventory",  A_INVENT,     'i',  -1,  display_invent, 0, 0),
-    VOID_ACT("help",       A_HELP,       '?',  -1,  display_help, 0, 0),
-    VOID_ACT("save",       A_SAVE,       'S',  -1,  save_exit, 0, 0),
-    VOID_ACT("quit",       A_QUIT,       'Q',  -1,  do_quit, 0, 0),
-    VOID_ACT("list actions", A_LIST,     '#',  -1,  list_actions_exec, 0, 0),
+    VOID_ACT("none",        A_NONE,        -1,  -1,  do_nothing, 0, 0),
+    MOV_ACT("West",         A_WEST,       'h',  '4'),
+    MOV_ACT("East",         A_EAST,       'l',  '6'),
+    MOV_ACT("North",        A_NORTH,      'k',  '8'),
+    MOV_ACT("South",        A_SOUTH,      'j',  '2'),
+    MOV_ACT("Northwest",    A_NORTHWEST,  'y',  '7'),
+    MOV_ACT("Northeast",    A_NORTHEAST,  'u',  '9'),
+    MOV_ACT("Southwest",    A_SOUTHWEST,  'b',  '1'),
+    MOV_ACT("Southeast",    A_SOUTHEAST,  'n',  '3'),
+    MOV_ACT("Rest",         A_REST,       '.',  '5'),
+    DIR_ACT("Open",         A_OPEN,       'o',  -1,  open_door, 0, 0),
+    DIR_ACT("Close",        A_CLOSE,      'c',  -1,  close_door, 0, 0),
+    DIR_ACT("Pick Up",      A_PICK_UP,    ',',  'g', pick_up, 0, 0),
+    VOID_ACT("Cycle Weapon", A_CYCLE,     '/',  -1,  cycle_active_attack, 0, 0),
+    VOID_ACT("Look",        A_LOOK,       ';',  -1,  lookmode, 0, 0),
+    VOID_ACT("Ascend",      A_ASCEND,     '<',  -1,  ascend, 0, 0),
+    VOID_ACT("Descend",     A_DESCEND,    '>',  -1,  descend, 0, 0),
+    VOID_ACT("Look Down",   A_LOOK_DOWN,  ':',  -1,  look_down, 0, 0),
+    VOID_ACT("Explore",     A_EXPLORE,    'x',  -1,  autoexplore, 0, 0),
+    VOID_ACT("Inventory",   A_INVENT,     'i',  -1,  display_invent, 0, 0),
+    VOID_ACT("Change HUD",  A_TAB_HUD,    '\t', -1,  change_hud_mode, 0, 0),
+    VOID_ACT("Full Log",    A_FULLSCREEN, 'M',  -1,  fullscreen_action, 0, 0),
+    VOID_ACT("Help",        A_HELP,       '?',  -1,  display_help, 0, 0),
+    VOID_ACT("Save",        A_SAVE,       'S',  -1,  save_exit, 0, 0),
+    VOID_ACT("Quit",        A_QUIT,       'Q',  -1,  do_quit, 0, 0),
+    VOID_ACT("Direct Input", A_LIST,      '#',  -1,  list_actions_exec, 0, 0),
 // DEBUG ACTIONS
-    VOID_ACT("debugmap",   A_MAGICMAP,   '[',  -1,  magic_mapping, 1, 0),
-    VOID_ACT("debugheat",  A_HEAT,       ']',  -1,  switch_viewmode, 1, 0),
+    VOID_ACT("debugmap",    A_MAGICMAP,   '[',  -1,  magic_mapping, 1, 0),
+    VOID_ACT("debugheat",   A_HEAT,       ']',  -1,  switch_viewmode, 1, 0),
     VOID_ACT("debugsummon", A_SPAWN,      '\\', -1,  debug_summon, 1, 0),
-    VOID_ACT("debugwish",  A_WISH,       '/',  -1,  debug_wish, 1, 0)
+    VOID_ACT("debugwish",   A_WISH,       '-',  -1,  debug_wish, 1, 0)
 };
+
+/**
+ * @brief Output a string representation of an action and the associated input.
+ * 
+ * @param index Index of the action in the actions list.
+ * @return char* String representing the action. Must be manually freed afterward.
+ */
+char *stringify_action(int index) {
+    char *buf = NULL;
+    buf = (char *) malloc(64);
+    if (actions[index].code == '\t')
+        snprintf(buf, 64, "[Tab] %s", actions[index].name);
+    else
+        snprintf(buf, 64, "[%c] %s", actions[index].code, actions[index].name);
+    return buf;
+}
 
 /**
  * @brief Does nothing.
@@ -451,9 +470,6 @@ int execute_action(struct actor *actor, struct action *action) {
     struct coord move_coord;
     if (action->index != A_NONE && actor == g.player) g.prev_action = action;
     // Autoexploring code goes here????
-    if (action->debug_only) {
-        logma(MAGENTA, "Warning: Performing a DEBUG action.");
-    }
     if (action->movement) {
         move_coord = action_to_dir(action);
         return action->func.dir_act(actor, move_coord.x, move_coord.y);
@@ -465,14 +481,31 @@ int execute_action(struct actor *actor, struct action *action) {
     return do_nothing();
 }
 
+/**
+ * @brief Get text input from the player, then execute the appropriate action.
+ * 
+ * @return int The cost of the action executed.
+ */
 int list_actions_exec(void) {
     char buf[32] = {'\0'};
-    text_entry("What action do you want to execute?", buf, 32);
+    text_entry("Specify direct SIOS action:", buf, 32);
     for (int i = 0; i < ACTION_COUNT; i++) {
         if (!strncmp(actions[i].name, buf, sizeof(buf))) {
             return execute_action(g.player, &actions[i]);
         }
     }
-    logm("Unable to execute the action \"%s.\"", buf);
+    logm("SIOS is unable to execute the action \"%s.\"", buf);
+    return 0;
+}
+
+/**
+ * @brief Change the HUD mode.
+ * 
+ * @return int The cost of changing the HUD mode.
+ */
+int change_hud_mode(void) {
+    term.hudmode += 1;
+    if (term.hudmode == MAX_HUD_MODE)
+        term.hudmode = 0;
     return 0;
 }

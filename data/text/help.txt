@@ -1,5 +1,5 @@
 ###########################################################
-                |= USER MANUAL =|
+                |= S.I.O.S. USER MANUAL =|
 
 Listen up, Civilian.
 
@@ -13,7 +13,7 @@ our budget, so don't screw this up.
 
     - Colonel Koval
 
-                 |= MOVEMENT =|
+                |= MOVEMENT =|
 
 Movement: It's what keeps you alive. You can move using the
 numpad, arrow keys, or vikeys, as diagrammed below:
@@ -54,7 +54,7 @@ Key     Function        Explanation
  ,      Get             Pick up an item.
  ;      Look            Look at a character on the screen.
  ?      Help            View this manual.
- Tab    Cycle           Cycle attacks.
+ /      Cycle           Cycle attacks.
  S      Save            Save and quit.
  Q      Quit            Abandon character.
 

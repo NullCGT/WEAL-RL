@@ -57,7 +57,8 @@ struct dungeon dgn = {
 
 struct terminal term = {
     .h = 40,
-    .w = 90
+    .w = 90,
+    .hudmode = 0
 };
 
 /**

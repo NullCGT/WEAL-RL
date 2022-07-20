@@ -30,7 +30,7 @@ void render_cursor(void);
  */
 void render_all(void) {
     if (f.update_msg) {
-        draw_msg_window(term.msg_h, 0);
+        draw_msg_window(0);
     }
     if (f.update_fov) {
         clear_fov();
@@ -43,7 +43,7 @@ void render_all(void) {
     if (f.mode_look) {
         render_cursor();
     }
-    display_energy_win();
+    display_sb();
     refresh_map();
 }
 
@@ -218,6 +218,6 @@ int switch_viewmode(void) {
     g.display_heat = g.display_heat + 1;
     if (g.display_heat > V_MAX) g.display_heat = 0;
     f.update_map = 1;
-    logma(MAGENTA, "You punch in the debug function that toggles the level heatmap.");
+    logm("SIOS Debug Output: Twiddled heatmap display.");
     return 0;
 }

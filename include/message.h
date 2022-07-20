@@ -18,6 +18,7 @@ void free_message_list(struct msg *);
 char *unwrap_string(char *);
 int logm(const char *, ...);
 int logma(int, const char *, ...);
+int logm_warning(const char *, ...);
 const char *an(const char *);
 int yn_prompt(const char *, int);
 
