@@ -32,9 +32,11 @@ void load_active_attacker(void);
  * @return The cost in energy of saving (always zero).
  */
 int save_exit(void) {
+    char buf[MAX_USERSZ + 4];
     if (!yn_prompt("Do you want to save and exit?", 0))
         return 0;
-    save_game("save.bin");
+    snprintf(buf, sizeof(buf), "%s.sav", g.userbuf);
+    save_game(buf);
     cleanup_screen();
     exit(0);
     return 0;
@@ -200,6 +202,7 @@ void load_game(const char *fname) {
         cur_actor = cur_actor->next;
     }
     fclose(fp);
+    remove(fname);
     /* Post-load pointer cleanup */
     g.target = NULL;
     load_active_attacker();

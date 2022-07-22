@@ -13,23 +13,34 @@ DUNGEON DESIGN
   similar at a local level.
 
 DUNGEON GENERATION ALGORITHM
-- Step One: Pick a starting place.
-    - Biased toward the center of the dungeon.
-- Step Two: Generate a room.
-    - Each room has several "candidates" which can hold a door.
-- Step Three: More rooms.
-    - Generate a new room that is contiguous to the old one.
-    - Allow rooms to occasionally (infrequently!) overlap.
-- Step Four: Connections.
-    - Add connections between rooms so that the dungeon is not a perfect
-      tree.
-- Step Five: Dungeon Features:
-    - Carve a river into the dungeon, or a chasm, or something of the sort.
-- Step Five: Room Features.
-    - Assign each room a type, and fill the room with that kind
-      of feature.
-    - Room types could be taken from the dungeon definition file.
-- Step Six: Population.
-    - Populate each room with creatures that are relevant to it.
-    - Prefer monsters whose tags match both the room's tags and
-      the preferred tags of the dungeon???
+- Generate the Dungeon.
+- Recurse up the BSP tree:
+    - At the room level, populate rooms.
+        - A room contains terrain, actors.
+            - Terrain features are just actors, but have such a high weight that
+              they cannot be picked up without large strength enhancements.
+                - This could lead to potentially interesting things, such as high
+                  strength players utilizing things like tables as weapons.
+                - As an aside, we could make a change such that large, heavy items
+                  cost additional movement to enter the space of. That way, you
+                  cannot just sprint through a table.
+                - As an example: A toilet.
+                    - [a]ctivating the toilet flushes it.
+                    - Give it an inventory so that it can store items.
+        - An example room might be a bathroom.
+        - Potentially floor color?
+    - At each level beyond the room level, populate with a theme.
+        - A theme might be spider-infested, or partially destroyed, or
+          flooded, or burning, or filled with gas.
+        - Themes don't just have to be terrain. There could be a "high
+          security" theme which replaces the type of doors, or a sciency
+          theme which generates lab equipment.
+        - Because we are recursing up the tree, themes can overlap. This should
+        allow us to generate interesting situations, such as "filled with flames
+        and flamable gas" or "faulty electronics and flooded."
+        - Lock certain themes to certain levels. For example, lower levels should
+          generate secret labs, prisons, etc., and should not generate offices
+          and meeting rooms.
+- Add the set of stairs that the player entered at.
+- Add at least one set of stairs down. Ensure that it is at least partway
+  across the level.

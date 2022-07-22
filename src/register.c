@@ -14,6 +14,7 @@
 #include "register.h"
 
 struct global g = {
+    .userbuf = { '\0' },
     .levmap = {{ {0} }},
     .player = NULL,
     .target = NULL,
@@ -33,6 +34,8 @@ struct global g = {
     .goal_x = -1,
     .goal_y = -1,
     .display_heat = 0,
+    .debug = 0,
+    .explore = 0
 };
 
 struct bitflags f = {

@@ -11,6 +11,9 @@
 #define MIN_TERM_H 20
 #define MIN_TERM_W 60
 
+/* Size Constants */
+#define MAX_USERSZ 32
+
 /* Common functions */
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
@@ -21,6 +24,7 @@
 void setup_term_dimensions(int, int, int, int);
 
 typedef struct global {
+    char userbuf[MAX_USERSZ];
     struct tile levmap[MAPW][MAPH];
     struct actor *player; /* Assume player is first NPC */
     struct actor *target;
@@ -37,6 +41,10 @@ typedef struct global {
     int cursor_x, cursor_y; /* In-game cursor location */
     int goal_x, goal_y; /* Traveling */
     int display_heat;
+    /* Persistent flags */
+    unsigned int debug;
+    unsigned int explore;
+    /* 7 free bits */
 } global;
 
 typedef struct bitflags {

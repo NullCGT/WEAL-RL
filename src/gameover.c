@@ -69,14 +69,13 @@ void end_game(int winner) {
  */
 int write_dumplog(const char *fname, int winner) {
     FILE *fp;
-    char userbuf[256];
     fp = fopen(fname, "w");
     if (!fp) {
         return 1;
     }
-    getlogin_r(userbuf, sizeof(userbuf));
+
     fputs("== Final Statics ==\n", fp);
-    fprintf(fp, "Your name was %s, servant of the higher entity named %s.\n", actor_name(g.player, 0), userbuf);
+    fprintf(fp, "Your name was %s, servant of the higher entity named %s.\n", actor_name(g.player, 0), g.userbuf);
     if (winner) {
         fprintf(fp, "You won on turn %d.\n", g.turns);
     } else if (g.target) {

@@ -142,6 +142,10 @@ struct actor *spawn_actor(const char *name, int x, int y) {
 int debug_summon(void) {
     char buf[MAXNAMESIZ] = {'\0'};
     struct actor *actor = NULL;
+    if (!g.debug) {
+        logm("SIOS Error: Debug commands are forbidden.");
+        return 0;
+    }
     text_entry("What creature do you want to summon?", buf, MAXNAMESIZ);
     actor = spawn_creature(buf, g.player->x, g.player->y);
     if (actor) {
@@ -160,6 +164,10 @@ int debug_summon(void) {
 int debug_wish(void) {
     char buf[MAXNAMESIZ] = {'\0'};
     struct actor *actor = NULL;
+    if (!g.debug) {
+        logm("SIOS Error: Debug commands are forbidden.");
+        return 0;
+    }
     text_entry("What item do you wish for?", buf, MAXNAMESIZ);
     /* TODO: Put it directly in the inventory instead of using this jank. */
     actor = spawn_item(buf, g.player->x, g.player->y);

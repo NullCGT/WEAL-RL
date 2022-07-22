@@ -79,6 +79,10 @@ struct coord rand_open_coord(void) {
  * @return The cost in energy of magic maping (always 0).
  */
 int magic_mapping(void) {
+    if (!g.debug) {
+        logm("SIOS Error: Debug commands are forbidden.");
+        return 0;
+    }
     for (int y = 0; y < MAPH; y++) {
         for (int x = 0; x < MAPW; x++) {
             g.levmap[x][y].explored = 1;

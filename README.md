@@ -6,6 +6,13 @@
 WEAL is a traditional roguelike. It's still pretty early in development, so please don't
 judge it too harshly yet.
 
+## Command Line Options
+| Syntax      | Example | Purpose           |
+| ------------|---------|-------------------|
+| -u\[User\]  | -u"Bob" | Specify the user.
+| -D          | -D      | Enter debug mode. In debug mode, the high score list is disabled, but the user has access to special debug functionality.
+| -X          | -X      | Enter explore mode. In explore mode, the high scorel list is disabled, but the user can elect not to die.
+
 ## Building from Source
 WEAL is built using CMake.
 

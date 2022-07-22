@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <execinfo.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "ai.h"
 #include "invent.h"
@@ -32,6 +33,7 @@
 void handle_exit(void);
 void handle_sigwinch(int);
 void new_game(void);
+void parse_args(int, const char *[]);
 
 /**
  * @brief Called whenever the program exits. Cleans up the screen and
@@ -113,17 +115,46 @@ void new_game(void) {
 }
 
 /**
- * @brief Main function.
+ * @brief Parse the given arguments
  * 
- * @return int Returns zero.
+ * @param argc Number of arguments
+ * @param argv Argument array
  */
-int main(void) {
+void parse_args(int argc, const char *argv[]) {
+    for (int i = 1; i < argc; i++) {
+        if (!strncmp(argv[i], "-X", 2)) {
+            g.explore = 1;
+        } else if (!strncmp(argv[i], "-D", 2)) {
+            g.debug = 1;
+        } else if (!strncmp(argv[i], "-u", 2)) {
+            snprintf(g.userbuf, sizeof(g.userbuf), "%s", argv[i] + 2);
+        }
+    }
+}
+
+/**
+ * @brief Main function
+ * 
+ * @param argc Number of arguments
+ * @param argv Argument array
+ * @return int 0
+ */
+int main(int argc, const char *argv[]) {
     struct actor *cur_actor;
+    char buf[MAX_USERSZ + 4] = { '\0' };
 
     /* handle exits and resizes */
     atexit(handle_exit);
     signal(SIGWINCH, handle_sigwinch);
     signal(SIGSEGV, handle_sigsegv);
+
+    // Parse args
+    parse_args(argc, argv);
+    if (g.userbuf[0] == '\0')
+        getlogin_r(g.userbuf, sizeof(g.userbuf));
+    
+    /* Build savefile name */
+    snprintf(buf, sizeof(buf), "%s.sav", g.userbuf);
 
     // Seed the rng
     rndseed_t();
@@ -131,8 +162,8 @@ int main(void) {
     // Set up the screen
     setup_screen();
     title_screen();
-    if (file_exists("save.bin")) {
-        load_game("save.bin");
+    if (file_exists(buf)) {
+        load_game(buf);
         logma(CYAN, "Your reverie ends, and you open your eyes. Welcome back.");
     } else {
         new_game();

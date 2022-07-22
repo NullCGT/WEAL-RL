@@ -16,4 +16,4 @@ build/
 
 # Application artifacts
 dumplog.txt
-save.bin
+*.sav

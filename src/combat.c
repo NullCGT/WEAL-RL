@@ -67,7 +67,12 @@ int do_attack(struct actor *aggressor, struct actor *target) {
     target->hp -= damage;
     if (target == g.player && target->hp <= 0) {
         g.target = aggressor;
-        logm("It's all over...");
+        logm("You die...");
+        if ((g.explore || g.debug) && !yn_prompt("Are you sure you want to die?", 0)) {
+            logm("You think better of it, and promptly un-die.");
+            g.player->hp = g.player->hpmax;
+            return cost;
+        }
         end_game(0);
     } else if (target != g.player && target->hp <= 0) {
         logm("%s dies.", actor_name(target, NAME_THE | NAME_CAP));

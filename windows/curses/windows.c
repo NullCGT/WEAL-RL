@@ -81,11 +81,7 @@ void title_screen(void) {
              VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, RELEASE_TYPE);
     selector = menu_new(buf, term.w / 2 - 10, 1, 24, 7);
 
-    if (file_exists("save.bin")) {
-        menu_add_item(selector, 'p', "Continue");
-    } else {
-        menu_add_item(selector, 'p', "Play");
-    }
+    menu_add_item(selector, 'p', "Play");
     menu_add_item(selector, 'd', "View Last Character");
     menu_add_item(selector, 'r', "Records");
     menu_add_item(selector, 'h', "Help");
